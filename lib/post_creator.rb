@@ -73,6 +73,7 @@ class PostCreator
 
     if @post
       PostAlerter.post_created(@post)
+      UserActionObserver.log_post(@post)
 
       handle_spam
       track_latest_on_category

@@ -1,5 +1,5 @@
 class UserActionObserver < ActiveRecord::Observer
-  observe :post_action, :topic, :post, :topic_user
+  observe :post_action, :topic, :topic_user
 
   def after_save(model)
     case model
@@ -7,8 +7,6 @@ class UserActionObserver < ActiveRecord::Observer
       log_post_action(model) if (model.is_bookmark? || model.is_like?)
     when Topic
       log_topic(model)
-    when Post
-      log_post(model)
     when TopicUser
       log_topic_user(model)
     else
@@ -66,8 +64,8 @@ class UserActionObserver < ActiveRecord::Observer
     end
   end
 
-  def log_post(model)
-    # first post gets nada
+  def self.log_post(model)
+    # first post handled by log_topic
     return if model.post_number == 1
 
     row = {
