@@ -1,5 +1,5 @@
 class UserActionObserver < ActiveRecord::Observer
-  observe :post_action, :topic, :post, :notification, :topic_user
+  observe :post_action, :topic, :post, :topic_user
 
   def after_save(model)
     case model
@@ -11,6 +11,8 @@ class UserActionObserver < ActiveRecord::Observer
       log_post(model)
     when TopicUser
       log_topic_user(model)
+    else
+      # raise "bad observer call?"
     end
   end
 
