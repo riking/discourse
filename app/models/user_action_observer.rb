@@ -2,14 +2,14 @@ class UserActionObserver < ActiveRecord::Observer
   observe :post_action, :topic, :post, :notification, :topic_user
 
   def after_save(model)
-    case
-    when (model.is_a?(PostAction) && (model.is_bookmark? || model.is_like?))
-      log_post_action(model)
-    when (model.is_a?(Topic))
+    case model
+    when PostAction
+      log_post_action(model) if (model.is_bookmark? || model.is_like?)
+    when Topic
       log_topic(model)
-    when (model.is_a?(Post))
+    when Post
       log_post(model)
-    when (model.is_a?(TopicUser))
+    when TopicUser
       log_topic_user(model)
     end
   end
