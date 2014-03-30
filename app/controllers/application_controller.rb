@@ -81,7 +81,7 @@ class ApplicationController < ActionController::Base
       time_left = I18n.t("rate_limiter.hours", count: (e.available_in / 1.hour.to_i))
     end
 
-    render json: {errors: [I18n.t("rate_limiter.too_many_requests", time_left: time_left)]}, status: 429
+    render_json_error I18n.t("rate_limiter.too_many_requests", time_left: time_left), 429
   end
 
   rescue_from Discourse::NotLoggedIn do |e|
@@ -90,29 +90,26 @@ class ApplicationController < ActionController::Base
     if request.get?
       redirect_to "/"
     else
-      render status: 403, json: failed_json.merge(message: I18n.t(:not_logged_in))
+      render_json_error I18n.t(:not_logged_in), 403
     end
 
   end
 
   rescue_from Discourse::NotFound do
-    rescue_discourse_actions("[error: 'not found']", 404) # TODO: this breaks json responses
+    rescue_discourse_actions("Error: Path not found", 404) # TODO: localize
   end
 
-  rescue_from Discourse::InvalidAccess do
-    rescue_discourse_actions("[error: 'invalid access']", 403, true) # TODO: this breaks json responses
+  rescue_from Discourse::InvalidAccess do |e|
+    rescue_discourse_actions(["Error: Invalid access", e.message], 403, true) # TODO: localize
   end
 
   rescue_from Discourse::ReadOnly do
-    render status: 405, json: failed_json.merge(message: I18n.t("read_only_mode_enabled"))
+    render_json_error I18n.t("read_only_mode_enabled"), 405
   end
 
   def rescue_discourse_actions(message, error, include_ember=false)
     if request.format && request.format.json?
-      # TODO: this doesn't make sense. Stuffing an html page into a json response will cause
-      #       $.parseJSON to fail in the browser. Also returning text like "[error: 'invalid access']"
-      #       from the above rescue_from blocks will fail because that isn't valid json.
-      render status: error, layout: false, text: (error == 404) ? build_not_found_page(error) : message
+      render_json_error message, error
     else
       render text: build_not_found_page(error, include_ember ? 'application' : 'no_js')
     end

@@ -111,6 +111,12 @@ en:
       trust_level_4: "trust_level_4"
       trust_level_5: "trust_level_5"
 
+  invites:
+    errors:
+      not_found: "Sorry, that user was not found."
+      already_invited: "Sorry, the invite wasn't sent - %{email} has already been invited."
+      already_registered: "Sorry, the invite wasn't sent - <a class='mention' href='/users/%{username}/activity'>@%{username}</a> is already a member of the forum."
+
   education:
     until_posts:
       one: "1 post"

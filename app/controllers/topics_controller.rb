@@ -210,7 +210,7 @@ class TopicsController < ApplicationController
         render json: success_json
       end
     else
-      render json: failed_json, status: 422
+      render_json_error I18n.t('invites.errors.not_found')
     end
   end
 

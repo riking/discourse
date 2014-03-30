@@ -32,10 +32,14 @@ class InvitesController < ApplicationController
 
     guardian.ensure_can_invite_to_forum!
 
+    if user = User.find_by_email(params[:email])
+      return render_json_error [I18n.t('invites.errors.already_registered', username: user.username_lower), 'ho']
+    end
+
     if Invite.invite_by_email(params[:email], current_user)
       render json: success_json
     else
-      render json: failed_json, status: 422
+      render_json_error I18n.t('invites.errors.already_invited', email: params[:email])
     end
   end
 

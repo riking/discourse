@@ -2,7 +2,11 @@
   {{#if error}}
     <div class="alert alert-error">
       <button class="close" data-dismiss="alert">×</button>
-      {{i18n topic.invite_reply.error}}
+      {{#if errorMessage}}
+        {{{errorMessage}}}
+      {{else}}
+        {{i18n topic.invite_reply.error}}
+      {{/if}}
     </div>
   {{/if}}
 

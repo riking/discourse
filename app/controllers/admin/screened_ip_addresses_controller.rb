@@ -9,6 +9,7 @@ class Admin::ScreenedIpAddressesController < Admin::AdminController
 
   def create
     screened_ip_address = ScreenedIpAddress.new(allowed_params)
+
     if screened_ip_address.save
       render_serialized(screened_ip_address, ScreenedIpAddressSerializer)
     else
