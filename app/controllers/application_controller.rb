@@ -241,12 +241,18 @@ class ApplicationController < ActionController::Base
       ))
     end
 
-    def render_json_error(obj)
-      if obj.present?
-        render json: MultiJson.dump(errors: obj.errors.full_messages), status: 422
-      else
-        render json: MultiJson.dump(errors: [I18n.t('js.generic_error')]), status: 422
-      end
+    def render_json_error(obj = nil, status = 422)
+      errors = (
+        if obj.nil?
+          [I18n.t('js.generic_error')]
+        elsif obj.respond_to?(:to_a)
+          obj.to_a
+        else
+          [obj]
+        end
+      )
+      # assert errors.is_a?(Array)
+      render json: MultiJson.dump(failed: 'FAILED', errors: errors), status: status
     end
 
     def success_json

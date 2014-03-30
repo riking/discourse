@@ -51,7 +51,7 @@ class CategoriesController < ApplicationController
     guardian.ensure_can_create!(Category)
 
     @category = Category.create(category_params.merge(user: current_user))
-    return render_json_error(@category) unless @category.save
+    return render_json_error(@category.errors.full_messages) unless @category.save
 
     @category.move_to(category_params[:position].to_i) if category_params[:position]
     render_serialized(@category, CategorySerializer)

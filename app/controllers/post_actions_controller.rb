@@ -16,8 +16,10 @@ class PostActionsController < ApplicationController
 
     post_action = PostAction.act(current_user, @post, @post_action_type_id, args)
 
-    if post_action.blank? || post_action.errors.present?
-      render_json_error(post_action)
+    if post_action.blank?
+      render_json_error
+    elsif post_action.errors.present?
+      render_json_error post_action.errors.full_messages
     else
       # We need to reload or otherwise we are showing the old values on the front end
       @post.reload

@@ -12,7 +12,7 @@ class Admin::ScreenedIpAddressesController < Admin::AdminController
     if screened_ip_address.save
       render_serialized(screened_ip_address, ScreenedIpAddressSerializer)
     else
-      render_json_error(screened_ip_address)
+      render_json_error(screened_ip_address.errors.full_messages)
     end
   end
 
@@ -20,7 +20,7 @@ class Admin::ScreenedIpAddressesController < Admin::AdminController
     if @screened_ip_address.update_attributes(allowed_params)
       render json: success_json
     else
-      render_json_error(@screened_ip_address)
+      render_json_error(@screened_ip_address.errors.full_messages)
     end
   end
 

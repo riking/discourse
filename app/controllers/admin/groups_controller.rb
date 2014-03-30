@@ -24,7 +24,7 @@ class Admin::GroupsController < Admin::AdminController
     if group.save
       render json: success_json
     else
-      render_json_error group
+      render_json_error group.errors.full_messages
     end
   end
 
@@ -35,7 +35,7 @@ class Admin::GroupsController < Admin::AdminController
     if group.save
       render_serialized(group, BasicGroupSerializer)
     else
-      render_json_error group
+      render_json_error group.errors.full_messages
     end
   end
 

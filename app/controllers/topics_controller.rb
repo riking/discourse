@@ -162,7 +162,7 @@ class TopicsController < ApplicationController
     if topic.save
       render json: success_json.merge!(auto_close_at: topic.auto_close_at)
     else
-      render_json_error(topic)
+      render_json_error(topic.errors.full_messages)
     end
   end
 

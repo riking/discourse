@@ -83,7 +83,7 @@ class PostsController < ApplicationController
       end
 
       if post.topic.errors.present?
-        render_json_error(post.topic)
+        render_json_error(post.topic.errors.full_messages)
         return
       end
     end
@@ -94,7 +94,7 @@ class PostsController < ApplicationController
     end
 
     if post.errors.present?
-      render_json_error(post)
+      render_json_error(post.errors.full_messages)
       return
     end
 
