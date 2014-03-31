@@ -28,8 +28,8 @@ Discourse.DiscoveryCategoriesController = Discourse.DiscoveryController.extend({
     return Discourse.User.currentProp('staff');
   }.property(),
 
-  moveCategory: function(categoryId, position){
-    this.get('model.categories').moveCategory(categoryId, position);
+  moveCategory: function(categoryId, position) {
+    return this.get('model.categories').moveCategory(categoryId, position);
   },
 
   latestTopicOnly: function() {

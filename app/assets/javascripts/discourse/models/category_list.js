@@ -13,8 +13,8 @@ Discourse.CategoryList = Ember.ArrayProxy.extend({
     this._super();
   },
 
-  moveCategory: function(categoryId, position){
-    Discourse.ajax("/category/" + categoryId + "/move", {
+  moveCategory: function(categoryId, position) {
+    return Discourse.ajax("/category/" + categoryId + "/move", {
       type: 'POST',
       data: { position: position }
     });

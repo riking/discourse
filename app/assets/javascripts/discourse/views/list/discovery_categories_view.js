@@ -1,6 +1,6 @@
 Discourse.DiscoveryCategoriesView = Discourse.View.extend({
 
-  orderingChanged: function(){
+  orderingChanged: function() {
     if (this.get("controller.ordering")) {
       this.enableOrdering();
     } else {
@@ -12,14 +12,18 @@ Discourse.DiscoveryCategoriesView = Discourse.View.extend({
     return $('#topic-list tbody');
   },
 
-  enableOrdering: function(){
+  enableOrdering: function() {
     var self = this;
-    Em.run.next(function(){
-      self.rows().sortable({handle: '.fa-bars'}).on('sortupdate',function(evt, data){
+    Em.run.next(function() {
+      self.rows().sortable({handle: '.fa-bars'}).on('sortupdate', function(evt, data) {
         var tr = $(data.item);
         var categoryId = tr.data('category_id');
         var position = self.rows().find('tr').index(tr[0]);
-        self.get('controller').moveCategory(categoryId, position);
+        self.get('controller').moveCategory(categoryId, position).catch(function(error) {
+          // TODO add revert on error
+          // https://stackoverflow.com/questions/2700130/jquery-sortable-revert-changes-if-update-callback-makes-an-ajax-call-that-fails
+          throw new Error("TODO add revert on error");
+        });
       });
     });
   },
@@ -30,11 +34,11 @@ Discourse.DiscoveryCategoriesView = Discourse.View.extend({
     });
   }.on('didInsertElement'),
 
-  disableOrdering: function(){
+  disableOrdering: function() {
     this.rows().sortable("destroy").off('sortupdate');
   },
 
-  willDestroyElement: function(){
+  willDestroyElement: function() {
     this.disableOrdering();
   }
 
