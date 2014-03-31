@@ -95,6 +95,9 @@ Discourse.ComposerMessagesController = Ember.ArrayController.extend({
           self.popup(msg);
         }
       });
+    }, function(errors) {
+      self.set('checkedMessages', false);
+      self.popup(Discourse.ComposerMessage.create({templateName: 'composer/education', body: I18n.t('error.composer_message')}));
     });
   }
 

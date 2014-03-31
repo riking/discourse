@@ -155,6 +155,7 @@ en:
 
     error:
       static: "Failed to load %{path}.html"
+      composer_message: "Sorry, an error has occured. Unable to check for composer messages."
 
     choose_topic:
       none_found: "No topics found."
