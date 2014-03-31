@@ -7,7 +7,11 @@
         <button class="btn btn-primary" {{action showLogin}}>{{i18n log_in}}</button>
       {{/if}}
     {{else}}
-      <div class='spinner'>{{i18n loading}}</div>
+      {{#if error}}
+        {{i18n error.static path=path}}
+      {{else}}
+        <div class='spinner'>{{i18n loading}}</div>
+      {{/if}}
     {{/if}}
   </div>
 </div>

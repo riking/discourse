@@ -153,6 +153,9 @@ en:
     uploading: "Uploading..."
     uploaded: "Uploaded!"
 
+    error:
+      static: "Failed to load %{path}.html"
+
     choose_topic:
       none_found: "No topics found."
       title:
@@ -475,6 +478,7 @@ en:
       invite: "Enter your username or email address, and we'll send you a password reset email."
       reset: "Reset Password"
       complete: "If an account matches that username or email address, you should receive an email with instructions on how to reset your password shortly."
+      request_error: "Could not reach the server."
 
     login:
       title: "Log In"
@@ -586,6 +590,7 @@ en:
       title: "notifications of @name mentions, replies to your posts and topics, private messages, etc"
       none: "You have no notifications right now."
       more: "view older notifications"
+      error: "Failed to contact the server. Try again?"
       mentioned: "<span title='mentioned' class='icon'>@</span> {{username}} {{link}}"
       quoted: "<i title='quoted' class='fa fa-quote-right'></i> {{username}} {{link}}"
       replied: "<i title='replied' class='fa fa-reply'></i> {{username}} {{link}}"

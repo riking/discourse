@@ -31,6 +31,9 @@ Discourse.StaticController = Discourse.Controller.extend({
     } else {
       return Discourse.ajax(path + ".html", {dataType: 'html'}).then(function (result) {
         self.set('content', result);
+      }, function(errors) {
+        self.set('error', true);
+        console.log(errors);
       });
     }
   }

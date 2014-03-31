@@ -10,8 +10,7 @@ class UserBadgesController < ApplicationController
     user = fetch_user_from_params
 
     unless can_assign_badge_to_user?(user)
-      render json: failed_json, status: 403
-      return
+      raise Discourse::InvalidAccess.new
     end
 
     badge = fetch_badge_from_params
@@ -25,8 +24,7 @@ class UserBadgesController < ApplicationController
     user_badge = UserBadge.find(params[:id])
 
     unless can_assign_badge_to_user?(user_badge.user)
-      render json: failed_json, status: 403
-      return
+      raise Discourse::InvalidAccess.new
     end
 
     BadgeGranter.revoke(user_badge, revoked_by: current_user)

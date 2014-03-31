@@ -33,6 +33,7 @@ class SessionController < ApplicationController
     if user = sso.lookup_or_create_user
       if SiteSetting.must_approve_users? && !user.approved?
         # TODO: need an awaiting approval message here
+        render text: "Your account has been created, but not approved. Please wait for the administrators to approve your account.", status: 403
       else
         log_on_user user
       end
@@ -89,7 +90,7 @@ class SessionController < ApplicationController
     params.require(:login)
 
     unless allow_local_auth?
-      render nothing: true, status: 500
+      render_json_error 'Site does not allow local logins', 403 # TODO localize
       return
     end
 
@@ -99,7 +100,7 @@ class SessionController < ApplicationController
       Jobs.enqueue(:user_email, type: :forgot_password, user_id: user.id, email_token: email_token.token)
     end
     # always render of so we don't leak information
-    render json: {result: "ok"}
+    render json: success_json
   end
 
   def current

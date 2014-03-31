@@ -19,10 +19,14 @@ Discourse.ForgotPasswordController = Discourse.Controller.extend(Discourse.Modal
     Discourse.ajax("/session/forgot_password", {
       data: { login: this.get('accountEmailOrUsername') },
       type: 'POST'
+    }).then(function() {
+      // don't tell people what happened, this keeps it more secure (ensure same on server)
+      this.flash(I18n.t('forgot_password.complete'));
+    }, function() {
+      // if net is out, server down, etc
+      this.flash(I18n.t('forgot_password.request_error'));
     });
 
-    // don't tell people what happened, this keeps it more secure (ensure same on server)
-    this.flash(I18n.t('forgot_password.complete'));
     return false;
   }
 

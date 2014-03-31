@@ -36,7 +36,7 @@ class CategoriesController < ApplicationController
       category.move_to(params["position"].to_i)
       render json: success_json
     else
-      render status: 500, json: failed_json
+      render_json_error
     end
   end
 

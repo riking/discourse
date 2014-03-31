@@ -96,7 +96,7 @@ class ApplicationController < ActionController::Base
   end
 
   rescue_from Discourse::NotFound do
-    rescue_discourse_actions("Error: Path not found", 404) # TODO: localize
+    rescue_discourse_actions("Error: Not found", 404) # TODO: localize
   end
 
   rescue_from Discourse::InvalidAccess do |e|
@@ -249,7 +249,7 @@ class ApplicationController < ActionController::Base
         end
       )
       # assert errors.is_a?(Array)
-      render json: MultiJson.dump(failed: 'FAILED', errors: errors), status: status
+      render json: MultiJson.dump(success: false, failed: 'FAILED', errors: errors), status: status
     end
 
     def success_json
