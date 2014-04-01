@@ -283,7 +283,7 @@ Discourse.ComposerController = Discourse.Controller.extend({
       } else {
         opts.tested = true;
         if (!opts.ignoreIfChanged) {
-          this.cancelComposer().then(function() { self.open(opts); }).catch(function() { return promise.reject(); });
+          this.cancelComposer().then(function() { self.open(opts); }).catch(function(error) { return promise.reject(error); });
         }
         return promise;
       }
@@ -295,6 +295,8 @@ Discourse.ComposerController = Discourse.Controller.extend({
         opts.draftSequence = data.draft_sequence;
         opts.draft = data.draft;
         return self.open(opts);
+      }, function(error) {
+        promise.reject(error);
       });
       return promise;
     }

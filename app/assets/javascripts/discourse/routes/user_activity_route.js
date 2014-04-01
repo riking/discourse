@@ -30,7 +30,7 @@ Discourse.UserActivityRoute = Discourse.Route.extend({
             draftSequence: data.draft_sequence
           });
         }
-      });
+      }, function() { /* ignore */ });
     }
   }
 
