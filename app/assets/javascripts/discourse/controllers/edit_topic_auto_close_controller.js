@@ -42,12 +42,8 @@ Discourse.EditTopicAutoCloseController = Discourse.ObjectController.extend(Disco
       dataType: 'json',
       data: { auto_close_time: Discourse.Utilities.timestampFromAutocloseString(time) }
     }).then(function(result){
-      if (result.success) {
-        self.send('closeModal');
-        self.set('details.auto_close_at', result.auto_close_at);
-      } else {
-        bootbox.alert(I18n.t('composer.auto_close_error'), function() { self.send('showModal'); } );
-      }
+      self.send('closeModal');
+      self.set('details.auto_close_at', result.auto_close_at);
     }, function () {
       bootbox.alert(I18n.t('composer.auto_close_error'), function() { self.send('showModal'); } );
     });
