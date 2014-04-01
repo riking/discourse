@@ -35,64 +35,20 @@ Discourse.Ajax = Em.Mixin.create({
 
     args.dataType = 'json';
 
-    return Discourse.ajax(url, args).then(null, function(error) {
-
-      if (error.responseJSON) {
-
-        var $message = $("<p>" + I18n.t('error.autocatch_message') + "</p>"),
-            $list = $("<ul></ul>");
-        error.responseJSON.errors.forEach(function(msg) {
-          $list.append("<li>" + msg + "</li>");
-        });
-        bootbox.alert($message.append($list));
-      } else {
-        bootbox.alert(I18n.t('error.autocatch_nomessage'));
-      }
-    });
+    return Discourse.ajax(url, args).catch(Discourse.genericErrorHandler);
   },
 
-  /**
-    This wraps Discourse.ajax() to handle a server response from render_json_error
-    by displaying a popup. If there is a better way to signal that the action failed,
-    use the standard catching in Discourse.ajax().
-
-    It also sets the dataType to json, because otherwise permission errors dump out a HTML page.
-
-
-  **/
-  caughtAjax: function() {
-    var url, args;
-
-    if (arguments.length === 1) {
-      if (typeof arguments[0] === "string") {
-        url = arguments[0];
-        args = {};
-      } else {
-        args = arguments[0];
-        url = args.url;
-        delete args.url;
-      }
-    } else if (arguments.length === 2) {
-      url = arguments[0];
-      args = arguments[1];
+  genericErrorHandler: function(error) {
+    if (error.responseJSON) {
+      var $message = $("<p>" + I18n.t('error.autocatch_message') + "</p>"),
+          $list = $("<ul></ul>");
+      error.responseJSON.errors.forEach(function(msg) {
+        $list.append("<li>" + msg + "</li>");
+      });
+      bootbox.alert($message.append($list));
+    } else {
+      bootbox.alert(I18n.t('error.autocatch_nomessage'));
     }
-
-    args.dataType = 'json';
-
-    return Discourse.ajax(url, args).then(null, function(error) {
-
-      if (error.responseJSON) {
-
-        var $message = $("<p>" + I18n.t('error.autocatch_message') + "</p>"),
-            $list = $("<ul></ul>");
-        error.responseJSON.errors.forEach(function(msg) {
-          $list.append("<li>" + msg + "</li>");
-        });
-        bootbox.alert($message.append($list));
-      } else {
-        bootbox.alert(I18n.t('error.autocatch_nomessage'));
-      }
-    });
   },
 
   /**
