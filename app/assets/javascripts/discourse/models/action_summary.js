@@ -26,7 +26,22 @@ Discourse.ActionSummary = Discourse.Model.extend({
   usersCollapsed: Em.computed.not('usersExpanded'),
   usersExpanded: Em.computed.gt('users.length', 0),
 
-  // Remove it
+  // Add the action locally
+  addAction: function() {
+    this.setProperties({
+      acted: true,
+      count: this.get('count') + 1,
+      can_act: false,
+      can_undo: true
+    });
+
+    // Add ourselves to the users who liked it if present
+    if (this.get('usersExpanded')) {
+      this.get('users').addObject(Discourse.User.current());
+    }
+  },
+
+  // Remove the action locally
   removeAction: function() {
     this.setProperties({
       acted: false,
@@ -44,28 +59,17 @@ Discourse.ActionSummary = Discourse.Model.extend({
   act: function(opts) {
     if (!opts) opts = {};
 
+    this.addAction();
+
     var action = this.get('actionType.name_key');
 
-    // Mark it as acted
-    this.setProperties({
-      acted: true,
-      count: this.get('count') + 1,
-      can_act: false,
-      can_undo: true
-    });
-
-    if(action === 'notify_moderators' || action === 'notify_user') {
-      this.set('can_undo',false);
-      this.set('can_clear_flags',false);
-    }
-
-    // Add ourselves to the users who liked it if present
-    if (this.get('usersExpanded')) {
-      this.get('users').addObject(Discourse.User.current());
+    if (action === 'notify_moderators' || action === 'notify_user') {
+      this.set('can_undo', false);
+      this.set('can_clear_flags', false);
     }
 
     // Create our post action
-    var actionSummary = this;
+    var self = this;
 
     return Discourse.ajax("/post_actions", {
       type: 'POST',
@@ -76,10 +80,9 @@ Discourse.ActionSummary = Discourse.Model.extend({
         take_action: opts.takeAction,
         flag_topic: this.get('flagTopic') ? true : false
       }
-    }).then(null, function (error) {
-      actionSummary.removeAction();
-      var message = $.parseJSON(error.responseText).errors;
-      bootbox.alert(message);
+    }).then(null, function(error) {
+      self.removeAction();
+      Discourse.genericErrorHandler(error);
     });
   },
 
@@ -87,18 +90,23 @@ Discourse.ActionSummary = Discourse.Model.extend({
   undo: function() {
     this.removeAction();
 
+    var self = this;
+
     // Remove our post action
     return Discourse.ajax("/post_actions/" + (this.get('post.id')), {
       type: 'DELETE',
       data: {
         post_action_type_id: this.get('id')
       }
+    }).then(null, function(error) {
+      self.addAction();
+      Discourse.genericErrorHandler(error);
     });
   },
 
   clearFlags: function() {
     var actionSummary = this;
-    return Discourse.ajax("/post_actions/clear_flags", {
+    return Discourse.caughtAjax("/post_actions/clear_flags", {
       type: "POST",
       data: {
         post_action_type_id: this.get('id'),
@@ -112,7 +120,7 @@ Discourse.ActionSummary = Discourse.Model.extend({
 
   loadUsers: function() {
     var actionSummary = this;
-    Discourse.ajax("/post_actions/users", {
+    Discourse.caughtAjax("/post_actions/users", {
       data: {
         id: this.get('post.id'),
         post_action_type_id: this.get('id')

@@ -35,7 +35,7 @@ Discourse.Ajax = Em.Mixin.create({
 
     args.dataType = 'json';
 
-    return Discourse.ajax(url, args).catch(Discourse.genericErrorHandler);
+    return Discourse.ajax(url, args).then(null, Discourse.genericErrorHandler);
   },
 
   genericErrorHandler: function(error) {
