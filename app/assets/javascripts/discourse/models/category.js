@@ -251,7 +251,7 @@ Discourse.Category.reopenClass({
   },
 
   reloadBySlugOrId: function(slugOrId) {
-    return Discourse.ajax("/category/" + slugOrId + "/show.json").then(function (result) {
+    return Discourse.caughtAjax("/category/" + slugOrId + "/show.json").then(function (result) {
       return Discourse.Category.create(result.category);
     });
   }

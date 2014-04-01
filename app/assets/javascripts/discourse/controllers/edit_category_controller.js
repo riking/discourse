@@ -179,8 +179,8 @@ Discourse.EditCategoryController = Discourse.ObjectController.extend(Discourse.M
         Discourse.URL.redirectTo("/category/" + Discourse.Category.slugFor(model));
 
       }).catch(function(error) {
-        if (error && error.responseText) {
-          self.flash($.parseJSON(error.responseText).errors[0]);
+        if (error && error.responseJSON) {
+          self.flash(error.responseJSON.errors[0]);
         } else {
           self.flash(I18n.t('generic_error'));
         }
