@@ -16,12 +16,23 @@ Discourse.Mention = (function() {
     return localCache[name];
   };
 
+  /**
+    Check if a name is a username on this site.
+
+    TODO this is a Zalgo API (http://blog.izs.me/post/59142742143/designing-apis-for-asynchrony)
+
+    @param name username
+    @param callback function to execute
+    @returns {boolean} if the callback was not executed immediately
+  **/
   var lookup = function(name, callback) {
     var cached = lookupCache(name);
     if (cached === true || cached === false) {
       callback(cached);
       return false;
     } else {
+      // TODO catch method
+      // please do that AFTER fixing the Zalgo problem
       Discourse.ajax("/users/is_local_username", { data: { username: name } }).then(function(r) {
         cache(name, r.valid);
         callback(r.valid);
@@ -37,14 +48,15 @@ Discourse.Mention = (function() {
     username = username.substr(1);
     var loading = lookup(username, function(valid) {
       if (valid) {
-        return $elem.replaceWith("<a href='" + Discourse.getURL("/users/") + (username.toLowerCase()) + "' class='mention'>@" + username + "</a>");
+        $elem.replaceWith("<a href='" + Discourse.getURL("/users/") + (username.toLowerCase()) + "' class='mention'>@" + username + "</a>");
       } else {
-        return $elem.removeClass('mention-loading').addClass('mention-tested');
+        $elem.removeClass('mention-loading').addClass('mention-tested');
       }
     });
     if (loading) {
       return $elem.addClass('mention-loading');
     }
+    return undefined;
   };
 
   return { load: load, lookup: lookup, lookupCache: lookupCache };
