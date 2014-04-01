@@ -154,6 +154,8 @@ en:
     uploaded: "Uploaded!"
 
     error:
+      autocatch_nomessage: "Sorry, an error has occured, and Discourse can't reach the server."
+      autocatch_message: "An error has occured. The server said: "
       static: "Failed to load %{path}.html"
       composer_message: "Sorry, an error has occured. Unable to check for composer messages."
 
