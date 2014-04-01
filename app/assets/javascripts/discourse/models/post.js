@@ -65,19 +65,12 @@ Discourse.Post = Discourse.Model.extend({
   postElementId: Discourse.computed.fmt('post_number', 'post_%@'),
 
   bookmarkedChanged: function() {
-    Discourse.ajax("/posts/" + this.get('id') + "/bookmark", {
+    Discourse.caughtAjax("/posts/" + this.get('id') + "/bookmark", {
       type: 'PUT',
       data: {
         bookmarked: this.get('bookmarked') ? true : false
       }
-    }).then(null, function (error) {
-      if (error && error.responseText) {
-        bootbox.alert($.parseJSON(error.responseText).errors[0]);
-      } else {
-        bootbox.alert(I18n.t('generic_error'));
-      }
     });
-
   }.observes('bookmarked'),
 
   internalLinks: function() {

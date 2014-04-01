@@ -228,7 +228,7 @@ Discourse.Topic = Discourse.Model.extend({
       'details.can_delete': false,
       'details.can_recover': true
     });
-    return Discourse.ajax("/t/" + this.get('id'), { type: 'DELETE' });
+    return Discourse.caughtAjax("/t/" + this.get('id'), { type: 'DELETE' });
   },
 
   // Recover this topic if deleted

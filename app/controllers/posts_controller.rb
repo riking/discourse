@@ -192,7 +192,7 @@ class PostsController < ApplicationController
         PostAction.remove_act(current_user, post, PostActionType.types[:bookmark])
       end
     end
-    render nothing: true
+    render json: success_json
   end
 
   protected
