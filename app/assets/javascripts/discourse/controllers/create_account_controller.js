@@ -72,7 +72,7 @@ Discourse.CreateAccountController = Discourse.Controller.extend(Discourse.ModalF
 
     // Looks good!
     return Discourse.InputValidation.create({
-      ok: true,
+      failed: false,
       reason: I18n.t('user.name.ok')
     });
   }.property('accountName'),
@@ -98,7 +98,7 @@ Discourse.CreateAccountController = Discourse.Controller.extend(Discourse.ModalF
 
     if ((this.get('authOptions.email') === email) && this.get('authOptions.email_valid')) {
       return Discourse.InputValidation.create({
-        ok: true,
+        failed: false,
         reason: I18n.t('user.email.authenticated', {
           provider: this.get('authOptions.auth_provider')
         })
@@ -107,7 +107,7 @@ Discourse.CreateAccountController = Discourse.Controller.extend(Discourse.ModalF
 
     if (Discourse.Utilities.emailValid(email)) {
       return Discourse.InputValidation.create({
-        ok: true,
+        failed: false,
         reason: I18n.t('user.email.ok')
       });
     }
@@ -175,7 +175,7 @@ Discourse.CreateAccountController = Discourse.Controller.extend(Discourse.ModalF
 
     if (this.get('accountUsername') === this.get('prefilledUsername')) {
       return Discourse.InputValidation.create({
-        ok: true,
+        failed: false,
         reason: I18n.t('user.username.prefilled')
       });
     }
@@ -224,12 +224,12 @@ Discourse.CreateAccountController = Discourse.Controller.extend(Discourse.ModalF
           if (result.global_match) {
             _this.set('globalNicknameExists', true);
             return _this.set('uniqueUsernameValidation', Discourse.InputValidation.create({
-              ok: true,
+              failed: false,
               reason: I18n.t('user.username.global_match')
             }));
           } else {
             return _this.set('uniqueUsernameValidation', Discourse.InputValidation.create({
-              ok: true,
+              failed: false,
               reason: I18n.t('user.username.available')
             }));
           }
@@ -284,7 +284,7 @@ Discourse.CreateAccountController = Discourse.Controller.extend(Discourse.ModalF
     var password;
     if (!this.get('passwordRequired')) {
       return Discourse.InputValidation.create({
-        ok: true
+        failed: false
       });
     }
 
@@ -311,18 +311,18 @@ Discourse.CreateAccountController = Discourse.Controller.extend(Discourse.ModalF
 
     // Looks good!
     return Discourse.InputValidation.create({
-      ok: true,
+      failed: false,
       reason: I18n.t('user.password.ok')
     });
   }.property('accountPassword', 'rejectedPasswords.@each'),
 
-  fetchConfirmationValue: function() {
+  fetchConfirmationValue: Discourse.debounce(function() {
     var createAccountController = this;
-    return Discourse.ajax('/users/hp.json').then(function (json) {
+    Discourse.ajax('/users/hp.json').then(function (json) {
       createAccountController.set('accountPasswordConfirm', json.value);
       createAccountController.set('accountChallenge', json.challenge.split("").reverse().join(""));
     });
-  },
+  }, 200),
 
   tosAcceptRequired: function() {
     return Discourse.SiteSettings.tos_accept_required;
