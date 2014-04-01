@@ -92,7 +92,7 @@ Discourse.Badge = Discourse.Model.extend({
       requestType = "PUT";
     }
 
-    return Discourse.ajax(url, {
+    return Discourse.caughtAjax(url, {
       type: requestType,
       data: {
         name: this.get('name'),
@@ -115,7 +115,7 @@ Discourse.Badge = Discourse.Model.extend({
   **/
   destroy: function() {
     if (this.get('newBadge')) return Ember.RSVP.resolve();
-    return Discourse.ajax("/admin/badges/" + this.get('id'), {
+    return Discourse.caughtAjax("/admin/badges/" + this.get('id'), {
       type: "DELETE"
     });
   }
