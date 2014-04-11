@@ -14,7 +14,7 @@ Discourse.UserBadge = Discourse.Model.extend({
     @returns {Promise} a promise that resolves when the badge has been revoked.
   **/
   revoke: function() {
-    return Discourse.ajax("/user_badges/" + this.get('id'), {
+    return Discourse.ajaxUncaughtError("/user_badges/" + this.get('id'), {
       type: "DELETE"
     });
   }
@@ -74,7 +74,7 @@ Discourse.UserBadge.reopenClass({
     @returns {Promise} a promise that resolves to an array of `Discourse.UserBadge`.
   **/
   findByUsername: function(username) {
-    return Discourse.ajax("/user_badges.json?username=" + username).then(function(json) {
+    return Discourse.ajaxUncaughtError("/user_badges.json?username=" + username).then(function(json) {
       return Discourse.UserBadge.createFromJson(json);
     });
   },
@@ -88,7 +88,7 @@ Discourse.UserBadge.reopenClass({
     @returns {Promise} a promise that resolves to an instance of `Discourse.UserBadge`.
   **/
   grant: function(badgeId, username) {
-    return Discourse.ajax("/user_badges", {
+    return Discourse.ajaxUncaughtError("/user_badges", {
       type: "POST",
       data: {
         username: username,
