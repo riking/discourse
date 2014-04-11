@@ -30,7 +30,7 @@ Discourse.Ajax = Em.Mixin.create({
    </code>
   **/
   genericErrorRethrow: function(error) {
-    Discourse.genericErrorCaught(error);
+    Discourse.genericErrorHandler(error);
     throw error;
   },
 
@@ -47,7 +47,7 @@ Discourse.Ajax = Em.Mixin.create({
     }, Discourse.genericErrorCaught);
     </code>
   **/
-  genericErrorCaught: function(error) {
+  genericErrorHandler: function(error) {
     if (error.responseJSON) {
       var $message = $("<p>" + I18n.t('error.autocatch') + "</p>"),
           $list = $("<ul></ul>");
@@ -61,13 +61,56 @@ Discourse.Ajax = Em.Mixin.create({
   },
 
   /**
+   * Call Discourse.ajax with standard error behavior.
+   */
+  ajaxUncaughtError: function() {
+    var url, args;
+
+    if (arguments.length === 1) {
+      if (typeof arguments[0] === "string") {
+        url = arguments[0];
+        args = {};
+      } else {
+        args = arguments[0];
+        url = args.url;
+        delete args.url;
+      }
+    } else if (arguments.length === 2) {
+      url = arguments[0];
+      args = arguments[1];
+    }
+
+    args.errorBehavior = Discourse.AJAXERROR_REJECT;
+
+    Discourse.ajax(url, args);
+  },
+
+  /**
+   * When an AJAX request fails, go through the standard promise rejection.
+   */
+  AJAXERROR_REJECT: 0x1,
+
+  /**
+   * When an AJAX request fails, call the generic error handler.
+   */
+  AJAXERROR_POPUP: 0x2,
+
+  AJAXERROR_REJECT_AND_POPUP: 0x3,
+
+  /**
+   * When an AJAX request fails, do nothing.
+   * (This silences the deprecation warning compared to passing 0)
+   */
+  AJAXERROR_IGNORE: 0x40,
+
+  /**
     Our own $.ajax method. Makes sure the .then method executes in an Ember runloop
     for performance reasons. Also automatically adjusts the URL to support installs
     in subfolders.
 
     @method ajax
   **/
-  ajaxUncaughtError: function() {
+  ajax: function() {
     var url, args;
 
     if (arguments.length === 1) {
@@ -89,6 +132,10 @@ Discourse.Ajax = Em.Mixin.create({
     }
     if (args.error) {
       Ember.Logger.error("DEPRECATION: Discourse.ajax should use promises, received 'error' callback");
+    }
+    if (!args.errorBehavior) {
+      Ember.Logger.error("DEPRECATION: Discourse.ajax calls must specify error behavior (change to Discourse.ajaxUncaughtError to silence)");
+      args.errorBehavior = Discourse.AJAXERROR_REJECT;
     }
 
     // If we have URL_FIXTURES, load from there instead (testing)
@@ -116,7 +163,14 @@ Discourse.Ajax = Em.Mixin.create({
         // If it's a parseerror, don't reject
         if (xhr.status === 200) return args.success(xhr);
 
-        Ember.run(promise, promise.reject, xhr);
+        if (args.errorBehavior & Discourse.AJAXERROR_REJECT !== 0) {
+          Ember.run(promise, promise.reject, xhr);
+        }
+
+        if (args.errorBehavior & Discourse.AJAXERROR_POPUP) {
+          Discourse.genericErrorHandler(xhr);
+        }
+
         if (oldError) oldError(xhr);
       };
 
