@@ -39,6 +39,10 @@ Discourse.TopicController = Discourse.ObjectController.extend(Discourse.Selected
       Discourse.URL.routeTo(this.get('lastPostUrl'));
     },
 
+    openJumper: function() {
+      this.set('jumperActive', !this.get('jumperActive'));
+    },
+
     selectAll: function() {
       var posts = this.get('postStream.posts'),
           selectedPosts = this.get('selectedPosts');
@@ -613,6 +617,7 @@ Discourse.TopicController = Discourse.ObjectController.extend(Discourse.Selected
         lastLoadedPost = postStream.get('lastLoadedPost'),
         index = postStream.get('stream').indexOf(post.get('id'))+1;
 
+    this.set('bottomVisiblePost', post);
     this.set('progressPosition', index);
 
     if (lastLoadedPost && lastLoadedPost === post) {

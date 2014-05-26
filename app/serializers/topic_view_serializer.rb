@@ -39,6 +39,8 @@ class TopicViewSerializer < ApplicationSerializer
              :highest_post_number,
              :last_read_post_number,
              :deleted_by,
+             :weights,
+             :weight_total,
              :actions_summary,
              :expandable_first_post
 
@@ -162,6 +164,25 @@ class TopicViewSerializer < ApplicationSerializer
 
   def pinned_at
     object.topic.pinned_at
+  end
+
+  def weights
+    @weight_total = 0
+    object.filtered_posts.map do |post|
+      weight = Math.log(post.raw.size) || 1
+      @weight_total += weight
+      {
+          post_number: post.post_number,
+          read: object.read?(post.post_number),
+          weight: weight
+      }
+    end.sort { |a, b| a[:post_number] <=> b[:post_number] }
+  end
+
+  def weight_total
+    weights if @weight_total.nil?
+
+    @weight_total
   end
 
   def actions_summary

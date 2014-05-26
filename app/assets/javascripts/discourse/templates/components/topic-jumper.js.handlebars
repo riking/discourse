@@ -1,0 +1,9 @@
+
+<div id="topic-jumper" {{bind-attr class="jumperHidden:jumper-hide"}}>
+  <div class="center">
+    Jump To Post: {{textField value=textValue pattern="\d+" action="pressEnter"}}
+  </div>
+  <nav class="timeline">
+    {{timeline-collection models=topic.model.weights topic=topic jumper=this}}
+  </nav>
+</div>

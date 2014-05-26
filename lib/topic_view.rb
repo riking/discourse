@@ -264,7 +264,6 @@ class TopicView
 
       post_numbers = PostTiming
                 .where(topic_id: @topic.id, user_id: @user.id)
-                .where(post_number: current_post_ids)
                 .pluck(:post_number)
 
       post_numbers.each {|pn| result << pn}

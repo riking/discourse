@@ -120,25 +120,34 @@ a:hover.reply-new {
     z-index: 1000;
     position: absolute;
     top: 2px;
-    left: 4px;
     border: 0;
     background: none;
     color: scale-color($primary, $lightness: 50%);
-    width: 50%;
-    text-align: left;
+    width: 30%;
     height: 30px;
     margin: 0;
     i {
       font-size: 18px;
     }
-    &:nth-of-type(2) {
+    &#jump-top {
+      left: 4px;
+      right: auto;
+      text-align: left;
+    }
+    &#jump-dialogue {
+      width: calc(40% - 8px);
+      right: calc(30% + 4px);
+      left: calc(30% + 4px);
+      text-align: center;
+    }
+    &#jump-bottom {
       right: 4px;
       left: auto;
       text-align: right;
     }
     &:disabled {
-    cursor: default;
-    color: scale-color($primary, $lightness: 50%);
+      cursor: default;
+      color: scale-color($primary, $lightness: 50%);
     }
   }
   h4 {
@@ -152,8 +161,87 @@ a:hover.reply-new {
     bottom: 0;
     width: 0;
     border-right: 1px solid  scale-color-diff();
-    background-color:  scale-color($success, $lightness: 70%);
+    background-color: scale-color($success, $lightness: 70%);
     transition: width .75s;
+  }
+}
+
+#topic-jumper {
+  position: fixed;
+  padding: 15px;
+  border-radius: 15px;
+  z-index: 1001;
+
+  @include large-width {
+    width: 860px;
+  }
+  @include medium-width {
+    width: 800px;
+  }
+  @include small-width {
+    width: 720px;
+  }
+
+  bottom: 100px;
+  background-color: scale-color-diff();
+  opacity: 0.95;
+  transition: bottom 0.5s, opacity 0.5s;
+  &.jumper-hide {
+    bottom: 50px;
+    opacity: 0;
+  }
+
+  .center {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    font-weight: bold;
+    font-size: 16px;
+
+    input {
+      text-align: center;
+      width: 40px;
+      height: 18px;
+      vertical-align: baseline;
+      font-size: 14px;
+      margin-left: 4px;
+    }
+  }
+
+  .timeline {
+    padding-bottom: 15px;
+    display: block;
+
+    > div {
+      border-right: 1px solid $primary;
+    }
+  }
+  .timeline-item {
+    height: 20px;
+    display: inline-block;
+    border-left: 1px solid $primary;
+    vertical-align: bottom;
+
+    background-color: scale-color($primary, $lightness: 70%);
+    &.read {
+      background-color: scale-color($success, $lightness: 70%);
+    }
+    text-align: center;
+    &:before {
+      display: inline-block;
+      height: 10px;
+      width: 10px;
+      border-radius: 999px;
+      margin-top: 25px;
+    }
+    &.current:before {
+      background-color: $primary;
+      content: " ";
+    }
+    &.selected:before {
+      background-color: $success;
+      content: " ";
+    }
   }
 }
 

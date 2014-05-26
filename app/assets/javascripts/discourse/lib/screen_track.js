@@ -72,12 +72,17 @@ Discourse.ScreenTrack = Ember.Object.extend({
       cancelled: false,
       timings: {},
       totalTimings: {},
-      topicTime: 0
+      topicTime: 0,
+      listeners: []
     });
   },
 
   scrolled: function() {
     this.set('lastScrolled', new Date().getTime());
+  },
+
+  listen: function(obj, callback) {
+    this.get('listeners').push({func: callback, object: obj});
   },
 
   flush: function() {
@@ -154,7 +159,8 @@ Discourse.ScreenTrack = Ember.Object.extend({
 
     this.set('topicTime', this.get('topicTime') + diff);
     var docViewTop = $(window).scrollTop() + $('header').height(),
-        docViewBottom = docViewTop + $(window).height();
+        docViewBottom = docViewTop + $(window).height(),
+        self = this;
 
     // TODO: Eyeline has a smarter more accurate function here. It's bad to do jQuery
     // in a model like component, so we should refactor this out later.
@@ -167,6 +173,10 @@ Discourse.ScreenTrack = Ember.Object.extend({
         // If part of the element is on the screen, increase the counter
         if (((docViewTop <= elemTop && elemTop <= docViewBottom)) || ((docViewTop <= elemBottom && elemBottom <= docViewBottom))) {
           timing.time = timing.time + diff;
+
+          _.each(self.get('listeners'), function(callback) {
+            callback.func.call(callback.object, timing.postNumber, timing.time);
+          });
         }
       }
     });
