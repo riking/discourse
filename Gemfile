@@ -219,7 +219,7 @@ gem 'memory_profiler', require: false, platform: :mri_21
 
 gem 'rmmseg-cpp', require: false
 
-gem 'logster'
+gem 'logster', path: '../logster'
 
 # perftools only works on 1.9 atm
 group :profile do
