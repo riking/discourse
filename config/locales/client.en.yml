@@ -401,13 +401,13 @@ en:
       new_topic_duration:
         label: "Consider topics new when"
         not_viewed: "you haven't viewed them yet"
-        last_here: "they were created since you were here last"
+        last_here: "created since you were here last"
         after_n_days:
-          one: "they were created in the last day"
-          other: "they were created in the last {{count}} days"
+          one: "created in the last day"
+          other: "created in the last {{count}} days"
         after_n_weeks:
-          one: "they were created in the last week"
-          other: "they were created in the last {{count}} weeks"
+          one: "created in the last week"
+          other: "created in the last {{count}} weeks"
 
       auto_track_topics: "Automatically track topics you enter"
       auto_track_options:
@@ -1317,7 +1317,7 @@ en:
           zero: "Unread"
           one: "Unread (1)"
           other: "Unread ({{count}})"
-        help: "topics you are watching or tracking with unread posts"
+        help: "topics you are currently watching or tracking with unread posts"
       new:
         lower_title_with_count:
           zero: ""
@@ -1328,7 +1328,7 @@ en:
           zero: "New"
           one: "New (1)"
           other: "New ({{count}})"
-        help: "topics created since your last visit"
+        help: "topics created in the last few days"
       posted:
         title: "My Posts"
         help: "topics you have posted in"
@@ -1421,13 +1421,13 @@ en:
         defer_flag_title: "No action is necessary at this time, defer any action on this flag until a later date, or never"
         delete: "Delete"
         delete_title: "Delete"
-        delete_post_defer_flag: "Delete Post and defer flag"
+        delete_post_defer_flag: "Delete Post and Defer flag"
         delete_post_defer_flag_title: "Delete post; if the first post, delete the topic"
-        delete_post_agree_flag: "Delete Post and agree with flag"
+        delete_post_agree_flag: "Delete Post and Agree with flag"
         delete_post_agree_flag_title: "Delete post; if the first post, delete the topic"
-        delete_flag_modal_title: "Choose the delete action"
+        delete_flag_modal_title: "Delete and..."
         delete_spammer: "Delete Spammer"
-        delete_spammer_title: "Delete the user and all its posts and topics."
+        delete_spammer_title: "Remove the user and all posts and topics by this user."
         disagree_flag_unhide_post: "Disagree (unhide post)"
         disagree_flag_unhide_post_title: "Remove any flags from this post and make the post visible again"
         disagree_flag: "Disagree"

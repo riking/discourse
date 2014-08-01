@@ -49,7 +49,8 @@ class PostSerializer < BasicPostSerializer
              :edit_reason,
              :can_view_edit_history,
              :wiki,
-             :user_custom_fields
+             :user_custom_fields,
+             :static_doc
 
   def moderator?
     !!(object.user && object.user.moderator?)
@@ -206,7 +207,7 @@ class PostSerializer < BasicPostSerializer
   end
 
   def include_reply_to_user?
-    (!SiteSetting.suppress_reply_when_quoting || object.quoteless?) && object.reply_to_user
+    !(SiteSetting.suppress_reply_when_quoting && object.reply_quoted?) && object.reply_to_user
   end
 
   def include_bookmarked?
@@ -229,6 +230,14 @@ class PostSerializer < BasicPostSerializer
     return if @topic_view.blank?
     custom_fields = @topic_view.user_custom_fields
     custom_fields && custom_fields[object.user_id]
+  end
+
+  def static_doc
+    true
+  end
+
+  def include_static_doc?
+    object.post_number == 1 && Discourse.static_doc_topic_ids.include?(object.topic_id)
   end
 
   private
