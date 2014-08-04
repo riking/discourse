@@ -587,7 +587,25 @@ describe TopicsController do
     end
 
     it 'records a view' do
-      lambda { xhr :get, :show, topic_id: topic.id, slug: topic.slug }.should change(View, :count).by(1)
+      lambda { xhr :get, :show, topic_id: topic.id, slug: topic.slug }.should change(TopicViewItem, :count).by(1)
+    end
+
+    it 'records incoming links' do
+      user = Fabricate(:user)
+      get :show, topic_id: topic.id, slug: topic.slug, u: user.username
+
+      IncomingLink.count.should == 1
+    end
+
+    it 'records redirects' do
+      @request.env['HTTP_REFERER'] = 'http://twitter.com'
+      get :show, { id: topic.id }
+
+      @request.env['HTTP_REFERER'] = nil
+      get :show, topic_id: topic.id, slug: topic.slug
+
+      link = IncomingLink.first
+      link.referer.should == 'http://twitter.com'
     end
 
     it 'tracks a visit for all html requests' do
