@@ -10,7 +10,25 @@ class Auth::GithubAuthenticator < Auth::Authenticator
     data = auth_token[:info]
 
     result.username = screen_name = data["nickname"]
-    result.email = email = data["email"]
+
+    # Get list of emails on account
+    gh_token = auth_token[:credentials][:token]
+    emails_response = MultiJson.load(
+        RestClient.get('https://api.github.com/user/emails', params: {access_token: gh_token}, accept: :json)
+    )
+    # Remove unverified emails
+    emails_response.reject {|x| !x['verified'] }
+    # Select the primary email
+    # TODO allow multiple returns?
+    primary_email = emails_response.find { |x| x['primary'] }
+
+    if primary_email
+      result.email = primary_email['email']
+      result.email_valid = primary_email['verified']
+    else
+      result.email = nil
+      result.email_valid = false
+    end
 
     github_user_id = auth_token["uid"]
 
@@ -23,16 +41,19 @@ class Auth::GithubAuthenticator < Auth::Authenticator
 
     if user_info
       user = user_info.user
-    elsif user = User.find_by_email(email)
+    # SECURITY: Do not perform user lookup for unverified emails
+    # TODO: look up by all verified emails?
+    elsif result.email_valid && user = User.find_by_email(email)
       user_info = GithubUserInfo.create(
           user_id: user.id,
           screen_name: screen_name,
           github_user_id: github_user_id
       )
+    else
+      user = nil
     end
 
     result.user = user
-    result.email_valid = false
 
     result
   end
