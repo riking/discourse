@@ -30,3 +30,6 @@
 {{#if loading}}
   <div class='spinner'>{{i18n loading}}</div>
 {{/if}}
+{{#unless canLoadMore}}
+  <div class='end-of-stream'></div>
+{{/unless}}

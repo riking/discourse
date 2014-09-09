@@ -8,6 +8,7 @@
 **/
 Discourse.UserStream = Discourse.Model.extend({
   loaded: false,
+  canLoadMore: true,
 
   _initialize: function() {
     this.setProperties({
@@ -15,6 +16,10 @@ Discourse.UserStream = Discourse.Model.extend({
       content: []
     });
   }.on("init"),
+
+  _resetCanLoadMore: function() {
+    this.set('canLoadMore', true);
+  }.observes('filter'),
 
   filterParam: function() {
     var filter = this.get('filter');
@@ -72,13 +77,12 @@ Discourse.UserStream = Discourse.Model.extend({
       url += "&filter=" + this.get('filterParam');
     }
 
-    // Don't load the same stream twice. We're probably at the end.
-    var lastLoadedUrl = this.get('lastLoadedUrl');
-    if (lastLoadedUrl === url) { return Ember.RSVP.resolve(); }
+    // Don't keep loading if we are at the end
+    if (!this.get('canLoadMore')) { return Ember.RSVP.resolve(); }
 
     if (this.get('loading')) { return Ember.RSVP.resolve(); }
     this.set('loading', true);
-    return Discourse.ajax(url, {cache: 'false'}).then( function(result) {
+    return Discourse.ajax(url, { cache: 'false' }).then(function(result) {
       if (result && result.user_actions) {
         var copy = Em.A();
         result.user_actions.forEach(function(action) {
@@ -88,12 +92,12 @@ Discourse.UserStream = Discourse.Model.extend({
         self.get('content').pushObjects(Discourse.UserAction.collapseStream(copy));
         self.setProperties({
           loaded: true,
+          canLoadMore: result.user_actions.length !== 0,
           itemsLoaded: self.get('itemsLoaded') + result.user_actions.length
         });
       }
     }).finally(function() {
       self.set('loading', false);
-      self.set('lastLoadedUrl', url);
     });
   }
 

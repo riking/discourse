@@ -1,7 +1,9 @@
 export default Ember.View.extend(Discourse.LoadMore, {
-  loading: false,
   eyelineSelector: '.user-stream .item',
   classNames: ['user-stream'],
+
+  loading: false,
+  canLoadMore: Em.computed.alias('controller.model.canLoadMore'),
 
   _scrollTopOnModelChange: function() {
     Em.run.schedule('afterRender', function() {
