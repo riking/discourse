@@ -292,10 +292,11 @@ module SiteSettingExtension
 
       update_action = update_levels[name]
       if update_action == :client_push
-        notify_clients_changed!
+        notify_clients_changed!(name, value)
       elsif update_action == :refresh
         Discourse.request_refresh!
       elsif update_action == :restart
+        Discourse.request_refresh!
         # TODO
       end
     else
