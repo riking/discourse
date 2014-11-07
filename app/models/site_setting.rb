@@ -9,7 +9,7 @@ class SiteSetting < ActiveRecord::Base
 
   def self.load_settings(file)
     SiteSettings::YamlLoader.new(file).load do |category, name, default, opts|
-      if opts.delete(:client)
+      if opts[:client]
         client_setting(name, default, opts.merge(category: category))
       else
         setting(name, default, opts.merge(category: category))

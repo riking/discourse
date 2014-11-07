@@ -17,6 +17,10 @@ module SiteSettingExtension
     @types ||= Enum.new(:string, :time, :fixnum, :float, :bool, :null, :enum, :list)
   end
 
+  def UPDATE_TYPES
+    @UPDATE_TYPES ||= [:none, :refresh, :client_push, :restart]
+  end
+
   def mutex
     @mutex ||= Mutex.new
   end
@@ -50,8 +54,8 @@ module SiteSettingExtension
     @hidden_settings ||= []
   end
 
-  def refresh_settings
-    @refresh_settings ||= []
+  def update_levels
+    @update_levels ||= {}.tap { |h| h.default = :none }
   end
 
   def validators
@@ -79,8 +83,12 @@ module SiteSettingExtension
       if opts[:hidden]
         hidden_settings << name
       end
-      if opts[:refresh]
-        refresh_settings << name
+      if opts[:update]
+        if level = UPDATE_TYPES.find(opts[:update])
+          @update_levels[name] = level
+        end
+      elsif opts[:client]
+        @update_levels[name] = :client_push
       end
 
       if validator_type = validator_for(opts[:type] || get_data_type(name, defaults[name]))

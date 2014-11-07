@@ -2,7 +2,11 @@
 #
 # default - The default value of the setting.
 # client  - Set to true if the javascript should have access to this setting's value.
-# refresh - Set to true if clients should refresh when the setting is changed.
+# update  - Scope of updates necessary when changing the setting.
+#   none:         The setting takes effect instantly. (Default)
+#   refresh:      Clients must reload the browser for the setting to take effect.
+#   client-push:  Clients can get the new setting without refreshing. (Implied by client: true)
+#   restart:      Discourse must be restarted for the change to propagate.
 # min     - For a string setting, the minimum length. For an integer setting, the minimum value.
 # max     - For a string setting, the maximum length. For an integer setting, the maximum value.
 # regex   - A regex that the value must match.
@@ -50,7 +54,7 @@ basic:
   default_locale:
     default: 'en'
     enum: 'LocaleSiteSetting'
-    refresh: true
+    update: refresh
   allow_user_locale:
     client: true
     default: false
@@ -80,7 +84,7 @@ basic:
     default: ''
   top_menu:
     client: true
-    refresh: true
+    update: refresh
     type: list
     default: 'latest|new|unread|starred|top|categories'
     choices:
@@ -317,7 +321,7 @@ posting:
   allow_uncategorized_topics:
     client: true
     default: true
-    refresh: true
+    update: refresh
   uncategorized_description: "Topics that don't need a category, or don't fit into any other existing category."
   allow_duplicate_topic_titles: false
   min_title_similar_length:
@@ -386,7 +390,7 @@ posting:
   censored_words:
     client: true
     default: ''
-    refresh: true
+    update: restart
     type: list
 
 email:
@@ -431,7 +435,7 @@ files:
   authorized_extensions:
     client: true
     default: 'jpg|jpeg|png|gif'
-    refresh: true
+    update: refresh
     type: list
   crawl_images:
     default:
