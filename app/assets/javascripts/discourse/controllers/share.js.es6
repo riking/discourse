@@ -21,13 +21,13 @@ export default DiscourseController.extend({
   },
 
   shareLinks: function() {
-    return Discourse.SiteSettings.share_links.split('|').map(function(i) {
-      if( Discourse.ShareLink.supportedTargets.indexOf(i) >= 0 ) {
-        return Discourse.ShareLink.create({target: i, link: this.get('link'), topicTitle: this.get('controllers.topic.title')});
+    return this.get('siteSettings.share_links').split('|').map(function(i) {
+      if (Discourse.ShareLink.supportedTargets.indexOf(i) >= 0) {
+        return Discourse.ShareLink.create({ target: i, link: this.get('link'), topicTitle: this.get('controllers.topic.title') });
       } else {
         return null;
       }
     }, this).compact();
-  }.property('link')
+  }.property('link', 'siteSettings.share_links')
 
 });

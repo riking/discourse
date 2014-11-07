@@ -37,11 +37,11 @@ export default ObjectController.extend(ModalFunctionality, {
 
     if (selected.get('is_custom_flag')) {
       var len = this.get('message.length') || 0;
-      return len >= Discourse.SiteSettings.min_private_message_post_length &&
+      return len >= this.get('siteSettings.min_private_message_post_length') &&
              len <= Discourse.PostActionType.MAX_MESSAGE_LENGTH;
     }
     return true;
-  }.property('selected.is_custom_flag', 'message.length'),
+  }.property('selected.is_custom_flag', 'message.length', 'siteSettings.min_private_message_post_length'),
 
   submitDisabled: Em.computed.not('submitEnabled'),
 

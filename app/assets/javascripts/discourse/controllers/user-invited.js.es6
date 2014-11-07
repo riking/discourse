@@ -87,12 +87,12 @@ export default Ember.ObjectController.extend({
       var self = this;
       var model = self.get('model');
 
-      if(self.get('canLoadMore')) {
+      if (self.get('canLoadMore')) {
         self.set('invitesLoading', true);
         Discourse.Invite.findInvitedBy(self.get('user'), self.get('searchTerm'), model.invites.length).then(function(invite_model) {
           self.set('invitesLoading', false);
           model.invites.pushObjects(invite_model.invites);
-          if(invite_model.invites.length === 0 || invite_model.invites.length < Discourse.SiteSettings.invites_per_page) {
+          if (invite_model.invites.length === 0 || invite_model.invites.length < self.get('siteSettings.invites_per_page')) {
             self.set('canLoadMore', false);
           }
         });

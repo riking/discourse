@@ -5,7 +5,5 @@ import DiscourseController from 'discourse/controllers/controller';
 export default DiscourseController.extend(ModalFunctionality, {
   needs: ['modal'],
 
-  showGoogleSearch: function() {
-    return !Discourse.SiteSettings.login_required;
-  }.property()
+  showGoogleSearch: Em.computed.not('siteSettings.login_required')
 });

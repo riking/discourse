@@ -34,9 +34,7 @@ export default ObjectController.extend(CanCheckEmails, {
 
   canEditName: Discourse.computed.setting('enable_names'),
 
-  canSelectTitle: function() {
-    return Discourse.SiteSettings.enable_badges && this.get('model.has_title_badges');
-  }.property('model.badge_count', 'siteSettings.enable_badges'),
+  canSelectTitle: Em.computed.and('siteSettings.enable_badges', 'model.has_title_badges'),
 
   canChangePassword: function() {
     return !Discourse.SiteSettings.enable_sso && Discourse.SiteSettings.enable_local_logins;
