@@ -35,7 +35,7 @@ export default Em.Controller.extend(Discourse.Presence, {
   newSearchNeeded: function() {
     this.set('noResults', false);
     var term = (this.get('term') || '').trim();
-    if (term.length >= Discourse.SiteSettings.min_search_term_length) {
+    if (term.length >= this.get('siteSettings.min_search_term_length')) {
       this.set('loading', true);
 
       Ember.run.debounce(this, 'searchTerm', term, this.get('typeFilter'), 400);
@@ -43,7 +43,7 @@ export default Em.Controller.extend(Discourse.Presence, {
       this.setProperties({ content: null });
     }
     this.set('selectedIndex', 0);
-  }.observes('term', 'typeFilter'),
+  }.observes('term', 'typeFilter', 'siteSettings.min_search_term_length'),
 
   searchTerm: function(term, typeFilter) {
     var self = this;

@@ -67,8 +67,8 @@ export default DiscourseController.extend(ModalFunctionality, {
   }.property('authOptions.auth_provider'),
 
   passwordInstructions: function() {
-    return I18n.t('user.password.instructions', {count: Discourse.SiteSettings.min_password_length});
-  }.property(),
+    return I18n.t('user.password.instructions', {count: this.get('siteSettings.min_password_length')});
+  }.property('siteSettings.min_password_length'),
 
   // Validate the name. It's not required.
   nameValidation: function() {

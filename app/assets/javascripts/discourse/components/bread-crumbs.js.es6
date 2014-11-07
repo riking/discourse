@@ -11,8 +11,8 @@ export default Ember.Component.extend({
   tagName: 'ol',
   parentCategory: Em.computed.alias('category.parentCategory'),
 
-  parentCategories: Em.computed.filter('categories', function(c) {
-    if (c.id === Discourse.Site.currentProp("uncategorized_category_id") && !Discourse.SiteSettings.allow_uncategorized_topics) {
+  parentCategories: Em.computed.filter(['categories', 'siteSettings.allow_uncategorized_topics'] function(c) {
+    if (c.id === Discourse.Site.currentProp("uncategorized_category_id") && !this.get('siteSettings.allow_uncategorized_topics')) {
       // Don't show "uncategorized" if allow_uncategorized_topics setting is false.
       return false;
     }

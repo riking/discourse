@@ -24,8 +24,8 @@ export default ObjectController.extend(CanCheckEmails, {
   canSeeNotificationHistory: Em.computed.alias('canSeePrivateMessages'),
 
   showBadges: function() {
-    return Discourse.SiteSettings.enable_badges && (this.get('content.badge_count') > 0);
-  }.property('content.badge_count'),
+    return this.get('siteSettings.enable_badges') && (this.get('content.badge_count') > 0);
+  }.property('content.badge_count', 'siteSettings.enable_badges'),
 
   privateMessageView: function() {
     return (this.get('userActionType') === Discourse.UserAction.TYPES.messages_sent) ||

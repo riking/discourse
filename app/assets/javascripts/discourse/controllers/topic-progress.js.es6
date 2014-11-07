@@ -95,8 +95,8 @@ export default Ember.ObjectController.extend({
   }.property('postStream.loaded', 'currentPost', 'postStream.filteredPostsCount'),
 
   hugeNumberOfPosts: function() {
-    return (this.get('postStream.filteredPostsCount') >= Discourse.SiteSettings.short_progress_text_threshold);
-  }.property('highest_post_number'),
+    return this.get('postStream.filteredPostsCount') >= this.get('siteSettings.short_progress_text_threshold');
+  }.property('highest_post_number', 'siteSettings.short_progress_text_threshold'),
 
   jumpToBottomTitle: function() {
     if (this.get('hugeNumberOfPosts')) {

@@ -33,12 +33,12 @@ export default ObjectController.extend({
   showDescription: Em.computed.not('showMessageInput'),
 
   customMessageLengthClasses: function() {
-    return (this.get('message.length') < Discourse.SiteSettings.min_private_message_post_length) ? "too-short" : "ok";
-  }.property('message.length'),
+    return (this.get('message.length') < this.get('siteSettings.min_private_message_post_length')) ? "too-short" : "ok";
+  }.property('message.length', 'siteSettings.min_private_message_post_length'),
 
   customMessageLength: function() {
     var len = this.get('message.length') || 0;
-    var minLen = Discourse.SiteSettings.min_private_message_post_length;
+    var minLen = this.get('siteSettings.min_private_message_post_length');
     if (len === 0) {
       return I18n.t("flagging.custom_message.at_least", { n: minLen });
     } else if (len < minLen) {
@@ -48,7 +48,7 @@ export default ObjectController.extend({
         n: Discourse.PostActionType.MAX_MESSAGE_LENGTH - len
       });
     }
-  }.property('message.length')
+  }.property('message.length', 'siteSettings.min_private_message_post_length')
 
 });
 
