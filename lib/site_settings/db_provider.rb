@@ -4,7 +4,7 @@ class SiteSettings::DbProvider
 
   def initialize(model)
     model.after_commit do
-      model.notify_changed!
+      model.notify_servers_changed!
     end
 
     @model = model

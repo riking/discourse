@@ -260,16 +260,17 @@ module SiteSettingExtension
     clear_cache!
   end
 
-  def notify_changed!
+  # after_commit hook
+  def notify_servers_changed!
     MessageBus.publish('/site_settings', {process: process_id})
+  end
+
+  def notify_clients_changed!(name, value)
+    MessageBus.publish('/client_site_settings', {name: name, value: value})
   end
 
   def has_setting?(name)
     defaults.has_key?(name.to_sym) || defaults.has_key?("#{name}?".to_sym)
-  end
-
-  def requires_refresh?(name)
-    refresh_settings.include?(name.to_sym)
   end
 
   def filter_value(name, value)
@@ -288,7 +289,15 @@ module SiteSettingExtension
     if has_setting?(name)
       value = filter_value(name, value)
       self.send("#{name}=", value)
-      Discourse.request_refresh! if requires_refresh?(name)
+
+      update_action = update_levels[name]
+      if update_action == :client_push
+        notify_clients_changed!
+      elsif update_action == :refresh
+        Discourse.request_refresh!
+      elsif update_action == :restart
+        # TODO
+      end
     else
       raise ArgumentError.new("No setting named #{name} exists")
     end
