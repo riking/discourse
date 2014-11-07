@@ -26,6 +26,9 @@ Discourse::Application.routes.draw do
   resources :about
 
   get "site" => "site#index"
+  get "site/settings" => "site#settings"
+  get "site/custom_html" => "site#custom_html"
+  get "site/banner" => "site#banner"
 
   resources :forums
   get "srv/status" => "forums#status"

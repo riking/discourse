@@ -246,6 +246,7 @@ class ApplicationController < ActionController::Base
   private
 
     def preload_anonymous_data
+      # Make sure these are also available in SiteController
       store_preloaded("site", Site.json_for(guardian))
       store_preloaded("siteSettings", SiteSetting.client_settings_json)
       store_preloaded("customHTML", custom_html_json)
@@ -256,26 +257,6 @@ class ApplicationController < ActionController::Base
       store_preloaded("currentUser", MultiJson.dump(CurrentUserSerializer.new(current_user, scope: guardian, root: false)))
       serializer = ActiveModel::ArraySerializer.new(TopicTrackingState.report([current_user.id]), each_serializer: TopicTrackingStateSerializer)
       store_preloaded("topicTrackingStates", MultiJson.dump(serializer))
-    end
-
-    def custom_html_json
-      data = {
-        top: SiteText.text_for(:top),
-        bottom: SiteText.text_for(:bottom)
-      }
-
-      if DiscoursePluginRegistry.custom_html
-        data.merge! DiscoursePluginRegistry.custom_html
-      end
-
-      MultiJson.dump(data)
-    end
-
-    def banner_json
-      topic = Topic.where(archetype: Archetype.banner).limit(1).first
-      banner = topic.present? ? topic.banner : {}
-
-      MultiJson.dump(banner)
     end
 
     def render_json_error(obj)
@@ -364,6 +345,26 @@ class ApplicationController < ActionController::Base
         post_serializer.post_actions = counts
       end
       render_json_dump(post_serializer)
+    end
+
+    def custom_html_json
+      data = {
+        top: SiteText.text_for(:top),
+        bottom: SiteText.text_for(:bottom)
+      }
+
+      if DiscoursePluginRegistry.custom_html
+        data.merge! DiscoursePluginRegistry.custom_html
+      end
+
+      MultiJson.dump(data)
+    end
+
+    def banner_json
+      topic = Topic.where(archetype: Archetype.banner).limit(1).first
+      banner = topic.present? ? topic.banner : {}
+
+      MultiJson.dump(banner)
     end
 
     def api_key_valid?
