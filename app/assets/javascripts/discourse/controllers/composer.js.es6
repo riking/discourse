@@ -64,7 +64,7 @@ export default DiscourseController.extend({
       if (this.get('model.viewDraft')) {
         this.set('model.composeState', Discourse.Composer.OPEN);
       }
-    },
+    }
 
   },
 
@@ -232,8 +232,8 @@ export default DiscourseController.extend({
         message;
 
     // Ensure the fields are of the minimum length
-    if (body.length < this.get('siteSettings.min_body_similar_length') ||
-        title.length < this.get('siteSettings.min_title_similar_length')) { return; }
+    if (body.length < Discourse.SiteSettings.min_body_similar_length ||
+        title.length < Discourse.SiteSettings.min_title_similar_length) { return; }
 
     // TODO pass the 200 in from somewhere
     body = body.substr(0, 200);
@@ -293,7 +293,7 @@ export default DiscourseController.extend({
 
     // If we show the subcategory list, scope the categories drop down to
     // the category we opened the composer with.
-    if (this.get('siteSettings.show_subcategory_list)) {
+    if (Discourse.SiteSettings.show_subcategory_list) {
       this.set('scopedCategoryId', opts.categoryId);
     }
 
