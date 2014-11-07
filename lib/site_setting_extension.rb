@@ -17,8 +17,8 @@ module SiteSettingExtension
     @types ||= Enum.new(:string, :time, :fixnum, :float, :bool, :null, :enum, :list)
   end
 
-  def UPDATE_TYPES
-    @UPDATE_TYPES ||= [:none, :refresh, :client_push, :restart]
+  def update_notify_levels
+    @update_notify_levels ||= [:none, :client_push, :refresh, :restart]
   end
 
   def mutex
@@ -84,11 +84,11 @@ module SiteSettingExtension
         hidden_settings << name
       end
       if opts[:update]
-        if level = UPDATE_TYPES.find(opts[:update])
-          @update_levels[name] = level
+        if level = update_notify_levels.find(opts[:update])
+          update_levels[name] = level
         end
       elsif opts[:client]
-        @update_levels[name] = :client_push
+        update_levels[name] = :client_push
       end
 
       if validator_type = validator_for(opts[:type] || get_data_type(name, defaults[name]))

@@ -140,7 +140,7 @@ Discourse.computed = {
   setting: function(name) {
     return Em.computed(function() {
       return Discourse.SiteSettings[name];
-    }).property();
+    }).property("siteSettings." + name);
   }
 
 };

@@ -23,7 +23,10 @@ export default {
     application.inject('model', 'site', 'site:main');
 
     // Inject Discourse.SiteSettings to avoid using Discourse.SiteSettings globals
-    application.register('site-settings:main', Discourse.SiteSettings, { instantiate: false });
+    var providedSettings = PreloadStore.get('siteSettings'),
+        settings = Em.Object.create(providedSettings);
+    Discourse.SiteSettings = settings; // replace the global with the object
+    application.register('site-settings:main', settings, { instantiate: false });
     application.inject('controller', 'siteSettings', 'site-settings:main');
     application.inject('component', 'siteSettings', 'site-settings:main');
     application.inject('route', 'siteSettings', 'site-settings:main');
