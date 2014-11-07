@@ -6,11 +6,16 @@ task "release_note:generate", :tag do |t, args|
   new_features = Set.new
   ux_changes = Set.new
   sec_changes = Set.new
+  reverted_changes = Set.new
 
-
-  `git log #{tag}..HEAD`.each_line do |comment|
-    next if comment =~ /^\s*Revert/
+  `git log --oneline #{tag}..HEAD`.each_line do |comment|
+    if comment =~ /Revert "/
+      reverted_changes << reverted_message(line)
+      next
+    end
     split_comments(comment).each do |line|
+      next if reverted_changes.include? line
+
       if line =~ /^FIX:/
         bug_fixes << better(line)
       elsif line =~ /^FEATURE:/
@@ -27,6 +32,10 @@ task "release_note:generate", :tag do |t, args|
   puts "BUG FIXES:", "----------", "", bug_fixes.to_a, ""
   puts "UX CHANGES:", "-----------", "", ux_changes.to_a, ""
   puts "SECURITY CHANGES:", "-----------------", "", sec_changes.to_a, ""
+end
+
+def reverted_message(line)
+  line.match(/^\s*Revert "(.*)"\s*$/)[1]
 end
 
 def better(line)
