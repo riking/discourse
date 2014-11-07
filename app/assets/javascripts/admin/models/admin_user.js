@@ -57,15 +57,15 @@ Discourse.AdminUser = Discourse.User.extend({
 
   deleteAllPostsExplanation: function() {
     if (!this.get('can_delete_all_posts')) {
-      if (this.get('post_count') > Discourse.SiteSettings.delete_all_posts_max) {
-        return I18n.t('admin.user.cant_delete_all_too_many_posts', {count: Discourse.SiteSettings.delete_all_posts_max});
+      if (this.get('post_count') > this.get('siteSettings.delete_all_posts_max')) {
+        return I18n.t('admin.user.cant_delete_all_too_many_posts', {count: this.get('siteSettings.delete_all_posts_max')});
       } else {
-        return I18n.t('admin.user.cant_delete_all_posts', {count: Discourse.SiteSettings.delete_user_max_post_age});
+        return I18n.t('admin.user.cant_delete_all_posts', {count: this.get('siteSettings.delete_user_max_post_age')});
       }
     } else {
       return null;
     }
-  }.property('can_delete_all_posts'),
+  }.property('can_delete_all_posts', 'siteSettings.delete_all_posts_max', 'siteSettings.delete_user_max_post_age'),
 
   deleteAllPosts: function() {
     var user = this;
@@ -307,12 +307,12 @@ Discourse.AdminUser = Discourse.User.extend({
       if (this.get('staff')) {
         return I18n.t('admin.user.delete_forbidden_because_staff');
       } else {
-        return I18n.t('admin.user.delete_forbidden', {count: Discourse.SiteSettings.delete_user_max_post_age});
+        return I18n.t('admin.user.delete_forbidden', {count: this.get('siteSettings.delete_user_max_post_age')});
       }
     } else {
       return null;
     }
-  }.property('deleteForbidden'),
+  }.property('deleteForbidden', 'siteSettings.delete_user_max_post_age'),
 
   destroy: function() {
     var user = this;

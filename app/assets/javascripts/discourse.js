@@ -31,7 +31,7 @@ window.Discourse = Ember.Application.createWithMixins(Discourse.Ajax, {
 
     // if we change this we can trigger changes on document.title
     // only set if changed.
-    if($('title').text() !== title) {
+    if ($('title').text() !== title) {
       $('title').text(title);
     }
 
@@ -50,12 +50,12 @@ window.Discourse = Ember.Application.createWithMixins(Discourse.Ajax, {
   }.observes('_docTitle', 'hasFocus', 'notifyCount'),
 
   faviconChanged: function() {
-    if(Discourse.User.currentProp('dynamic_favicon')) {
+    if (Discourse.User.currentProp('dynamic_favicon')) {
       new Favcount(Discourse.SiteSettings.favicon_url).set(
         this.get('notifyCount')
       );
     }
-  }.observes('notifyCount'),
+  }.observes('notifyCount', 'Discourse.SiteSettings.favicon_url'),
 
   // The classes of buttons to show on a post
   postButtons: function() {

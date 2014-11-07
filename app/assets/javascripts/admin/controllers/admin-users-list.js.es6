@@ -65,8 +65,8 @@ export default Ember.ArrayController.extend(Discourse.Presence, {
     @property showApproval
   **/
   showApproval: function() {
-    return Discourse.SiteSettings.must_approve_users && this.get('queryHasApproval');
-  }.property('queryPending'),
+    return this.get('siteSettings.must_approve_users') && this.get('queryHasApproval');
+  }.property('queryPending', 'siteSettings.must_approve_users'),
 
   /**
     How many users are currently selected
@@ -135,7 +135,7 @@ export default Ember.ArrayController.extend(Discourse.Presence, {
       var message = I18n.t("admin.users.reject_successful", {count: result.success});
       if (result.failed > 0) {
         message += ' ' + I18n.t("admin.users.reject_failures", {count: result.failed});
-        message += ' ' + I18n.t("admin.user.delete_forbidden", {count: Discourse.SiteSettings.delete_user_max_post_age});
+        message += ' ' + I18n.t("admin.user.delete_forbidden", {count: this.get('siteSettings.delete_user_max_post_age')});
       }
       bootbox.alert(message);
       controller.refreshUsers();

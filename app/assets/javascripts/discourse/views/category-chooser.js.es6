@@ -30,7 +30,7 @@ export default ComboboxView.extend({
   }.on('init'),
 
   none: function() {
-    if (Discourse.User.currentProp('staff') || Discourse.SiteSettings.allow_uncategorized_topics) {
+    if (Discourse.User.currentProp('staff') || this.get('siteSettings.allow_uncategorized_topics')) {
       if (this.get('rootNone')) {
         return "category.none";
       } else {
@@ -39,7 +39,7 @@ export default ComboboxView.extend({
     } else {
       return 'category.choose';
     }
-  }.property(),
+  }.property('siteSettings.allow_uncategorized_topics'),
 
   template: function(item) {
 

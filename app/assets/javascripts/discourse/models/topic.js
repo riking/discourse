@@ -120,11 +120,11 @@ Discourse.Topic = Discourse.Model.extend({
 
   viewsHeat: function() {
     var v = this.get('views');
-    if( v >= Discourse.SiteSettings.topic_views_heat_high )   return 'heatmap-high';
-    if( v >= Discourse.SiteSettings.topic_views_heat_medium ) return 'heatmap-med';
-    if( v >= Discourse.SiteSettings.topic_views_heat_low )    return 'heatmap-low';
+    if (v >= this.get('siteSettings.topic_views_heat_high'))   return 'heatmap-high';
+    if (v >= this.get('siteSettings.topic_views_heat_medium')) return 'heatmap-med';
+    if (v >= this.get('siteSettings.topic_views_heat_low'))    return 'heatmap-low';
     return null;
-  }.property('views'),
+  }.property('views', 'siteSettings.topic_views_heat_high', 'siteSettings.topic_views_heat_medium', 'siteSettings.topic_views_heat_low'),
 
   archetypeObject: function() {
     return Discourse.Site.currentProp('archetypes').findProperty('id', this.get('archetype'));

@@ -14,10 +14,10 @@ export default Discourse.Route.extend({
   },
 
   fetchDashboardData: function(c) {
-    if( !c.get('dashboardFetchedAt') || moment().subtract(30, 'minutes').toDate() > c.get('dashboardFetchedAt') ) {
+    if (!c.get('dashboardFetchedAt') || moment().subtract(30, 'minutes').toDate() > c.get('dashboardFetchedAt')) {
       c.set('dashboardFetchedAt', new Date());
       Discourse.AdminDashboard.find().then(function(d) {
-        if( Discourse.SiteSettings.version_checks ){
+        if (Discourse.SiteSettings.version_checks) {
           c.set('versionCheck', Discourse.VersionCheck.create(d.version_check));
         }
         _.each(d.reports,function(report){
@@ -40,7 +40,7 @@ export default Discourse.Route.extend({
       });
     }
 
-    if( !c.get('problemsFetchedAt') || moment().subtract(c.problemsCheckMinutes, 'minutes').toDate() > c.get('problemsFetchedAt') ) {
+    if (!c.get('problemsFetchedAt') || moment().subtract(c.problemsCheckMinutes, 'minutes').toDate() > c.get('problemsFetchedAt')) {
       c.set('problemsFetchedAt', new Date());
       c.loadProblems();
     }

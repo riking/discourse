@@ -34,8 +34,8 @@ Discourse.Post = Discourse.Model.extend({
 
   showName: function() {
     var name = this.get('name');
-    return name && (name !== this.get('username'))  && Discourse.SiteSettings.display_name_on_posts;
-  }.property('name', 'username'),
+    return name && (name !== this.get('username')) && this.get('siteSettings.display_name_on_posts');
+  }.property('name', 'username', 'siteSettings.display_name_on_posts'),
 
   postDeletedBy: function() {
     if (this.get('firstPost')) { return this.get('topic.deleted_by'); }
@@ -55,10 +55,10 @@ Discourse.Post = Discourse.Model.extend({
 
   showUserReplyTab: function() {
     return this.get('reply_to_user') && (
-      !Discourse.SiteSettings.suppress_reply_directly_above ||
+      !this.get('siteSettings.suppress_reply_directly_above') ||
       this.get('reply_to_post_number') < (this.get('post_number') - 1)
     );
-  }.property('reply_to_user', 'reply_to_post_number', 'post_number'),
+  }.property('reply_to_user', 'reply_to_post_number', 'post_number', 'siteSettings.suppress_reply_directly_above'),
 
   byTopicCreator: Discourse.computed.propertyEqual('topic.details.created_by.id', 'user_id'),
   hasHistory: Em.computed.gt('version', 1),
@@ -235,7 +235,7 @@ Discourse.Post = Discourse.Model.extend({
     this.set('oldCooked', this.get('cooked'));
 
     // Moderators can delete posts. Users can only trigger a deleted at message, unless delete_removed_posts_after is 0.
-    if (deletedBy.get('staff') || Discourse.SiteSettings.delete_removed_posts_after === 0) {
+    if (deletedBy.get('staff') || this.get('siteSettings.delete_removed_posts_after') === 0) {
       this.setProperties({
         deleted_at: new Date(),
         deleted_by: deletedBy,
@@ -243,7 +243,7 @@ Discourse.Post = Discourse.Model.extend({
       });
     } else {
       this.setProperties({
-        cooked: Discourse.Markdown.cook(I18n.t("post.deleted_by_author", {count: Discourse.SiteSettings.delete_removed_posts_after})),
+        cooked: Discourse.Markdown.cook(I18n.t("post.deleted_by_author", {count: this.get('siteSettings.delete_removed_posts_after')})),
         can_delete: false,
         version: this.get('version') + 1,
         can_recover: true,
@@ -401,7 +401,7 @@ Discourse.Post = Discourse.Model.extend({
     if (replyCount === 0) return false;
 
     // Always show replies if the setting `suppress_reply_directly_below` is false.
-    if (!Discourse.SiteSettings.suppress_reply_directly_below) return true;
+    if (!this.get('siteSettings.suppress_reply_directly_below')) return true;
 
     // Always show replies if there's more than one
     if (replyCount > 1) return true;
@@ -410,7 +410,7 @@ Discourse.Post = Discourse.Model.extend({
     var topic = this.get('topic');
     return !topic.isReplyDirectlyBelow(this);
 
-  }.property('reply_count'),
+  }.property('reply_count', 'siteSettings.suppress_reply_directly_below'),
 
   expandHidden: function() {
     var self = this;

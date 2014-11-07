@@ -166,7 +166,7 @@ var ApplicationRoute = Discourse.Route.extend({
   handleShowLogin: function() {
     var self = this;
 
-    if(Discourse.SiteSettings.enable_sso) {
+    if (Discourse.SiteSettings.enable_sso) {
       var returnPath = encodeURIComponent(window.location.pathname);
       window.location = Discourse.getURL('/session/sso?return_path=' + returnPath);
     } else {

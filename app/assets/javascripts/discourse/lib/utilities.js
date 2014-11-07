@@ -198,7 +198,7 @@ Discourse.Utilities = {
 
     // check file size
     var fileSizeKB = file.size / 1024;
-    var maxSizeKB = Discourse.SiteSettings['max_' + type + '_size_kb'];
+    var maxSizeKB = Discourse.SiteSettings.get('max_' + type + '_size_kb');
     if (fileSizeKB > maxSizeKB) {
       bootbox.alert(I18n.t('post.errors.file_too_large', { max_size_kb: maxSizeKB }));
       return false;

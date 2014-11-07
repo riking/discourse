@@ -20,10 +20,10 @@ Discourse.PostView = Discourse.GroupedView.extend(Ember.Evented, {
     var rightNow = new Date().getTime(),
         updatedAtDate = new Date(updatedAt).getTime();
 
-    if (updatedAtDate > (rightNow - DAY * Discourse.SiteSettings.history_hours_low)) return 'heatmap-high';
-    if (updatedAtDate > (rightNow - DAY * Discourse.SiteSettings.history_hours_medium)) return 'heatmap-med';
-    if (updatedAtDate > (rightNow - DAY * Discourse.SiteSettings.history_hours_high)) return 'heatmap-low';
-  }.property('post.updated_at'),
+    if (updatedAtDate > (rightNow - DAY * this.get('siteSettings.history_hours_low'))) return 'heatmap-high';
+    if (updatedAtDate > (rightNow - DAY * this.get('siteSettings.history_hours_medium'))) return 'heatmap-med';
+    if (updatedAtDate > (rightNow - DAY * this.get('siteSettings.history_hours_high'))) return 'heatmap-low';
+  }.property('post.updated_at', 'siteSettings.history_hours_low', 'siteSettings.history_hours_medium', 'siteSettings.history_hours_high'),
 
   postTypeClass: function() {
     return this.get('post.post_type') === Discourse.Site.currentProp('post_types.moderator_action') ? 'moderator' : 'regular';
@@ -192,8 +192,9 @@ Discourse.PostView = Discourse.GroupedView.extend(Ember.Evented, {
       var stream = topicController.get('postStream');
       var offsetFromTop = this.$().position().top - $(window).scrollTop();
 
-      if(Discourse.SiteSettings.experimental_reply_expansion) {
-        if(postNumber - replyPostNumber > 1) {
+      // TODO resolve
+      if (Discourse.SiteSettings.experimental_reply_expansion) {
+        if (postNumber - replyPostNumber > 1) {
           stream.collapsePosts(replyPostNumber + 1, postNumber - 1);
         }
 

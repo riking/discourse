@@ -124,10 +124,12 @@ Discourse.Composer = Discourse.Model.extend({
     if (this.get('missingReplyCharacters') > 0) return true;
 
     return this.get('canCategorize') &&
-        !Discourse.SiteSettings.allow_uncategorized_topics &&
+        !this.get('siteSettings.allow_uncategorized_topics') &&
         !this.get('categoryId') &&
         !Discourse.User.currentProp('staff');
-  }.property('loading', 'canEditTitle', 'titleLength', 'targetUsernames', 'replyLength', 'categoryId', 'missingReplyCharacters'),
+  }.property('loading', 'canEditTitle', 'titleLength',
+      'targetUsernames', 'replyLength', 'categoryId',
+      'missingReplyCharacters', 'siteSettings.allow_uncategorized_topics'),
 
   /**
     Is the title's length valid?
@@ -137,8 +139,8 @@ Discourse.Composer = Discourse.Model.extend({
   titleLengthValid: function() {
     if (Discourse.User.currentProp('admin') && this.get('post.static_doc') && this.get('titleLength') > 0) return true;
     if (this.get('titleLength') < this.get('minimumTitleLength')) return false;
-    return (this.get('titleLength') <= Discourse.SiteSettings.max_topic_title_length);
-  }.property('minimumTitleLength', 'titleLength', 'post.static_doc'),
+    return (this.get('titleLength') <= this.get('siteSettings.max_topic_title_length'));
+  }.property('minimumTitleLength', 'titleLength', 'post.static_doc', 'siteSettings.max_topic_title_length'),
 
   // The icon for the save button
   saveIcon: function () {
@@ -190,11 +192,11 @@ Discourse.Composer = Discourse.Model.extend({
   **/
   minimumTitleLength: function() {
     if (this.get('privateMessage')) {
-      return Discourse.SiteSettings.min_private_message_title_length;
+      return this.get('siteSettings.min_private_message_title_length');
     } else {
-      return Discourse.SiteSettings.min_topic_title_length;
+      return this.get('siteSettings.min_topic_title_length');
     }
-  }.property('privateMessage'),
+  }.property('privateMessage', 'siteSettings.min_private_message_title_length', 'siteSettings.min_topic_title_length'),
 
   /**
     Number of missing characters in the reply until valid.
@@ -211,12 +213,12 @@ Discourse.Composer = Discourse.Model.extend({
     @property minimumPostLength
   **/
   minimumPostLength: function() {
-    if( this.get('privateMessage') ) {
-      return Discourse.SiteSettings.min_private_message_post_length;
+    if (this.get('privateMessage')) {
+      return this.get('siteSettings.min_private_message_post_length');
     } else {
-      return Discourse.SiteSettings.min_post_length;
+      return this.get('siteSettings.min_post_length');
     }
-  }.property('privateMessage'),
+  }.property('privateMessage', 'siteSettings.min_private_message_post_length', 'siteSettings.min_post_length'),
 
   /**
     Computes the length of the title minus non-significant whitespaces
@@ -620,7 +622,7 @@ Discourse.Composer = Discourse.Model.extend({
     // Do not save when there is no reply
     if (!this.get('reply')) return;
     // Do not save when the reply's length is too small
-    if (this.get('replyLength') < Discourse.SiteSettings.min_post_length) return;
+    if (this.get('replyLength') < this.get('siteSettings.min_post_length')) return;
 
     var data = {
       reply: this.get('reply'),

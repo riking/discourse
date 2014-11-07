@@ -56,11 +56,11 @@ Discourse.User = Discourse.Model.extend({
     @type {String}
   **/
   displayName: function() {
-    if (Discourse.SiteSettings.enable_names && !this.blank('name')) {
+    if (this.get('siteSettings.enable_names') && !this.blank('name')) {
       return this.get('name');
     }
     return this.get('username');
-  }.property('username', 'name'),
+  }.property('username', 'name', 'siteSettings.enable_names'),
 
   /**
     This user's profile background(in CSS).
@@ -70,10 +70,10 @@ Discourse.User = Discourse.Model.extend({
   **/
   profileBackground: function() {
     var background = this.get('profile_background');
-    if(Em.isEmpty(background) || !Discourse.SiteSettings.allow_profile_backgrounds) { return; }
+    if (Em.isEmpty(background) || !this.get('siteSettings.allow_profile_backgrounds')) { return; }
 
     return 'background-image: url(' + background + ')';
-  }.property('profile_background'),
+  }.property('profile_background', 'siteSettings.allow_profile_backgrounds'),
 
   statusIcon: function() {
     var name = Handlebars.Utils.escapeExpression(this.get('name')),
@@ -216,7 +216,7 @@ Discourse.User = Discourse.Model.extend({
       data[s + '_category_ids'] = cats;
     });
 
-    if (!Discourse.SiteSettings.edit_history_visible_to_public) {
+    if (!this.get('siteSettings.edit_history_visible_to_public')) {
       data['edit_history_public'] = this.get('edit_history_public');
     }
 
@@ -372,7 +372,7 @@ Discourse.User = Discourse.Model.extend({
   isAllowedToUploadAFile: function(type) {
     return this.get('staff') ||
            this.get('trust_level') > 0 ||
-           Discourse.SiteSettings['newuser_max_' + type + 's'] > 0;
+           this.get('siteSettings.newuser_max_' + type + 's') > 0;
   },
 
   /**

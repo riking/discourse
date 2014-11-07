@@ -90,15 +90,15 @@ export default Discourse.View.extend({
         visibleButtons = [];
 
     if (typeof hiddenButtons === "undefined") {
-      if (!Em.isEmpty(Discourse.SiteSettings.post_menu_hidden_items)) {
-        hiddenButtons = Discourse.SiteSettings.post_menu_hidden_items.split('|');
+      if (!Em.isEmpty(this.get('siteSettings.post_menu_hidden_items'))) {
+        hiddenButtons = this.get('siteSettings.post_menu_hidden_items').split('|');
       } else {
         hiddenButtons = [];
       }
     }
 
     var yours = post.get('yours');
-    Discourse.SiteSettings.post_menu.split("|").forEach(function(i) {
+    this.get('siteSettings.post_menu').split("|").forEach(function(i) {
       var creator = self["buttonFor" + i.replace(/\+/, '').capitalize()];
       if (creator) {
         var button = creator.call(self, post);

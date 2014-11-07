@@ -149,11 +149,11 @@ Discourse.PostStream = Em.Object.extend({
     var firstIndex = this.indexOf(firstPost);
     if (firstIndex === -1) { return []; }
 
-    var startIndex = firstIndex - Discourse.SiteSettings.posts_chunksize;
+    var startIndex = firstIndex - this.get('siteSettings.posts_chunksize');
     if (startIndex < 0) { startIndex = 0; }
     return stream.slice(startIndex, firstIndex);
 
-  }.property('posts.@each', 'stream.@each'),
+  }.property('posts.@each', 'stream.@each', 'siteSettings.posts_chunksize'),
 
   /**
     Returns the window of posts below the current set in the stream, bound by the bottom of the
@@ -173,8 +173,8 @@ Discourse.PostStream = Em.Object.extend({
     if ((lastIndex + 1) >= this.get('highest_post_number')) { return []; }
 
     // find our window of posts
-    return stream.slice(lastIndex+1, lastIndex+Discourse.SiteSettings.posts_chunksize+1);
-  }.property('lastLoadedPost', 'stream.@each'),
+    return stream.slice(lastIndex + 1, lastIndex + this.get('siteSettings.posts_chunksize') + 1);
+  }.property('lastLoadedPost', 'stream.@each', 'siteSettings.posts_chunksize'),
 
 
   /**
@@ -649,7 +649,7 @@ Discourse.PostStream = Em.Object.extend({
   **/
   findReplyHistory: function(post) {
     var postStream = this,
-        url = "/posts/" + post.get('id') + "/reply-history.json?max_replies=" + Discourse.SiteSettings.max_reply_history;
+        url = "/posts/" + post.get('id') + "/reply-history.json?max_replies=" + this.get('siteSettings.max_reply_history');
 
     return Discourse.ajax(url).then(function(result) {
       return result.map(function (p) {

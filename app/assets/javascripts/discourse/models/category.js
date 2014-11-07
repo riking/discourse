@@ -46,8 +46,8 @@ Discourse.Category = Discourse.Model.extend({
   }.property('color', 'text_color'),
 
   moreTopics: function() {
-    return this.get('topic_count') > Discourse.SiteSettings.category_featured_topics;
-  }.property('topic_count'),
+    return this.get('topic_count') > this.get('siteSettings.category_featured_topics');
+  }.property('topic_count', 'siteSettings.category_featured_topics'),
 
   save: function() {
     var url = "/categories";
@@ -117,9 +117,9 @@ Discourse.Category = Discourse.Model.extend({
   featuredTopics: function() {
     var topics = this.get('topics');
     if (topics && topics.length) {
-      return topics.slice(0, Discourse.SiteSettings.category_featured_topics || 2);
+      return topics.slice(0, this.get('siteSettings.category_featured_topics') || 2);
     }
-  }.property('topics'),
+  }.property('topics', 'siteSettings.category_featured_topics'),
 
   topicTrackingState: function(){
     return Discourse.TopicTrackingState.current();
