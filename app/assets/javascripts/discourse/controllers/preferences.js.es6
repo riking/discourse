@@ -36,17 +36,17 @@ export default ObjectController.extend(CanCheckEmails, {
 
   canSelectTitle: function() {
     return Discourse.SiteSettings.enable_badges && this.get('model.has_title_badges');
-  }.property('model.badge_count'),
+  }.property('model.badge_count', 'siteSettings.enable_badges'),
 
   canChangePassword: function() {
     return !Discourse.SiteSettings.enable_sso && Discourse.SiteSettings.enable_local_logins;
-  }.property(),
+  }.property('siteSettings.enable_sso', 'siteSettings.enable_local_logins'),
 
   availableLocales: function() {
     return Discourse.SiteSettings.available_locales.split('|').map( function(s) {
       return {name: s, value: s};
     });
-  }.property(),
+  }.property('siteSettings.available_locales'),
 
   digestFrequencies: [{ name: I18n.t('user.email_digests.daily'), value: 1 },
                       { name: I18n.t('user.email_digests.weekly'), value: 7 },
