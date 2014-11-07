@@ -21,6 +21,7 @@
 required:
   title:
     client: true
+    update: refresh
     default: 'Discourse'
   site_description:
     default: ''
@@ -162,6 +163,7 @@ basic:
   show_subcategory_list:
     default: false
     client: true
+    update: reload
   enable_badges:
     client: true
     default: true
@@ -172,6 +174,7 @@ login:
     default: false
   login_required:
     client: true
+    update: client-push # anyone denied by login-required isn't going to wait around for it to be turned off
     default: false
   must_approve_users:
     client: true
@@ -225,6 +228,7 @@ login:
   enable_sso:
     client: true
     default: false
+    update: refresh
   sso_url: ''
   sso_secret: ''
   sso_overrides_email: false
@@ -343,6 +347,7 @@ posting:
   traditional_markdown_linebreaks:
     client: true
     default: false
+    update: restart
   suppress_reply_directly_below:
     client: true
     default: true
@@ -357,6 +362,7 @@ posting:
   experimental_reply_expansion:
     default: false
     client: true
+    update: refresh
   post_undo_action_window_mins: 10
   max_mentions_per_post: 10
   newuser_max_replies_per_topic: 3
@@ -382,6 +388,7 @@ posting:
   default_code_lang:
     client: true
     default: "auto"
+    update: restart
   warn_reviving_old_topic_age: 180
   autohighlight_all_code:
     client: true
@@ -435,7 +442,7 @@ files:
   authorized_extensions:
     client: true
     default: 'jpg|jpeg|png|gif'
-    update: refresh
+    update: client-push
     type: list
   crawl_images:
     default:
@@ -638,6 +645,7 @@ developer:
   flush_timings_secs:
     client: true
     default: 10
+    update: client-push
   active_user_rate_limit_secs: 60
   verbose_localization:
     default: false
@@ -700,6 +708,7 @@ uncategorized:
   suppress_uncategorized_badge:
     client: true
     default: true
+    update: client-push
 
   # Search
   min_search_term_length:
