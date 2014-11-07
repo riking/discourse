@@ -290,9 +290,13 @@ module SiteSettingExtension
       value = filter_value(name, value)
       self.send("#{name}=", value)
 
+      if client_settings.include? name
+        notify_clients_changed!(name, value)
+      end
+
       update_action = update_levels[name]
       if update_action == :client_push
-        notify_clients_changed!(name, value)
+        # already done
       elsif update_action == :refresh
         Discourse.request_refresh!
       elsif update_action == :restart

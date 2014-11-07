@@ -1,14 +1,15 @@
 export default {
-    name: "site-settings",
-    after: "message-bus",
+  name: "site-settings",
+  after: "message-bus",
 
-    initialize: function (container) {
-        var settings = container.lookup("site-settings:main")
+  initialize: function (container) {
+    var settings = container.lookup("site-settings:main");
 
-        if (!Discourse.MessageBus) { return; }
+    if (!Discourse.MessageBus) { return; }
 
-        Discourse.MessageBus.subscribe("/client_site_settings", function (change) {
-            settings.set(change.name, change.value);
-        });
-    }
+    Discourse.MessageBus.subscribe("/client_site_settings", function(change) {
+      console.info("recieved site setting update: ", change);
+      settings.set(change.name, change.value);
+    });
+  }
 };
