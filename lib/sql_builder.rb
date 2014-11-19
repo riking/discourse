@@ -7,7 +7,7 @@ class SqlBuilder
     @klass = klass
   end
 
-  [:set, :where2,:where,:order_by,:limit,:left_join,:join,:offset, :select].each do |k|
+  [:set, :where2, :where, :order_by, :limit, :left_join, :join, :offset, :select, :explained].each do |k|
     define_method k do |data, args = {}|
       @args.merge!(args)
       @sections[k] ||= []
@@ -47,6 +47,8 @@ class SqlBuilder
         joined = "ORDER BY " << v.join(" , ")
       when :set
         joined = "SET " << v.join(" , ")
+      when :explained
+        sql = "EXPLAIN " + sql
       end
 
       sql.sub!("/*#{k}*/", joined)
