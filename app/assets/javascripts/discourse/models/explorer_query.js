@@ -2,7 +2,12 @@
 Discourse.ExplorerQuery = Discourse.Model.extend({
 
   save: function() {
-    
+    return Discourse.ajax('/explorer/save/' + this.get('id'), { type: "POST", data: {
+      name: this.get('name'),
+      query: this.get('query'),
+      params: this.get('param_list'),
+
+    }});
   }
 });
 

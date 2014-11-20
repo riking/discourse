@@ -41,6 +41,7 @@ class ExplorerController < ApplicationController
       raise Discourse::NotFound
     end
 
+    render_serialized query
   end
 
   def run
