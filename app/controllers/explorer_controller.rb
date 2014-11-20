@@ -8,31 +8,12 @@ class ExplorerController < ApplicationController
 
   def list
     # TODO real data
-    render json: [
-        {
-            name: "2^n eligible posts",
-            sql: "SELECT 2 foo, 3 AS bar, 4 AS baz",
-            params: {},
-            public_read: true,
-            public_run: true,
-            creator: {
-                username: "PJH"
-            }
-        },
-        {
-            name: "Attendance",
-            sql: "SELECT 2 foo, 3 AS bar, 4 AS baz FROM users WHERE user_id = :user_id",
-            params: {
-                user_id: "integer"
-            },
-            public_read: true,
-            public_run: true,
-            creator: {
-                username: "PJH"
-            }
+    queries = ExplorerQuery.all
+    unless guardian.is_admin?
+      queries = queries.where(public_view: true)
+    end
 
-        }
-    ]
+    render_serialized queries, ExplorerQuerySerializer
   end
 
   def show

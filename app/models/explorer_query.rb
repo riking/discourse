@@ -1,6 +1,6 @@
 class ExplorerQuery < ActiveRecord::Base
   belongs_to :creator, class_name: "User"
-  has_many :explorer_query_parameters
+  has_many :params, class_name: "ExplorerQueryParameter"
 
 end
 
