@@ -171,6 +171,8 @@ basic:
   enable_badges:
     client: true
     default: true
+  enable_data_explorer: true
+  public_data_explorer: true
 
 login:
   invite_only:

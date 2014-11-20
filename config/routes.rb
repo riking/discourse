@@ -498,8 +498,9 @@ Discourse::Application.routes.draw do
   root to: "list#top", constraints: HomePageConstraint.new("top"), :as => "top_lists"
 
   get "explorer" => "explorer#index"
+  get "explorer/query/:id" => "explorer#query"
   get "explorer/list" => "explorer#list", format: :json
-  get "explorer/query/:id" => "explorer#show"
+  get "explorer/show/:id" => "explorer#show", format: :json
   post "explorer/run/:id" => "explorer#run"
   post "explorer/save/:id" => "explorer#save", constraints: AdminConstraint.new
 
