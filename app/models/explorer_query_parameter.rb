@@ -7,7 +7,7 @@ end
 # Table name: explorer_query_parameters
 #
 #  id                :integer          not null, primary key
-#  explorer_query_id :integer
-#  param_name        :string(255)
-#  type              :integer
+#  explorer_query_id :integer          not null
+#  param_name        :string(255)      not null
+#  type              :integer          not null
 #

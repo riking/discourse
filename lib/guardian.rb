@@ -271,7 +271,7 @@ class Guardian
 
   def can_see_explorer_query?(query)
     query && is_admin? || (
-      SiteSetting.public_data_explorer && query.public_read
+      SiteSetting.public_data_explorer && query.public_view
     )
   end
 
