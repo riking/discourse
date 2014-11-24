@@ -14,7 +14,13 @@
     {{else}}
       <br>
       {{combo-box valueAttribute="id" value=controller.selectedBadgeId content=controller.grantableBadges}}
-      <button class='btn btn-primary' {{action "grantBadge" controller.selectedBadgeId}}>{{i18n admin.badges.grant}}</button>
+      <br>
+      {{text-field value=postId placeholderKey="admin.badges.placeholder_post_number" disabled=postIdDisabled}}
+      <button class='btn btn-primary' {{action "grantBadge" controller.selectedBadgeId}} {{bind-attr disabled=submitDisabled}}>{{i18n admin.badges.grant}}</button>
+      {{#if error}}
+        <br>
+        <span class="grant-error">{{error}}</span>
+      {{/if}}
     {{/if}}
 
     <br>
@@ -35,10 +41,14 @@
         <tr>
           <td>{{user-badge badge=badge}}</td>
           <td>
-            {{#link-to 'adminUser' badge.granted_by}}
-              {{avatar granted_by imageSize="tiny"}}
-              {{granted_by.username}}
-            {{/link-to}}
+            {{#if badge.granted_by}}
+              {{#link-to 'adminUser' badge.granted_by}}
+                {{avatar granted_by imageSize="tiny"}}
+                {{granted_by.username}}
+              {{/link-to}}
+            {{else}}
+              {{i18n admin.badges.granted_by_sql}}
+            {{/if}}
           </td>
           <td>{{age-with-tooltip granted_at}}</td>
           <td>

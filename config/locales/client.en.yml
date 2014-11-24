@@ -2124,7 +2124,10 @@ en:
         revoke_confirm: Are you sure you want to revoke this badge?
         edit_badges: Edit Badges
         grant_badge: Grant Badge
+        placeholder_post_number: "'topic/post' or post id (ex: 187/4, 27653)"
+        bad_post_number: "Bad or non-existent post ID"
         granted_badges: Granted Badges
+        granted_by_sql: (automatic)
         grant: Grant
         no_user_badges: "%{name} has not been granted any badges."
         no_badges: There are no badges that can be granted.

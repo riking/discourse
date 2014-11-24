@@ -39,7 +39,15 @@ class UserBadgesController < ApplicationController
     end
 
     badge = fetch_badge_from_params
-    user_badge = BadgeGranter.grant(badge, user, granted_by: current_user)
+    post_id = nil
+    if badge.target_posts
+      params.require(:post_ident)
+      unless post_id = get_post_id_from_ident(params[:post_ident])
+        return render_json_error 'bad_post_id' # magic string, client turns into translation
+      end
+    end
+
+    user_badge = BadgeGranter.grant(badge, user, granted_by: current_user, post_id: post_id)
 
     render_serialized(user_badge, UserBadgeSerializer, root: "user_badge")
   end
@@ -58,6 +66,17 @@ class UserBadgesController < ApplicationController
   end
 
   private
+
+    def get_post_id_from_ident(post_ident)
+      match = post_ident.match /(\d+)(\/(\d+))?/
+      return nil unless match
+
+      if match[3]
+        Post.where(topic_id: match[1].to_i, post_number: match[3].to_i).pluck(:id).first
+      else
+        match[1].to_i if Post.exists?(id: match[1].to_i)
+      end
+    end
 
     # Get the badge from either the badge name or id specified in the params.
     def fetch_badge_from_params

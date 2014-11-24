@@ -126,14 +126,16 @@ Discourse.UserBadge.reopenClass({
     @method grant
     @param {Integer} badgeId id of the badge to be granted.
     @param {String} username username of the user to be granted the badge.
+    @param {String} postIdent string of 'postid' OR 'topic/post_num'.
     @returns {Promise} a promise that resolves to an instance of `Discourse.UserBadge`.
   **/
-  grant: function(badgeId, username) {
+  grant: function(badgeId, username, postIdent) {
     return Discourse.ajax("/user_badges", {
       type: "POST",
       data: {
         username: username,
-        badge_id: badgeId
+        badge_id: badgeId,
+        post_ident: postIdent
       }
     }).then(function(json) {
       return Discourse.UserBadge.createFromJson(json);
