@@ -154,8 +154,14 @@ var showSelector = function(){
   });
 };
 
-window.PagedownCustom.appendButtons.push({
-  id: 'wmd-emoji-button',
-  description: I18n.t("composer.emoji"),
-  execute: showSelector
+// a ready callback is necessary to access SiteSettings which is defined at the bottom of the page?
+// would do better as an es6 initializer
+$(function() {
+  if (Discourse.SiteSettings.enable_emoji) {
+    window.PagedownCustom.appendButtons.push({
+      id: 'wmd-emoji-button',
+      description: I18n.t("composer.emoji"),
+      execute: showSelector
+    });
+  }
 });
