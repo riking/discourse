@@ -1,0 +1,21 @@
+<div class="modal-body">
+  <div {{bind-attr class=":error-container error-class"}}>
+    {{#if hasResponse}}
+      {{#if hasErrorJson}}
+        {{#each error in errorsArray}}
+          <li>{{error}}</li>
+        {{/each}}
+      {{else}}
+        {{i18n 'generic_error'}}
+      {{/if}}
+    {{else}}
+      {{#if hasStatusCode}}
+        Server responded with {{statusCode}}
+        <!-- todo meaningful messages-->
+      {{/if}}
+    {{/if}}
+    <div class="status-code-line">
+      {{i18n 'errors.status_line' status=statusCode}}
+    </div>
+  </div>
+</div>

@@ -537,6 +537,10 @@ en:
 
     loading: "Loading..."
     errors:
+      header:
+        composer: "Error saving post"
+        generic: Error performing action
+      status_line: "server responded with error code {{status}}"
       prev_page: "while trying to load"
       reasons:
         network: "Network Error"

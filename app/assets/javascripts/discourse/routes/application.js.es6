@@ -62,6 +62,10 @@ var ApplicationRoute = Discourse.Route.extend({
       }
     },
 
+    showError: function(xhr, desc) {
+      Discourse.Route.showModal(this, 'show-error', {xhr: xhr, description: desc || 'generic'});
+    },
+
     autoLogin: function(modal, onFail){
       var methods = Em.get('Discourse.LoginMethod.all');
       if (!Discourse.SiteSettings.enable_local_logins &&

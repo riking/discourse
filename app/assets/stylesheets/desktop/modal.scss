@@ -202,3 +202,16 @@
     width: 400px;
   }
 }
+
+.modal-show-error {
+  h3 {
+    color: $tertiary;
+  }
+
+  .status-code-line {
+    color: grey;
+    font-style: italic;
+    margin-top: 10px;
+    font-size: .8em;
+  }
+}
