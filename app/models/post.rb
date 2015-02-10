@@ -219,10 +219,11 @@ class Post < ActiveRecord::Base
     return hosts if hosts.length == 0
 
     TopicLink.where(domain: hosts.keys, user_id: acting_user.id)
-             .group(:domain, :post_id)
-             .count.keys.each do |tuple|
+             .group(:domain)
+             .count.each do |tuple|
       domain = tuple[0]
-      hosts[domain] = (hosts[domain] || 0) + 1
+      count = tuple[1].to_i
+      hosts[domain] = (hosts[domain] || 0) + count
     end
 
     hosts
