@@ -74,6 +74,7 @@ class PostMover
       topic_id: destination_topic.id,
       acting_user: user
     )
+    raise ActiveRecord::Rollback unless p.present?
     p.update_column(:reply_count, @reply_count[1] || 0)
   end
 

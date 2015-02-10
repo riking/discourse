@@ -224,9 +224,12 @@ class PostAction < ActiveRecord::Base
                                 end
     end
 
-    PostCreator.new(user, opts).create.id
+    post = PostCreator.new(user, opts).create
+    raise ActiveRecord::Rollback unless post.present?
+    post.id
   end
 
+  # TODO transaction, error returning
   def self.act(user, post, post_action_type_id, opts = {})
     related_post_id = create_message_for_post_action(user, post, post_action_type_id, opts)
     staff_took_action = opts[:take_action] || false

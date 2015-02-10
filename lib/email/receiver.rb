@@ -255,7 +255,7 @@ module Email
       creator = PostCreator.new(user, options)
       post = creator.create
 
-      if creator.errors.present?
+      if post.errors.present?
         raise InvalidPost, creator.errors.full_messages.join("\n")
       end
 

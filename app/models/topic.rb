@@ -484,6 +484,7 @@ class Topic < ActiveRecord::Base
                                 no_bump: opts[:bump].blank?,
                                 topic_id: self.id)
       new_post = creator.create
+      raise ActiveRecord::Rollback.new unless new_post.present?
       increment!(:moderator_posts_count)
     end
 

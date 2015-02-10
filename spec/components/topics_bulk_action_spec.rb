@@ -106,7 +106,7 @@ describe TopicsBulkAction do
     context "when the user can moderate the topic" do
       it "closes the topic and returns the topic_id" do
         Guardian.any_instance.expects(:can_moderate?).returns(true)
-        Guardian.any_instance.expects(:can_create?).returns(true)
+        Guardian.any_instance.stubs(:can_create_post?).returns(true)
         tba = TopicsBulkAction.new(topic.user, [topic.id], type: 'close')
         topic_ids = tba.perform!
         expect(topic_ids).to eq([topic.id])
@@ -133,7 +133,7 @@ describe TopicsBulkAction do
     context "when the user can moderate the topic" do
       it "archives the topic and returns the topic_id" do
         Guardian.any_instance.expects(:can_moderate?).returns(true)
-        Guardian.any_instance.expects(:can_create?).returns(true)
+        Guardian.any_instance.stubs(:can_create_post?).returns(true)
         tba = TopicsBulkAction.new(topic.user, [topic.id], type: 'archive')
         topic_ids = tba.perform!
         expect(topic_ids).to eq([topic.id])

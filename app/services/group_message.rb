@@ -36,6 +36,7 @@ class GroupMessage
         title: I18n.t("system_messages.#{@message_type}.subject_template", message_params),
         raw: I18n.t("system_messages.#{@message_type}.text_body_template", message_params)
       )
+      raise ActiveRecord::Rollback unless post.present?
       remember_message_sent
       post
     else

@@ -38,12 +38,12 @@ class TopicEmbed < ActiveRecord::Base
                                   cook_method: Post.cook_methods[:raw_html],
                                   category: SiteSetting.embed_category)
         post = creator.create
-        if post.present?
-          TopicEmbed.create!(topic_id: post.topic_id,
-                             embed_url: url,
-                             content_sha1: content_sha1,
-                             post_id: post.id)
-        end
+        raise ActiveRecord::Rollback unless post.present?
+
+        TopicEmbed.create!(topic_id: post.topic_id,
+                           embed_url: url,
+                           content_sha1: content_sha1,
+                           post_id: post.id)
       end
     else
       absolutize_urls(url, contents)
