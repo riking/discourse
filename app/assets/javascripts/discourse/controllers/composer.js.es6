@@ -167,7 +167,7 @@ export default DiscourseController.extend({
       this.set('model.isWarning', false);
     }
 
-    if(composer.get('cantSubmitPost')) {
+    if (composer.get('cantSubmitPost')) {
       var now = Date.now();
       this.setProperties({
         'view.showTitleTip': now,
@@ -181,7 +181,7 @@ export default DiscourseController.extend({
 
     // for now handle a very narrow use case
     // if we are replying to a topic AND not on the topic pop the window up
-    if(!force && composer.get('replyingToTopic')) {
+    if (!force && composer.get('replyingToTopic')) {
       var topic = this.get('topic');
       if (!topic || topic.get('id') !== composer.get('topic.id'))
       {
@@ -243,9 +243,11 @@ export default DiscourseController.extend({
           Discourse.URL.routeTo(opts.post.get('url'));
         }
       }
-    }, function(error) {
+    }, function(xhr) {
+      console.log(xhr);
       composer.set('disableDrafts', false);
-      bootbox.alert(error);
+      self.send('showError', xhr, 'composer');
+      return null;
     });
   },
 

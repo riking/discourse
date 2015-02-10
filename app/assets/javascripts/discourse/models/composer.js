@@ -413,8 +413,10 @@ Discourse.Composer = Discourse.Model.extend({
   },
 
   save: function(opts) {
-    if( !this.get('cantSubmitPost') ) {
+    if (!this.get('cantSubmitPost')) {
       return this.get('editingPost') ? this.editPost(opts) : this.createPost(opts);
+    } else {
+      return Ember.RSVP.resolve();
     }
   },
 
@@ -464,15 +466,10 @@ Discourse.Composer = Discourse.Model.extend({
       return post.save(function(result) {
         post.updateFromPost(result);
         self.clearState();
-      }).catch(function(error) {
-        var response = $.parseJSON(error.responseText);
-        if (response && response.errors) {
-          return(response.errors[0]);
-        } else {
-          return(I18n.t('generic_error'));
-        }
+      }, function(xhr) {
         post.set('cooked', oldCooked);
         self.set('composeState', OPEN);
+        return Ember.RSVP.reject(xhr);
       });
     });
   },
@@ -584,27 +581,14 @@ Discourse.Composer = Discourse.Model.extend({
         }
 
         return resolve({ post: result });
-      }, function(error) {
+      }, function(xhr) {
         // If an error occurs
         if (postStream) {
           postStream.undoPost(createdPost);
         }
         composer.set('composeState', OPEN);
 
-        // TODO extract error handling code
-        var parsedError;
-        try {
-          var parsedJSON = $.parseJSON(error.responseText);
-          if (parsedJSON.errors) {
-            parsedError = parsedJSON.errors[0];
-          } else if (parsedJSON.failed) {
-            parsedError = parsedJSON.message;
-          }
-        }
-        catch(ex) {
-          parsedError = "Unknown error saving post, try again. Error: " + error.status + " " + error.statusText;
-        }
-        reject(parsedError);
+        reject(xhr);
       });
     });
   },

@@ -120,6 +120,7 @@ Discourse.Post = Discourse.Model.extend({
   }.property('actions_summary.@each.users', 'actions_summary.@each.count'),
 
   // Save a post and call the callback when done.
+  // Also returns a promise.
   save: function(complete, error) {
     var self = this;
     if (!this.get('newPost')) {
@@ -137,9 +138,10 @@ Discourse.Post = Discourse.Model.extend({
         self.set('version', result.post.version);
         if (result.category) Discourse.Site.current().updateCategory(result.category);
         if (complete) complete(Discourse.Post.create(result.post));
-      }, function(result) {
-        // Post failed to update
-        if (error) error(result);
+      }, function(xhr) {
+        // Failed to create a post
+        if (error) error(xhr);
+        return Ember.RSVP.reject(xhr);
       });
 
     } else {
@@ -162,9 +164,10 @@ Discourse.Post = Discourse.Model.extend({
       }).then(function(result) {
         // Post created
         if (complete) complete(Discourse.Post.create(result));
-      }, function(result) {
+      }, function(xhr) {
         // Failed to create a post
-        if (error) error(result);
+        if (error) error(xhr);
+        return Ember.RSVP.reject(xhr);
       });
     }
   },
