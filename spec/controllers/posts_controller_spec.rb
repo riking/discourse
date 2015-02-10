@@ -472,22 +472,51 @@ describe PostsController do
       let!(:user) { log_in }
       let(:moderator) { log_in(:moderator) }
       let(:new_post) { Fabricate.build(:post, user: user) }
+      let!(:topic) { Fabricate(:topic, user: user) }
+      let(:basic_reply_params) { { raw: 'A post that is, basically, valid.', topic_id: topic.id, reply_to_post_number: 4} }
+      let(:basic_topic_params) { { raw: 'A post that is, basically, valid.', title: 'A pretty boring title.'} }
+
+      after do
+        DiscourseEvent.clear
+      end
 
       it "raises an exception without a raw parameter" do
 	      expect { xhr :post, :create }.to raise_error(ActionController::ParameterMissing)
       end
 
-      it 'creates the post' do
-        PostCreator.any_instance.expects(:create).returns(new_post)
-
+      it 'triggers the post and topic creation events' do
         # Make sure our extensibility points are triggered
-        DiscourseEvent.expects(:trigger).with(:topic_created, new_post.topic, anything, user).once
-        DiscourseEvent.expects(:trigger).with(:post_created, new_post, anything, user).once
+        created_post = nil
+        created_topic = nil
+        triggers = []
+        expected_triggers = [:before_create_post, :validate_post, :topic_created, :post_created].freeze
+        DiscourseEvent.on :before_create_post do |post|
+          created_post = post
+          triggers << :before_create_post
+        end
+        DiscourseEvent.on :validate_post do |post|
+          expect(post).to eq(created_post)
+          triggers << :validate_post
+        end
+        DiscourseEvent.on :topic_created do |t, params, u|
+          created_topic = t
+          expect(u).to eq(user)
+          triggers << :topic_created
+        end
+        DiscourseEvent.on :post_created do |post, params, u|
+          expect(post).to eq(created_post)
+          expect(post.topic).to eq(created_topic)
+          expect(u).to eq(user)
+          triggers << :post_created
+        end
 
-        xhr :post, :create, {raw: 'test'}
+        xhr :post, :create, basic_topic_params
 
         expect(response).to be_success
-        expect(::JSON.parse(response.body)).to be_present
+        expect(triggers).to eq(expected_triggers)
+        json = MultiJson.load(response.body)
+        expect(json["id"]).to eq(created_post.id)
+        expect(json["topic_id"]).to eq(created_topic.id)
       end
 
       it 'protects against dupes' do
@@ -503,101 +532,37 @@ describe PostsController do
 
       context "errors" do
 
-        let(:post_with_errors) { Fabricate.build(:post, user: user)}
-
-        before do
-          post_with_errors.errors.add(:base, I18n.t(:spamming_host))
-          PostCreator.any_instance.stubs(:errors).returns(post_with_errors.errors)
-          PostCreator.any_instance.expects(:create).returns(post_with_errors)
-        end
-
-        it "does not succeed" do
-          xhr :post, :create, {raw: 'test'}
-          User.any_instance.expects(:flag_linked_posts_as_spam).never
+        it "raw too short" do
+          xhr :post, :create, basic_reply_params.merge(raw: 'Hi')
           expect(response).not_to be_success
-        end
-
-        it "it triggers flag_linked_posts_as_spam when the post creator returns spam" do
-          PostCreator.any_instance.expects(:spam?).returns(true)
-          User.any_instance.expects(:flag_linked_posts_as_spam)
-          xhr :post, :create, {raw: 'test'}
+          json = MultiJson.load(response.body)
+          expect(json["errors"].first).to match(/too short/)
         end
 
       end
 
-
-      context "parameters" do
-
-        let(:post_creator) { mock }
+      context "spamming links" do
+        let(:spam_domain) { "spam.google.com" }
+        let(:raw) { "Hey check out my AMAZING stuff over at http://#{spam_domain}/spam "}
+        let!(:user) { log_in(:newuser) }
 
         before do
-          post_creator.expects(:create).returns(new_post)
-          post_creator.stubs(:errors).returns(nil)
-        end
-
-        it "passes raw through" do
-          PostCreator.expects(:new).with(user, has_entries('raw' => 'hello')).returns(post_creator)
-          xhr :post, :create, {raw: 'hello'}
-        end
-
-        it "passes title through" do
-          PostCreator.expects(:new).with(user, has_entries('title' => 'new topic title')).returns(post_creator)
-          xhr :post, :create, {raw: 'hello', title: 'new topic title'}
-        end
-
-        it "passes topic_id through" do
-          PostCreator.expects(:new).with(user, has_entries('topic_id' => '1234')).returns(post_creator)
-          xhr :post, :create, {raw: 'hello', topic_id: 1234}
-        end
-
-        it "passes archetype through" do
-          PostCreator.expects(:new).with(user, has_entries('archetype' => 'private_message')).returns(post_creator)
-          xhr :post, :create, {raw: 'hello', archetype: 'private_message'}
-        end
-
-        it "passes category through" do
-          PostCreator.expects(:new).with(user, has_entries('category' => 'cool')).returns(post_creator)
-          xhr :post, :create, {raw: 'hello', category: 'cool'}
-        end
-
-        it "passes target_usernames through" do
-          PostCreator.expects(:new).with(user, has_entries('target_usernames' => 'evil,trout')).returns(post_creator)
-          xhr :post, :create, {raw: 'hello', target_usernames: 'evil,trout'}
-        end
-
-        it "passes reply_to_post_number through" do
-          PostCreator.expects(:new).with(user, has_entries('reply_to_post_number' => '6789')).returns(post_creator)
-          xhr :post, :create, {raw: 'hello', reply_to_post_number: 6789}
-        end
-
-        it "passes image_sizes through" do
-          PostCreator.expects(:new).with(user, has_entries('image_sizes' => {'width' => '100', 'height' => '200'})).returns(post_creator)
-          xhr :post, :create, {raw: 'hello', image_sizes: {width: '100', height: '200'}}
-        end
-
-        it "passes meta_data through" do
-          PostCreator.expects(:new).with(user, has_entries('meta_data' => {'xyz' => 'abc'})).returns(post_creator)
-          xhr :post, :create, {raw: 'hello', meta_data: {xyz: 'abc'}}
-        end
-
-        context "is_warning" do
-          it "doesn't pass `is_warning` through if you're not staff" do
-            PostCreator.expects(:new).with(user, Not(has_entries('is_warning' => true))).returns(post_creator)
-            xhr :post, :create, {raw: 'hello', archetype: 'private_message', is_warning: 'true'}
+          SiteSetting.newuser_spam_host_threshold = 3
+          3.times do |i|
+            l = TopicLink.create(id: i, topic_id: topic.id, user_id: user.id, post_id: i,
+                                 url: "http://#{spam_domain}/spam", internal: false, clicks: 0,
+                                 domain: spam_domain)
           end
-
-          it "passes `is_warning` through if you're staff" do
-            PostCreator.expects(:new).with(moderator, has_entries('is_warning' => true)).returns(post_creator)
-            xhr :post, :create, {raw: 'hello', archetype: 'private_message', is_warning: 'true'}
-          end
-
-          it "passes `is_warning` as false through if you're staff" do
-            PostCreator.expects(:new).with(moderator, has_entries('is_warning' => false)).returns(post_creator)
-            xhr :post, :create, {raw: 'hello', archetype: 'private_message', is_warning: 'false'}
-          end
-
         end
 
+        it "it triggers flag_linked_posts_as_spam when the post is spamming links" do
+          xhr :post, :create, basic_topic_params.merge(raw: raw)
+
+          expect(response).not_to be_success
+          json = MultiJson.load(response.body)
+          expect(json["errors"].first).to match(/post a link/)
+          expect(Post.where(raw: raw).present?).to be_falsey
+        end
       end
 
     end

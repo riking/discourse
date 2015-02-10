@@ -28,8 +28,12 @@ describe PostCreator do
     end
 
     it "ensures the user can create the topic" do
-      Guardian.any_instance.expects(:can_create?).with(Topic,nil).returns(false)
-      expect { creator.create }.to raise_error(Discourse::InvalidAccess)
+      Guardian.any_instance.expects(:can_create?).with(Topic, nil).returns(false)
+      p = creator.create
+      expect(creator.errors.full_messages).to eq([
+        "You can't create a new topic in that category."
+      ])
+      expect(p.valid?).to be_falsey
     end
 
 
@@ -39,7 +43,10 @@ describe PostCreator do
 
       it "has errors" do
         creator_invalid_title.create
-        expect(creator_invalid_title.errors).to be_present
+        expect(creator_invalid_title.errors.full_messages.sort).to eq([
+          "Title #{I18n.t('errors.messages.too_short', count: 15)}",
+          "Title #{I18n.t('is_invalid')}"
+        ].sort)
       end
 
     end
@@ -50,7 +57,11 @@ describe PostCreator do
 
       it "has errors" do
         creator_invalid_raw.create
-        expect(creator_invalid_raw.errors).to be_present
+        expect(creator_invalid_raw.errors.full_messages.sort).to eq([
+          "#{I18n.t('activerecord.attributes.post.raw')} #{I18n.t('errors.messages.blank')}",
+          "#{I18n.t('activerecord.attributes.post.raw')} #{I18n.t('errors.messages.too_short', count: 5)}",
+          "#{I18n.t('activerecord.attributes.post.raw')} #{I18n.t('is_invalid')}",
+        ].sort)
       end
 
     end
@@ -58,7 +69,7 @@ describe PostCreator do
     context "success" do
 
       it "doesn't return true for spam" do
-        creator.create
+        p = creator.create
         expect(creator.spam?).to eq(false)
       end
 
@@ -237,6 +248,30 @@ describe PostCreator do
     end
   end
 
+  context "denied permission" do
+    let(:open_category) { Fabricate(:category) }
+    let(:restricted_category) {
+      c = Fabricate(:category)
+      c.set_permissions(:everyone => :readonly)
+      c.save
+      c
+    }
+    let(:topic) { Fabricate(:topic) }
+    let(:rc_topic) { Fabricate(:topic, category: restricted_category) }
+    let(:closed_topic) { Fabricate(:topic, closed: true) }
+
+    def basic_topic_params(topic)
+      { raw: 'test reply that is long enough to reply', topic_id: topic.id, reply_to_post_number: 4, user: user }
+    end
+
+    it "does not allow posting in restricted category" do
+      creator = PostCreator.new(user, basic_topic_params(rc_topic))
+      post = creator.create
+      expect(creator.errors.full_messages).to eq(["You don't have permission to reply in this topic."])
+      expect(post.valid?).to be_falsey
+    end
+  end
+
   context 'uniqueness' do
 
     let!(:topic) { Fabricate(:topic, user: user) }
@@ -262,7 +297,7 @@ describe PostCreator do
         SiteSetting.unique_posts_mins = 10
       end
 
-      it "fails for dupe post accross topic" do
+      it "fails for dupe post across topic" do
         first = create_post
         second = create_post
 
@@ -275,10 +310,12 @@ describe PostCreator do
         expect(response_2.errors.count).to eq(1)
       end
 
-      it "returns blank for another post with the same content" do
+      it "returns an error for another post with the same content" do
         creator.create
         new_post_creator.create
-        expect(new_post_creator.errors).to be_present
+        expect(new_post_creator.errors.full_messages).to eq([
+          "Body is too similar to what you recently posted"
+        ])
       end
 
       it "returns a post for admins" do
@@ -309,18 +346,13 @@ describe PostCreator do
       Post.any_instance.expects(:has_host_spam?).returns(true)
     end
 
-    it "does not create the post" do
-      GroupMessage.stubs(:create)
-      creator.create
-      expect(creator.errors).to be_present
-      expect(creator.spam?).to eq(true)
-    end
-
-    it "sends a message to moderators" do
+    it "does not create the post and sends a message to moderators" do
       GroupMessage.expects(:create).with do |group_name, msg_type, params|
         group_name == Group[:moderators].name and msg_type == :spam_post_blocked and params[:user].id == user.id
       end
-      creator.create
+      p = creator.create
+      expect(creator.errors.full_messages).to eq([I18n.t('activerecord.errors.models.post.attributes.base.spamming_host')])
+      expect(p.id).to be_nil # i.e.: post is not saved
     end
 
   end
@@ -331,8 +363,11 @@ describe PostCreator do
     let(:creator) { PostCreator.new(user, raw: 'test reply', topic_id: topic.id, reply_to_post_number: 4) }
 
     it 'ensures the user can create the post' do
-      Guardian.any_instance.expects(:can_create?).with(Post, topic).returns(false)
-      expect { creator.create }.to raise_error(Discourse::InvalidAccess)
+      Guardian.any_instance.expects(:can_create_post?).with(nil).returns(true)
+      Guardian.any_instance.expects(:can_create_post?).with(topic).returns(false)
+      post = creator.create
+      expect(creator.errors.full_messages).to eq([I18n.t('activerecord.errors.models.post.attributes.base.topic_permission')])
+      expect(post.valid?).to be_falsey
     end
 
     context 'success' do
@@ -413,19 +448,24 @@ describe PostCreator do
     it "works as expected" do
       # Invalid archetype
       creator = PostCreator.new(user, base_args)
-      creator.create
+      post = creator.create
       expect(creator.errors).to be_present
+      expect(creator.errors.full_messages).to eq([I18n.t('activerecord.errors.models.topic.attributes.base.warning_requires_pm')])
+      expect(post.valid?).to be_falsey
 
       # Too many users
       creator = PostCreator.new(user, base_args.merge(archetype: Archetype.private_message,
                                                       target_usernames: [target_user1.username, target_user2.username].join(',')))
-      creator.create
+      post = creator.create
       expect(creator.errors).to be_present
+      expect(creator.errors.full_messages).to eq([I18n.t('activerecord.errors.models.topic.attributes.base.too_many_users')])
+      expect(post.valid?).to be_falsey
 
       # Success
       creator = PostCreator.new(user, base_args.merge(archetype: Archetype.private_message))
       post = creator.create
       expect(creator.errors).to be_blank
+      expect(post.valid?).to be_truthy
 
       topic = post.topic
       expect(topic).to be_present
@@ -542,6 +582,7 @@ describe PostCreator do
       creator = PostCreator.new(user, {title: "my test title 123", raw: "I should not be allowed to post"} )
       creator.create
       expect(creator.errors.count).to be > 0
+      expect(creator.errors.full_messages).to eq([I18n.t('activerecord.errors.models.post.attributes.base.user_is_suspended')])
     end
   end
 

@@ -40,8 +40,12 @@ describe SpamRulesEnforcer do
           When { PostAction.act(user2, spam_post, PostActionType.types[:spam]) }
 
           Invariant { expect(Guardian.new(spammer).can_create_topic?(nil)).to be false }
-          Invariant { expect{PostCreator.create(spammer, {title: 'limited time offer for you', raw: 'better buy this stuff ok', archetype_id: 1})}.to raise_error(Discourse::InvalidAccess) }
-          Invariant { expect{PostCreator.create(spammer, {topic_id: another_topic.id, raw: 'my reply is spam in your topic', archetype_id: 1})}.to raise_error(Discourse::InvalidAccess) }
+          Invariant { expect(
+                        PostCreator.create(spammer, {title: 'limited time offer for you', raw: 'better buy this stuff ok', archetype_id: 1}).errors.full_messages
+                      ).to eq([I18n.t('activerecord.errors.models.topic.attributes.base.create_permission')])}
+          Invariant { expect(
+                        PostCreator.create(spammer, {topic_id: another_topic.id, raw: 'my reply is spam in your topic', archetype_id: 1}).errors.full_messages
+                      ).to eq([I18n.t('activerecord.errors.models.post.attributes.base.create_permission')])}
 
           Then { expect(spammer.reload).to be_blocked }
           And  { expect(spam_post.reload).to be_hidden }

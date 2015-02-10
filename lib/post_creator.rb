@@ -7,7 +7,7 @@ require_dependency 'distributed_mutex'
 
 class PostCreator
 
-  attr_reader :errors, :opts
+  attr_reader :opts
 
   # Acceptable options:
   #
@@ -57,6 +57,10 @@ class PostCreator
     @spam
   end
 
+  def errors
+    @post.errors if @post && !@post.errors.blank?
+  end
+
   def skip_validations?
     @opts[:skip_validations]
   end
@@ -70,17 +74,21 @@ class PostCreator
     @post = nil
 
     if @user.suspended? && !skip_validations?
-      @errors = Post.new.errors
-      @errors.add(:base, I18n.t(:user_is_suspended))
-      return
+      begin
+        fail_rollback! :user_is_suspended
+      rescue ActiveRecord::Rollback
+        return nil
+      end
     end
 
     transaction do
       setup_topic
       setup_post
-      rollback_if_host_spam_detected
-      plugin_callbacks
+      check_host_spam
+      plugin_validate
+      # fail_rollback! calls should be above this point
       save_post
+
       extract_links
       store_unique_post_key
       track_topic
@@ -97,14 +105,11 @@ class PostCreator
     if @post && @post.errors.empty?
       publish
       PostAlerter.post_created(@post) unless @opts[:import_mode]
+      enforce_spam_rules unless @opts[:import_mode]
 
       track_latest_on_category
       enqueue_jobs
       BadgeGranter.queue_badge_grant(Badge::Trigger::PostRevision, post: @post)
-    end
-
-    if @post || @spam
-      handle_spam unless @opts[:import_mode]
     end
 
     @post
@@ -148,6 +153,12 @@ class PostCreator
     end
   end
 
+  def fail_rollback!(error, attr=:base)
+    @post ||= Post.new # use a dummy post to get an Errors object
+    @post.errors.add(attr, error)
+    raise ActiveRecord::Rollback.new
+  end
+
   # You can supply an `embed_url` for a post to set up the embedded relationship.
   # This is used by the wp-discourse plugin to associate a remote post with a
   # discourse post.
@@ -156,19 +167,13 @@ class PostCreator
     TopicEmbed.create!(topic_id: @post.topic_id, post_id: @post.id, embed_url: @opts[:embed_url])
   end
 
-  def handle_spam
-    if @spam
-      GroupMessage.create( Group[:moderators].name,
-                           :spam_post_blocked,
-                           { user: @user,
-                             limit_once_per: 24.hours,
-                             message_params: {domains: @post.linked_hosts.keys.join(', ')} } )
-    elsif @post && !@post.errors.present? && !skip_validations?
+  def enforce_spam_rules
+    unless skip_validations?
       SpamRulesEnforcer.enforce!(@post)
     end
   end
 
-  def plugin_callbacks
+  def plugin_validate
     DiscourseEvent.trigger :before_create_post, @post
     DiscourseEvent.trigger :validate_post, @post
   end
@@ -196,15 +201,24 @@ class PostCreator
 
       begin
         topic = topic_creator.create
-        @errors = topic_creator.errors
-      rescue ActiveRecord::Rollback => ex
-        # In the event of a rollback, grab the errors from the topic
-        @errors = topic_creator.errors
-        raise ex
+        unless topic_creator.errors.blank?
+          raise ActiveRecord::Rollback.new # the TopicCreator could rollback too, hence the rescue
+        end
+      rescue ActiveRecord::Rollback
+        @post = Post.new
+        topic_creator.errors.each do |attr, error|
+          @post.errors.add(attr, error)
+        end
+        raise
       end
     else
       topic = Topic.find_by(id: @opts[:topic_id])
-      guardian.ensure_can_create!(Post, topic)
+      unless guardian.can_create_post?(nil)
+        fail_rollback! :create_permission
+      end
+      unless guardian.can_create_post?(topic)
+        fail_rollback! :topic_permission
+      end
     end
     @topic = topic
   end
@@ -246,19 +260,25 @@ class PostCreator
     @post = post
   end
 
-  def rollback_if_host_spam_detected
+  def check_host_spam
     return if skip_validations?
     if @post.has_host_spam?
-      @post.errors.add(:base, I18n.t(:spamming_host))
-      @errors = @post.errors
+      GroupMessage.create(Group[:moderators].name, :spam_post_blocked, {
+                              user: @user,
+                              limit_once_per: 24.hours,
+                              message_params: {domains: @post.linked_hosts.keys.join(', ')}
+                            })
       @spam = true
-      raise ActiveRecord::Rollback.new
+      fail_rollback! :spamming_host
     end
   end
 
   def save_post
+    # Do not save if post has errors
+    if @post.errors.present?
+      raise ActiveRecord::Rollback.new
+    end
     unless @post.save(validate: !skip_validations?)
-      @errors = @post.errors
       raise ActiveRecord::Rollback.new
     end
   end

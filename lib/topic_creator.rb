@@ -1,7 +1,5 @@
 class TopicCreator
 
-  attr_accessor :errors
-
   def self.create(user, guardian, opts)
     self.new(user, guardian, opts).create
   end
@@ -16,6 +14,7 @@ class TopicCreator
   def create
     @topic = Topic.new(setup_topic_params)
 
+    check_permission
     setup_auto_close_time
     process_private_message
     save_topic
@@ -25,23 +24,37 @@ class TopicCreator
     @topic
   end
 
+  def errors
+    @topic.errors if @topic.errors.present?
+  end
+
   private
+
+  def fail_rollback!(error)
+    @topic.errors.add(:base, error)
+    raise ActiveRecord::Rollback.new
+  end
+
+  def check_permission
+    unless @guardian.can_create_topic?(nil)
+      fail_rollback! :create_permission
+    end
+    unless @guardian.can_create?(Topic, @topic.category)
+      fail_rollback! :category_permission
+    end
+  end
 
   def create_warning
     return unless @opts[:is_warning]
 
     # We can only attach warnings to PMs
     unless @topic.private_message?
-      @topic.errors.add(:base, :warning_requires_pm)
-      @errors = @topic.errors
-      raise ActiveRecord::Rollback.new
+      fail_rollback! :warning_requires_pm
     end
 
     # Don't create it if there is more than one user
     if @added_users.size != 1
-      @topic.errors.add(:base, :too_many_users)
-      @errors = @topic.errors
-      raise ActiveRecord::Rollback.new
+      fail_rollback! :too_many_users
     end
 
     # Create a warning record
@@ -80,8 +93,6 @@ class TopicCreator
 
     category = find_category
 
-    @guardian.ensure_can_create!(Topic, category)
-
     topic_params[:category_id] = category.id if category.present?
 
     topic_params[:created_at] = Time.zone.parse(@opts[:created_at].to_s) if @opts[:created_at].present?
@@ -116,9 +127,7 @@ class TopicCreator
     @topic.subtype = TopicSubtype.user_to_user unless @topic.subtype
 
     unless @opts[:target_usernames].present? || @opts[:target_group_names].present?
-      @topic.errors.add(:base, :no_user_selected)
-      @errors = @topic.errors
-      raise ActiveRecord::Rollback.new
+      fail_rollback! :no_user_selected
     end
 
     add_users(@topic,@opts[:target_usernames])
@@ -128,7 +137,6 @@ class TopicCreator
 
   def save_topic
     unless @topic.save(validate: !@opts[:skip_validations])
-      @errors = @topic.errors
       raise ActiveRecord::Rollback.new
     end
   end
@@ -136,7 +144,9 @@ class TopicCreator
   def add_users(topic, usernames)
     return unless usernames
     User.where(username: usernames.split(',')).each do |user|
-      check_can_send_permission!(topic, user)
+      unless @guardian.can_send_private_message?(user)
+        fail_rollback! :cant_send_pm
+      end
       @added_users << user
       topic.topic_allowed_users.build(user_id: user.id)
     end
@@ -145,16 +155,10 @@ class TopicCreator
   def add_groups(topic, groups)
     return unless groups
     Group.where(name: groups.split(',')).each do |group|
-      check_can_send_permission!(topic,group)
+      unless @guardian.can_send_private_message?(group)
+        fail_rollback! :cant_send_pm
+      end
       topic.topic_allowed_groups.build(group_id: group.id)
-    end
-  end
-
-  def check_can_send_permission!(topic,item)
-    unless @guardian.can_send_private_message?(item)
-      topic.errors.add(:base, :cant_send_pm)
-      @errors = topic.errors
-      raise ActiveRecord::Rollback.new
     end
   end
 end
