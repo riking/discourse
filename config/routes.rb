@@ -499,8 +499,9 @@ Discourse::Application.routes.draw do
 
   get "explorer" => "explorer#index"
   get "explorer/query/:id" => "explorer#query"
-  get "explorer/list" => "explorer#list", format: :json
-  get "explorer/show/:id" => "explorer#show", format: :json
+  get "explorer/parse" => "explorer#parse"
+  get "explorer/list" => "explorer#list"
+  get "explorer/show/:id" => "explorer#show"
   post "explorer/run/:id" => "explorer#run"
   post "explorer/save/:id" => "explorer#save", constraints: AdminConstraint.new
 

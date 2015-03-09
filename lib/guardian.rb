@@ -269,12 +269,6 @@ class Guardian
     UserExport.where(user_id: @user.id, created_at: (Time.zone.now.beginning_of_day..Time.zone.now.end_of_day)).count == 0
   end
 
-  def can_see_explorer_query?(query)
-    query && is_admin? || (
-      SiteSetting.public_data_explorer && query.public_view
-    )
-  end
-
   private
 
   def is_my_own?(obj)

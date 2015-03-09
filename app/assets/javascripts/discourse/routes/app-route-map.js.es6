@@ -89,6 +89,8 @@ export default function() {
   this.route('tos', {path: '/tos'});
   this.route('privacy', {path: '/privacy'});
   this.route('guidelines', {path: '/guidelines'});
+  this.route('explorer', {path: '/explorer'});
+  this.route('explorer-show', {path: '/explorer/show/:id'});
 
   this.resource('badges', function() {
     this.route('show', {path: '/:id/:slug'});

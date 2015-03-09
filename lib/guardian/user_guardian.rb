@@ -63,4 +63,22 @@ module UserGuardian
     user && is_staff?
   end
 
+  def can_see_explorer_query?(query)
+    query && is_admin? || (
+      SiteSetting.public_data_explorer && query.public_view
+    )
+  end
+
+  def can_create_explorer_query?
+    is_admin?
+  end
+
+  def can_edit_explorer_query?(query)
+    query && @user && is_admin? || query.creator == @user
+  end
+
+  def can_run_explorer_query?(query)
+    is_admin? || (can_see_explorer_query?(query) && query.public_run)
+  end
+
 end

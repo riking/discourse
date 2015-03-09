@@ -2494,6 +2494,12 @@ en:
 
     explorer:
       title: "Data Explorer"
+      parse: "Check Query"
+      run: "Run Query"
+      save: "Save"
+      parse_good: "Query syntax looks good."
+      error:
+        at: "Near character {{char}}: {{context}}"
 
     google_search: |
       <h2>Search with Google</h2>

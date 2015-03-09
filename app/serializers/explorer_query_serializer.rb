@@ -1,8 +1,13 @@
 class ExplorerQuerySerializer < ApplicationSerializer
-  attributes :name, :query, :public_view, :public_run, :can_run, :params
+  attributes :name, :query, :public_view, :public_run, :params
+  attributes :can_run, :can_edit
 
   def can_run
-    object.public_run || scope.is_admin?
+    scope.can_run_explorer_query?(object)
+  end
+
+  def can_edit
+    scope.can_edit?(object)
   end
 
   # has_many is being weird, so workaround
