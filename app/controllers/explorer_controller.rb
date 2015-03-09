@@ -1,4 +1,3 @@
-require 'pg_query'
 
 class ExplorerController < ApplicationController
 
@@ -25,41 +24,47 @@ class ExplorerController < ApplicationController
   end
 
   def parse
-    params.require :sql
-    begin
-      sql = params[:sql]
-      sql, paramNames = extract_params sql
 
-      result = PgQuery.parse(sql)
-
-      # lol hacks. this inserts more data into the json result
-      result.instance_variable_set :@success, true
-      result.instance_variable_set :@params, paramNames
-      render json: result
-    rescue PgQuery::ParseError => e
-      render json: {success: false,
-                    error_message: e.message,
-                    error_loc: e.location}, status: 422
-    end
+    render json: {success: true}
   end
 
   def run
     params.require :id
 
-    query = ExplorerQuery.find(params[:id])
-    guardian.ensure_can_run_query!(query)
+    equery = ExplorerQuery.find(params[:id])
+    guardian.ensure_can_run_query!(equery)
+
+    ActiveRecord::Base.transaction do
+      ActiveRecord::Base.exec_sql "SET TRANSACTION READ ONLY"
+
+      result = ActiveRecord::Base.exec_sql <<SQL
+WITH query AS (
+  #{equery.query}
+)
+SELECT * FROM query;
+SQL
+
+      binding.pry
+    end
   end
 
   def save
-    if params[:id].present?
-      # edit
-      query = ExplorerQuery.find(params[:id])
-      guardian.ensure_can_edit_explorer_query!(query)
-    else
-      # create
-      guardian.ensure_can_create_explorer_query!
+    # TODO saving params is weird
+    vals = params.permit(:name, :query, :params, :public_view, :public_run)
+
+    query = ExplorerQuery.find(params[:id])
+    guardian.ensure_can_edit_explorer_query!(query)
+
+    vals.keys.each do |k|
+      query.send("#{k}=", vals[k])
     end
 
+    query.save
+    if query.errors.present?
+      render_json_error query
+    else
+      render json: success_json
+    end
   end
 
   private

@@ -1,5 +1,9 @@
 class ExplorerQueryParameter < ActiveRecord::Base
   belongs_to :explorer_query
+
+  def self.types
+    @types ||= Enum.new(:string, :integer, :int_list)
+  end
 end
 
 # == Schema Information
@@ -8,6 +12,7 @@ end
 #
 #  id                :integer          not null, primary key
 #  explorer_query_id :integer          not null
-#  param_name        :string(255)      not null
-#  type              :integer          not null
+#  name              :string(255)      not null
+#  param_type        :integer          default(0)
+#  default           :string(255)
 #

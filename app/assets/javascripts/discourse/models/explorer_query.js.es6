@@ -18,9 +18,8 @@ const ExplorerQuery = Discourse.Model.extend({
       existingParamNames = existingParams.map(function(p) { return p.name; });
 
     var namesToAdd = names.slice(0).filter(function(n) { return existingParamNames.indexOf(n) === -1; });
-    //var namesToRemove = existingParamNames.filter(function(n) { return names.indexOf(n) === -1; });
 
-    let newParams = existingParams.filter(function(p) {
+    let newParams = existingParams.reject(function(p) {
       return names.indexOf(p.name) === -1;
     });
     namesToAdd.forEach(function(name) {
@@ -34,24 +33,15 @@ const ExplorerQuery = Discourse.Model.extend({
     return Discourse.ajax('/explorer/save/' + this.get('id'), { type: "POST", data: {
         name: this.get('name'),
         query: this.get('query'),
-        params: this.get('params')
+        params: this.get('params'),
+        public_view: this.get('public_view'),
+        public_run: this.get('public_run')
       }
     });
   },
 
   parse() {
-    return Discourse.ajax('/explorer/parse.json', { data: { sql: this.get('query')}}).then(function(json) {
-      console.log(json);
-      return json;
-    }).catch(function(xhr) {
-      if (xhr.responseJSON) {
-        if (xhr.responseJSON.success === false) {
-          console.log(xhr.responseJSON);
-          return xhr.responseJSON;
-        }
-      }
-      throw xhr;
-    });
+    return Em.RSVP.resolve();
   }
 });
 

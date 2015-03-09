@@ -42,8 +42,9 @@
 
 .query-textarea {
   width: 600px;
-  height: 300px;
+  min-height: 220px;
   overflow: scroll;
+  font-family: monospace;
 }
 .parameters {
   float: right;

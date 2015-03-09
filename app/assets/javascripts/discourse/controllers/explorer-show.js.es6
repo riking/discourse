@@ -14,40 +14,40 @@ export default DiscourseController.extend({
   actions: {
     parse() {
       const self = this;
-      this.setProperties({
-        loading: true,
-        hasErrors: false,
-        dirtyParse: true
-      });
+      this.set('loading', true);
 
-      this.get('model').parse().then(function(res) {
-        self.set('loading', false);
-        console.log(res);
-
-        if (res.success) {
-          self.setProperties({
-            dirtyParse: false,
-            hasErrors: false,
-            parseGood: true
-          });
-          // TODO
-
-          self.get('query').setParamNames(res.params);
-
-        } else {
-          self.setProperties({
-            dirtyParse: true,
-            hasErrors: true,
-            parseGood: false,
-            error_message: res.error_message,
-            error_loc: res.error_loc
-          });
-        }
-
+      this.get('model').parse().then(function() {
+        self.set('dirtyParse', false);
       }).catch(function(xhr) {
-        // ERROR HANDLING
+        // TODO ERROR HANDLING
+      }).finally(function() {
         self.set('loading', false);
+      });
+    },
 
+    save() {
+      const self = this;
+      this.set('loading', true);
+
+      this.get('model').save().then(function() {
+        self.set('dirtySave', false);
+      }).catch(function(xhr) {
+        // TODO ERROR HANDLING
+      }).finally(function() {
+        self.set('loading', false);
+      });
+    },
+
+    run() {
+      const self = this;
+      this.set('loadingResult', true);
+
+      this.get('model').run().then(function() {
+        self.set('dirtySave', false);
+      }).catch(function(xhr) {
+        // TODO ERROR HANDLING
+      }).finally(function() {
+        self.set('loadingResult', false);
       });
     }
   },
@@ -60,6 +60,9 @@ export default DiscourseController.extend({
   error_context: function() {
     const queryText = this.get('query.query');
     const errorLoc = this.get('error_loc');
+    if (errorLoc === -1) {
+      return "";
+    }
     let sliceStart = errorLoc - 10, sliceEnd = errorLoc + 10;
 
     if (sliceStart < 0) sliceStart = 0;
@@ -81,13 +84,13 @@ export default DiscourseController.extend({
   }.property('query.can_edit', 'dirtyParse'),
 
   run_disabled: function() {
-    return !this.get('query.can_run') || this.get('dirtyParse') || this.get('hasErrors');
-  }.property('query.can_run', 'dirtyParse', 'hasErrors'),
+    return !this.get('query.can_run') || this.get('dirtySave');
+  }.property('query.can_run', 'dirtySave'),
 
   save_disabled: function() {
     if (!this.get('query.can_edit')) return true; // cannot edit -> cannot save
     if (this.get('dirtyParse')) return true; // haven't parsed -> cannot save
-    if (!Em.isEmpty(this.get('parseErrors'))) return true; // parse errors -> cannot save
-    return false;
-  }.property('query.can_edit', 'dirtySave', 'parseErrors')
+    if (this.get('dirtySave')) return false; // haven't saved -> need to save
+    return true;
+  }.property('query.can_edit', 'dirtySave', 'dirtyParse')
 });

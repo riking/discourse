@@ -1,5 +1,5 @@
 class ExplorerQuerySerializer < ApplicationSerializer
-  attributes :name, :query, :public_view, :public_run, :params
+  attributes :id, :name, :query, :public_view, :public_run, :params
   attributes :can_run, :can_edit
 
   def can_run

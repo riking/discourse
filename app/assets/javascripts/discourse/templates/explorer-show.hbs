@@ -1,20 +1,25 @@
 <div class="container explorer">
   <h1>Data Explorer</h1>
+  {{#if showResults}}
+
+  {{/if}}
   <div class="left-column">
     <h2 class="title query-name">{{model.name}}</h2>
     {{textarea value=model.query class="query-textarea" width="300" height="450" disabled=edit_disabled}}
     <br>
-    {{#if hasErrors}}
-      <div class="parse errors">
-        <div class="er-message">{{fa-icon "times"}} {{error_message}}</div>
-        <div class="er-context">{{{error_context}}}</div>
-      </div>
-    {{/if}}
-    {{#if parseGood}}
-      <div class="parse success">
-        <div class="su-message">{{fa-icon "check"}} {{i18n "explorer.parse_good"}}</div>
-      </div>
-    {{/if}}
+    {{#loading-spinner condition=loading}}
+      {{#if hasErrors}}
+        <div class="parse errors">
+          <div class="er-message">{{fa-icon "times"}} {{error_message}}</div>
+          <div class="er-context">{{{error_context}}}</div>
+        </div>
+      {{/if}}
+      {{#if parseGood}}
+        <div class="parse success">
+          <div class="su-message">{{fa-icon "check"}} {{i18n "explorer.parse_good"}}</div>
+        </div>
+      {{/if}}
+    {{/loading-spinner}}
     <div class="button-container">
       {{d-button action="parse" icon="check" label="explorer.parse" disabled=parse_disabled}}
       {{d-button action="run" icon="caret-square-o-right" label="explorer.run" disabled=run_disabled}}

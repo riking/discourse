@@ -12,7 +12,8 @@ class CreateDataExplorerTables < ActiveRecord::Migration
     create_table :explorer_query_parameters do |t|
       t.integer :explorer_query_id, null: false
       t.string :name, null: false
-      t.integer :param_type, null: false
+      t.integer :param_type, default: 0
+      t.string :default
     end
   end
 end
