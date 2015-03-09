@@ -10,10 +10,7 @@ class ExplorerQuerySerializer < ApplicationSerializer
     scope.can_edit?(object)
   end
 
-  # has_many is being weird, so workaround
   def params
-    object.params.map do |param|
-      ExplorerQueryParameterSerializer.new(param, scope: scope, root: false)
-    end
+    object.params
   end
 end

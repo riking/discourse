@@ -2497,9 +2497,9 @@ en:
       parse: "Check Query"
       run: "Run Query"
       save: "Save"
-      parse_good: "Query syntax looks good."
-      error:
-        at: "Near character {{char}}: {{context}}"
+      editbutton: "Show Edit Controls"
+      public_view: "Any user can see the results of this query"
+      public_run: "Any user can input values and run this query"
 
     google_search: |
       <h2>Search with Google</h2>

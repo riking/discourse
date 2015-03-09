@@ -1,19 +1,22 @@
-
-const ExplorerQueryParam = Discourse.Model.extend({
-
-});
-
-ExplorerQueryParam.reopenClass({
-  createNew(name) {
-    return {name: name, value: "", def: "", type: "string"};
-  }
-});
+//import ExplorerQueryParam from 'discourse/models/explorer_query_param' // TODO ES6
 
 const ExplorerQuery = Discourse.Model.extend({
 
-  params: [{name: "user_id", value: "35568", def: "$CURRENTUSERID"}, {name: "backfill", value: "false", def: "false"}],
+  paramValues: function() {
+    return this.get('params').map(function(param) {
+      return param.get('value');
+    });
+  }.property('params.@each'),
+
+  paramsJson: function() {
+    return this.get('params').map(function(param) {
+      return param.getProperties('name', 'default_value', 'type');
+    });
+  }.property('params.@each'),
 
   setParamNames(names) {
+    const ExplorerQueryParam = Discourse.ExplorerQueryParam; // TODO ES6
+
     const existingParams = this.get('params'),
       existingParamNames = existingParams.map(function(p) { return p.name; });
 
@@ -30,31 +33,64 @@ const ExplorerQuery = Discourse.Model.extend({
   },
 
   save() {
+    console.log('saving');
     return Discourse.ajax('/explorer/save/' + this.get('id'), { type: "POST", data: {
         name: this.get('name'),
         query: this.get('query'),
-        params: this.get('params'),
+        params: this.get('paramsJson'),
         public_view: this.get('public_view'),
         public_run: this.get('public_run')
       }
+    }).then(function(resp) {
+      console.log('saved');
+      return resp;
     });
   },
 
   parse() {
+    const sql = this.get('query');
+    const paramRegex = /:([a-z_]+)/gi;
+    var result;
+    let paramNames = [];
+
+    while ( (result = paramRegex.exec(sql)) ) {
+      paramNames.push(result[1]);
+    }
+
+    this.setParamNames(paramNames);
+
     return Em.RSVP.resolve();
+  },
+
+  run() {
+    return Discourse.ajax('/explorer/run/' + this.get('id'), { type: "POST", data: {
+      params: this.get('paramValues')
+    }});
   }
 });
 
 ExplorerQuery.reopenClass({
+  createFromJson(json) {
+    const ExplorerQueryParam = Discourse.ExplorerQueryParam; // TODO ES6
+    const paramJsonArr = json.params;
+    delete json.params;
+
+    let eq = ExplorerQuery.create(json);
+    eq.set('params', paramJsonArr.map(function(paramJson) {
+      return ExplorerQueryParam.createFromJson(paramJson);
+    }));
+    return eq;
+  },
+
   findAll: function() {
     return Discourse.ajax('/explorer/list.json').then(function(queries) {
-      return queries.map(function(q) { return Discourse.ExplorerQuery.create(q); });
+      return queries.map(function(q) { return Discourse.ExplorerQuery.createFromJson(q); });
     });
   },
 
   find: function(id) {
     return Discourse.ajax('/explorer/show/' + id + '.json').then(function(json) {
-      return Discourse.ExplorerQuery.create(json.explorer_query);
+      return Discourse.ExplorerQuery.createFromJson(json.explorer_query);
     });
   }
 });

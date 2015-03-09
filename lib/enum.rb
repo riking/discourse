@@ -1,4 +1,4 @@
-class Enum < Hash
+class Enum < HashWithIndifferentAccess
   # Public: Initialize an enum.
   #
   # members - the array of enum members. May contain a hash of options:

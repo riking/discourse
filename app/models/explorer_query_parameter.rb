@@ -14,5 +14,5 @@ end
 #  explorer_query_id :integer          not null
 #  name              :string(255)      not null
 #  param_type        :integer          default(0)
-#  default           :string(255)
+#  default_value     :string(255)
 #

@@ -34,6 +34,7 @@ class ExplorerController < ApplicationController
     equery = ExplorerQuery.find(params[:id])
     guardian.ensure_can_run_query!(equery)
 
+    result = nil
     ActiveRecord::Base.transaction do
       ActiveRecord::Base.exec_sql "SET TRANSACTION READ ONLY"
 
@@ -43,20 +44,35 @@ WITH query AS (
 )
 SELECT * FROM query;
 SQL
-
-      binding.pry
     end
+
+    binding.pry
+
+    render json: result
   end
 
   def save
-    # TODO saving params is weird
-    vals = params.permit(:name, :query, :params, :public_view, :public_run)
+    params.require(:id)
+    vals = params.permit(:name, :query, :public_view, :public_run)
 
     query = ExplorerQuery.find(params[:id])
     guardian.ensure_can_edit_explorer_query!(query)
 
     vals.keys.each do |k|
       query.send("#{k}=", vals[k])
+    end
+    if params[:params]
+      params_ary = []
+      params[:params].each do |k, v|
+        params_ary[k.to_i] = v
+      end
+      query.params = params_ary.map do |paramJson|
+        paramJson[:param_type] = ExplorerQueryParameter.types[paramJson[:type]]
+        paramJson.delete :type
+        paramJson[:default_value] = "" unless paramJson[:default_value]
+
+        ExplorerQueryParameter.new(paramJson)
+      end
     end
 
     query.save

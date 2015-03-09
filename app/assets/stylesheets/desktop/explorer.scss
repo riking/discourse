@@ -1,24 +1,4 @@
 .container.explorer {
-  .parse {
-    &.errors {
-      background-color: dark-light-diff($danger, $secondary, 90%, -20%);
-      color: $danger;
-    }
-    &.success {
-      background-color: dark-light-diff($success, $secondary, 90%, -20%);
-      color: $success;
-    }
-    padding: 3px;
-    border-radius: 3px;
-    margin: 10px 0;
-    .er-message {
-      font-weight: bold;
-    }
-    .er-context {
-      white-space: pre;
-      font-family: monospace, serif;
-    }
-  }
 
   .query-container {
     margin: 10px;
@@ -29,15 +9,17 @@
   h2.title {
     margin: 10px 0;
   }
+  margin-bottom: 50px;
 }
 
-.left-column {
-  float: left;
-  max-width: 700px;
-}
-.right-column {
-  float: right;
-  max-width: 300px;
+.edit-controls {
+  visibility: visible;
+  &.ec-hidden {
+    visibility: hidden;
+    #showEdit {
+      visibility: visible;
+    }
+  }
 }
 
 .query-textarea {
@@ -45,17 +27,4 @@
   min-height: 220px;
   overflow: scroll;
   font-family: monospace;
-}
-.parameters {
-  float: right;
-  border: 1px solid rgb(195, 187, 187);
-  padding: 6px;
-  max-width: 200px;
-  input {
-    width: auto;
-    margin-left: 6px;
-  }
-  .row {
-    margin: 5px 0;
-  }
 }

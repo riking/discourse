@@ -2,16 +2,24 @@ import DiscourseController from 'discourse/controllers/controller';
 
 export default DiscourseController.extend({
   _init: function() {
-    this.setProperties({
-      dirtyParse: false,
-      dirtySave: false,
-      parseGood: false
+    this.set('editControlsHidden', true);
+    // Mark query as clean, we just got it from the server
+    const self = this;
+    Em.run.next(function() {
+      self.setProperties({
+        dirtyParse: false,
+        dirtySave: false
+      });
     });
   }.on('init'),
 
   query: Em.computed.alias('model'),
 
   actions: {
+    showEdit() {
+      this.toggleProperty('editControlsHidden');
+    },
+
     parse() {
       const self = this;
       this.set('loading', true);
@@ -29,8 +37,9 @@ export default DiscourseController.extend({
       const self = this;
       this.set('loading', true);
 
-      this.get('model').save().then(function() {
+      this.get('model').save().then(function(result) {
         self.set('dirtySave', false);
+        //self.get('model').updateFromJson(result);
       }).catch(function(xhr) {
         // TODO ERROR HANDLING
       }).finally(function() {
@@ -42,8 +51,8 @@ export default DiscourseController.extend({
       const self = this;
       this.set('loadingResult', true);
 
-      this.get('model').run().then(function() {
-        self.set('dirtySave', false);
+      this.get('model').run().then(function(result) {
+        console.log(result);
       }).catch(function(xhr) {
         // TODO ERROR HANDLING
       }).finally(function() {
@@ -52,28 +61,20 @@ export default DiscourseController.extend({
     }
   },
 
-  markDirty: function() {
+  dirty1: function() {
     this.set('dirtyParse', true);
     this.set('dirtySave', true);
   }.observes('query.query'),
 
-  error_context: function() {
-    const queryText = this.get('query.query');
-    const errorLoc = this.get('error_loc');
-    if (errorLoc === -1) {
-      return "";
-    }
-    let sliceStart = errorLoc - 10, sliceEnd = errorLoc + 10;
-
-    if (sliceStart < 0) sliceStart = 0;
-    if (sliceEnd >= queryText.length) sliceEnd = queryText.length;
-
-    let slice = queryText.substring(sliceStart, sliceEnd);
-
-    return "Context: " + Handlebars.Utils.escapeExpression(slice);
-  }.property('error_loc', 'hasErrors'),
+  dirty2: function() {
+    this.set('dirtySave', true);
+  }.observes('query.public_run', 'query.public_view'),
 
   // UI disable triggers
+
+  any_params: function() {
+    return this.get('query.params.length') > 0;
+  }.property('query.params.@each'),
 
   edit_disabled: function() {
     return !this.get('query.can_edit');
