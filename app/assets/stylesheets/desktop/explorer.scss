@@ -19,13 +19,10 @@ $table_cell_padding: 6px 8px 5px 8px;
   .query-list,
   .edit-controls,
   .query-name,
+  .description,
   .ec-title,
   {
     margin: 10px 0;
-  }
-
-  .query-readonly pre code {
-    height: 150px;
   }
 
   #showEdit {
@@ -51,6 +48,34 @@ $table_cell_padding: 6px 8px 5px 8px;
     .invalid {
       background-color: dark-light-diff($danger, $secondary, 90%, -10%);
     }
+    .computed {
+      background-color: dark-light-diff($success, $secondary, 90%, -10%);
+    }
+  }
+}
+
+.explorer .run-query {
+  .query-readonly pre code {
+    height: 150px;
+    width: 700px;
+  }
+  .query-readonly {
+    float: right;
+  }
+  .description, .parameters {
+    float: left;
+  }
+  .buttons {
+    clear: both;
+  }
+  .description {
+    font-size: 15px;
+  }
+  .parameters {
+    max-width: 350px;
+    padding: $table_cell_padding;
+    background-color: dark-light-diff($primary, $secondary, 98%, -3%);
+    border: 1px solid dark-light-diff($primary, $secondary, 70%, -70%);
   }
 }
 
@@ -74,6 +99,7 @@ $table_cell_padding: 6px 8px 5px 8px;
     display: none;
   }
   background-color: dark-light-diff($secondary, $primary, 98%, -3%);
+  border: 1px solid dark-light-diff($primary, $secondary, 70%, -70%);
   padding: 6px;
 
   .edit-name, .edit-description {
@@ -89,10 +115,13 @@ $table_cell_padding: 6px 8px 5px 8px;
       padding: $table_cell_padding;
     }
   }
+  .float-buttons {
+    float: right;
+  }
 }
 
 .query-textarea {
-  width: 600px;
+  width: 540px;
   min-height: 220px;
   overflow: scroll;
   font-family: monospace;
@@ -126,6 +155,13 @@ $table_cell_padding: 6px 8px 5px 8px;
     tr:nth-child(even) {
       background-color: $secondary;
     }
+  }
+
+  .result-download {
+    float: right;
+  }
+  table {
+    clear: both;
   }
 
   .result-error {

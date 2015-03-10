@@ -2,24 +2,31 @@
   <h1>{{#link-to "explorer-index"}}{{fa-icon "chevron-left"}} {{i18n "explorer.title"}}{{/link-to}}</h1>
 
   {{d-button action="showEdit" icon="plus" label="explorer.editbutton" id="showEdit"}}
-  <h2 class="query-name">{{i18n "explorer.query"}} {{model.name}}</h2>
+  <h2 class="query-name">{{i18n "explorer.query"}}: {{model.name}}</h2>
+  <hr>
 
   <div {{bind-attr class=":run-query editControlsHidden::hidden"}}>
+
     {{code-highlighted-field value=model.query codeClass="lang-sql" classNames="query-readonly"}}
 
     <div class="description">
-      <blockquote>{{query.description}}</blockquote>
+      {{query.description}}
     </div>
-
     <div class="parameters">
-      <h3>{{i18n "explorer.parameters"}}</h3>
-      {{#each param in model.params}}
-        <div class="row">
-          <span class="name">{{param.name}}</span>
-          <span class="value">{{validating-text-field value=param.value validationObject=param checkMethod="validate" disabled=param.cant_edit}}</span>
-        </div>
-      {{/each}}
-      <br>
+      {{#if any_params}}
+        <h3>{{i18n "explorer.parameters"}}</h3>
+        {{#each param in model.params}}
+          <div class="run-param">
+            <span class="name">{{param.name}}</span>
+          <span class="value">
+            {{validating-text-field value=param.value validationObject=param checkMethod="validate" disabled=param.cant_edit extraClass=param.isComputedValueClass}}
+          </span>
+          </div>
+        {{/each}}
+        {{d-button action="resetParams" icon="undo" class="" label="explorer.reset_params"}}
+      {{/if}}
+    </div>
+    <div class="buttons">
       {{d-button action="run" icon="chevron-right" label="explorer.run"
           disabled=run_disabled class="btn-primary" translatedTitle=run_disabled_reason_t}}
       <div class="options">
@@ -46,6 +53,14 @@
   </div>
 
   <div {{bind-attr class=":edit-controls editControlsHidden:hidden"}}>
+    <div class="ec-item float-buttons">
+      {{#if model.deleted}}
+        {{d-button action="recover" icon="undo" label="explorer.undelete" class="btn-danger" disabled=edit_disabled}}
+      {{else}}
+        {{d-button action="delete" icon="trash-o" label="explorer.delete" class="btn-danger" disabled=edit_disabled}}
+      {{/if}}
+      {{d-button action="export" icon="download" label="explorer.downloadquery"}}
+    </div>
     <h2 class="ec-title">{{#if edit_disabled}}{{fa-icon "lock"}} {{/if}}{{i18n "explorer.edit_title"}}</h2>
     <div class="ec-item edit-query">
       {{textarea value=model.query class="query-textarea" disabled=edit_disabled}}
@@ -87,7 +102,7 @@
             <tr>
               <td class="name">{{param.name}}</td>
               <td class="value">
-                {{validating-text-field value=param.default_value validationObject=param checkMethod="validateIfLocked" disabled=edit_disabled}}
+                {{validating-text-field value=param.default_value validationObject=param checkMethod="validateIfLocked" disabled=edit_disabled extraClass=param.isComputedValueClass}}
               </td>
               <td class="type">{{combo-box valueAttribute="s" nameProperty="s" content=typeList value=param.type disabled=edit_disabled}}</td>
               <td class="locked">{{input type="checkbox" checked=param.public_edit disabled=edit_disabled}}</td>

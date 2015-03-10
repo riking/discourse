@@ -1,3 +1,9 @@
+<div class="result-download">
+  <a class="btn" id="result-download" {{bind-attr download=downloadName}} data-auto-route="true">
+    {{fa-icon "download"}}
+    {{i18n "explorer.downloadjson"}}
+  </a>
+</div>
 <div class="result-params">
   {{i18n "explorer.parameters"}}:
   {{#if noParams}}

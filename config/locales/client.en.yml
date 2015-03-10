@@ -2516,19 +2516,23 @@ en:
         notransform: Do not prettify result
         explain: Include query plan
       downloadjson: Download result as JSON
+      downloadquery: Export Query
       editbutton: "Edit Query"
       edit_title: "Edit Query"
-      public_view: "Any user can see the results of this query"
+      public_view: "Any user can view this query"
       public_run: "Any user can input values and run this query"
       create: "Create New Query"
       newHint: "The name of the new query"
       parameters: "Parameters"
       parameters_none: "(none)"
+      reset_params: "Reset parameters to defaults"
       norun:
         format: "Cannot run query because %{reason}"
         permission: "you don't have permission to execute this query."
         save_first: "you must save the query first."
         invalid: "there are parameters with invalid values."
+      delete: "Delete Query"
+      undelete: "Undelete Query"
 
     google_search: |
       <h2>Search with Google</h2>

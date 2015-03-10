@@ -2,6 +2,11 @@ class ExplorerQuery < ActiveRecord::Base
   belongs_to :creator, class_name: "User"
   has_many :params, class_name: "ExplorerQueryParameter"
 
+  def slug
+    s = Slug.for(name)
+    s = "query-#{id}" unless s.present?
+    s
+  end
 end
 
 # == Schema Information

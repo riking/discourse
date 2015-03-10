@@ -7,25 +7,19 @@ class ExplorerQueryParameter < ActiveRecord::Base
   end
 
   def self.types
-    @types ||= Enum.new(:string, :integer, :int_list, :current_user_id, :visible_categories)
+    @types ||= Enum.new(:string, :integer, :int_list, :string_list, :json)
   end
 
-  def self.calculated_default_types
-    [types[:current_user_id], types[:visible_categories]]
-  end
-
-  def calculated_default?
-    ExplorerQueryParameter.calculated_default_types.include? param_type
-  end
-
-  def calculated_default(controller)
-    case param_type
-      when ExplorerQueryParameter.types[:current_user_id]
+  # NB: logic duplicated on server/client
+  # client side: app/assets/javascripts/discourse/models/explorer_query_param.js.es6
+  def self.calculated_value(name, controller)
+    case name
+      when "current_user_id"
         controller.current_user.try(:id)
-      when ExplorerQueryParameter.types[:visible_categories]
+      when "visible_categories"
         Site.new(controller.guardian).categories.map(&:id)
       else
-        default_value
+        "$#{name}"
     end
   end
 end

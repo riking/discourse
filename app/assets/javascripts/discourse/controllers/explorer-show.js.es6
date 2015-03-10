@@ -1,4 +1,5 @@
 import DiscourseController from 'discourse/controllers/controller';
+//import ExplorerQueryParam from 'discourse/models/explorer_query_param'; // TODO es6
 
 export default DiscourseController.extend({
   queryParams: ['resultId'],
@@ -12,6 +13,12 @@ export default DiscourseController.extend({
   actions: {
     showEdit() {
       this.toggleProperty('editControlsHidden');
+    },
+
+    resetParams() {
+      this.get('query.params').forEach(function(p) {
+        p.reset();
+      });
     },
 
     parse() {
@@ -71,10 +78,12 @@ export default DiscourseController.extend({
     }
   },
 
-  // this looks dumb because of combo-box
-  typeList: ExplorerQueryParam.availableTypes.map(function(type) {
-    return {s: type};
-  }),
+  typeList: function() {
+    const ExplorerQueryParam = Discourse.ExplorerQueryParam; // TODO es6
+    return ExplorerQueryParam.availableTypes.map(function (type) {
+      return {s: type};
+    })
+  }.property(),
 
   dirty1: function() {
     this.set('dirtyParse', true);

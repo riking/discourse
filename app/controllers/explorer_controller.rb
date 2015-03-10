@@ -32,33 +32,60 @@ class ExplorerController < ApplicationController
     err = nil
     explain = nil
 
+    ####################
+    # Process query parameters
+
     query_args = params[:params]
     query.params.each do |qparam|
+      # Reset to default if restricted
       unless query_args.include?(qparam.name) && query_args[qparam.name] != "" &&
              guardian.can_edit_explorer_query_parameter?(qparam)
 
-        query_args[qparam.name] = qparam.calculated_default(self)
+        query_args[qparam.name] = qparam.default_value
+      end
+
+      # Replace with computed value
+      if query_args[qparam.name] =~ /^\$([a-z][a-z_]*)$/
+        query_args[qparam.name] = ExplorerQueryParameter.calculated_value($1, self)
+      end
+
+      # Parse into native types
+      case qparam.param_type
+        when ExplorerQueryParameter.types[:int_list]
+          arr = query_args[qparam.name]
+          arr = arr.split(',') if arr.is_a? String
+          arr = arr.map(&:to_i)
+          query_args[qparam.name] = arr
+        when ExplorerQueryParameter.types[:string_list]
+          arr = query_args[qparam.name]
+          arr = arr.split(',') if arr.is_a? String
+          arr = arr.map(&:to_s)
+          query_args[qparam.name] = arr
+        else
+          # no tranform
       end
     end
 
+    ####################
+    # Execute query
+
     begin
       ActiveRecord::Base.connection.transaction do
-        ActiveRecord::Base.exec_sql "SET TRANSACTION READ ONLY"
+        ActiveRecord::Base.exec_sql "SET TRANSACTION READ ONLY" # extra safe
         if params[:explain] == "true"
           explain = ActiveRecord::Base.exec_sql "EXPLAIN #{query.query}", query_args
           explain = explain.map { |r| r["QUERY PLAN"] }.join "\n"
         end
 
         sql = <<SQL
+  -- DataExplorer Query
+  -- Query ID: #{query.id}
+  -- Started by: #{current_user ? current_user.username : request.remote_ip}
+  WITH query AS (
 
--- DataExplorer Query
--- Query ID: #{query.id}
--- Started by: #{current_user ? current_user.username : request.remote_ip}
-WITH query AS (
+  #{query.query}
 
-#{query.query}
-
-) SELECT * FROM query
+  ) SELECT * FROM query
 SQL
 
         result = ActiveRecord::Base.exec_sql(sql, query_args)
@@ -66,6 +93,9 @@ SQL
     rescue Exception => ex
       err = ex
     end
+
+    ####################
+    # Produce result
 
     if err
       # Pretty printing logic
@@ -79,7 +109,17 @@ SQL
     else
       cols = result.fields
 
-      json = {success: true, columns: cols, rows: result, params: query_args}
+      json = {
+        success: true,
+        columns: cols,
+        rows: result,
+        params: query_args,
+        meta: {
+          name: query.slug,
+          date: Time.now,
+          user: current_user ? current_user.username : '(not logged in)',
+        }
+      }
       json[:explain] = explain if params[:explain] == "true"
       if cols.any? { |c| c.match /\$/ }
         json[:relations] = DataExplorerSerialization.new.add_extra_data result
@@ -87,8 +127,6 @@ SQL
       render json: json
     end
   end
-
-  #######
 
   def save
     params.require(:id)

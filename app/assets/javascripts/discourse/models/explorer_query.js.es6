@@ -54,13 +54,21 @@ const ExplorerQuery = Discourse.Model.extend({
 
   parse() {
     const sql = this.get('query');
-    const paramRegex = /:([a-z_]+)/gi;
+    const paramRegex = /(:?):([a-z][a-z_]*)/gi;
     var result;
     let paramNames = [];
 
     while ( (result = paramRegex.exec(sql)) ) {
-      paramNames.push(result[1]);
+      // Skip typecasts
+      if (!result[1]) {
+        paramNames.push(result[2]);
+      }
     }
+
+    // Sort & unique
+    paramNames = paramNames.sort().filter(function(el, i, a) {
+      return (i === a.indexOf(el));
+    });
 
     this.setParamNames(paramNames);
 

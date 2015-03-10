@@ -7,6 +7,10 @@ import { categoryLinkHTML } from 'discourse/helpers/category-link';
 
 var defaultFallback = function(buffer, content, defaultRender) { defaultRender(buffer, content); };
 
+function isoYMD(date) {
+  return date.getUTCFullYear() + "-" + date.getUTCMonth() + "-" + date.getUTCDate();
+}
+
 const QueryResultComponent = Ember.Component.extend({
   layoutName: 'explorer-query-result',
 
@@ -14,12 +18,17 @@ const QueryResultComponent = Ember.Component.extend({
   columns: Em.computed.alias('content.columns'),
   params: Em.computed.alias('content.params'),
   explainText: Em.computed.alias('content.explain'),
+  meta: Em.computed.alias('content.meta'),
 
   hasExplain: Em.computed.notEmpty('content.explain'),
   noParams: Em.computed.empty('params'),
   colCount: function() {
     return this.get('content.columns').length;
   }.property('content.columns.length'),
+
+  downloadName: function() {
+    return this.get('meta.name') + "@" + window.location.host + "-" + isoYMD(new Date()) + ".json";
+  }.property(),
 
   parameterAry: function() {
     let arr = [];
@@ -34,6 +43,15 @@ const QueryResultComponent = Ember.Component.extend({
 
   columnHandlers: function() {
     const self = this;
+    if (self.get('opts.notransform')) {
+      return this.get('columns').map(function(colName) {
+        return {
+          name: colName,
+          displayName: colName,
+          render: defaultFallback
+        };
+      });
+    }
     return this.get('columns').map(function(colName) {
       let handler = defaultFallback;
 
@@ -68,6 +86,20 @@ const QueryResultComponent = Ember.Component.extend({
       };
     });
   }.property('columns.@each'),
+
+  _clickDownloadButton: function() {
+    const self = this;
+    const $button = this.$().find("#result-download");
+    // .once not .on
+    $button.one('mouseover', function(e) {
+      const a = e.target;
+      let resultString = "data:text/plain;base64,";
+      var jsonString = JSON.stringify(self.get('content'));
+      resultString += btoa(jsonString);
+
+      a.href = resultString;
+    });
+  }.on('didInsertElement'),
 
   parent: function() { return this; }.property()
 

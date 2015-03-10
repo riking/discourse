@@ -14,7 +14,8 @@ export default Discourse.Route.extend(ShowFooter, {
     controller.setProperties({
       editControlsHidden: true,
       dirtyParse: false,
-      dirtySave: false
+      dirtySave: false,
+      queryResult: null
     });
   },
 
