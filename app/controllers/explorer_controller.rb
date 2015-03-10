@@ -69,11 +69,7 @@ SQL
       end
       render json: {success: false, message: err_msg, class: err_class.to_s}
     else
-      cols = []
-      res_ary = result.to_a
-      if res_ary.present?
-        cols = res_ary.first.keys
-      end
+      cols = result.fields
 
       result = {success: true, columns: cols, rows: result, params: params[:params]}
       result[:explain] = explain if params[:explain] == "true"

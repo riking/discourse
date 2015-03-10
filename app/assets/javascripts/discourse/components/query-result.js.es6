@@ -1,11 +1,6 @@
-/**
-  This view handles rendering of the data explorer query results
+var ColumnHandlers = [];
+var defaultFallback = function(buffer, content, defaultRender) { defaultRender(buffer, content); };
 
-  @class QueryResultView
-  @extends Discourse.View
-  @namespace Discourse
-  @module Discourse
-**/
 const QueryResultComponent = Ember.Component.extend({
   layoutName: 'explorer-query-result',
 
@@ -29,36 +24,68 @@ const QueryResultComponent = Ember.Component.extend({
       }
     }
     return arr;
-  }.property('params.@each')
+  }.property('params.@each'),
+
+  columnHandlers: function() {
+    return this.get('columns').map(function(colName) {
+      let handler = defaultFallback;
+
+      ColumnHandlers.forEach(function(handlerInfo) {
+        if (handlerInfo.regex.test(colName)) {
+          handler = handlerInfo.render;
+        }
+      });
+
+      return {
+        name: colName,
+        render: handler
+      };
+    });
+  }.property('columns.@each'),
+
+  parent: function() { return this; }.property()
 
 });
 
-QueryResultComponent.reopenClass({
-  columnNameMatchers: [],
-  columnTransformers: [],
-
-  /**
-   * Register a function to render columns with particular names.
-   *
-   * renderer is a function that takes (buffer, rowValue, colName, context).
-   *
-   * @param regex
-   * @param renderer
-   */
-  registerColumnHandler(regex, renderer) {
-    this.columnNameMatchers.push({ regex: regex, cb: renderer });
-  },
-
-  /**
-   * Register a function to transform the content of every row of columns with particular names.
-   *
-   * transformer is a function that takes (rows, matchedColName,
-   * @param regex
-   * @param transformer
-   */
-  registerColumnTransformer(regex, transformer){
-
+ColumnHandlers.push({ regex: /user_id/, render: function(buffer, content, defaultRender) {
+  if (!/^\d+$/.test(content)) {
+    return defaultRender(buffer, content);
   }
-});
+  buffer.push("<a href='/users/by-id/");
+  buffer.push(content);
+  buffer.push("'>User #");
+  buffer.push(content);
+  buffer.push("</a>");
+}});
+ColumnHandlers.push({ regex: /post_id/, render: function(buffer, content, defaultRender) {
+  if (!/^\d+$/.test(content)) {
+    return defaultRender(buffer, content);
+  }
+  buffer.push("<a href='/p/");
+  buffer.push(content);
+  buffer.push("'>Post #");
+  buffer.push(content);
+  buffer.push("</a>");
+}});
+ColumnHandlers.push({ regex: /badge_id/, render: function(buffer, content, defaultRender) {
+  if (!/^\d+$/.test(content)) {
+    return defaultRender(buffer, content);
+  }
+  buffer.push("<a href='/badges/");
+  buffer.push(content);
+  buffer.push("/-'>Badge #");
+  buffer.push(content);
+  buffer.push("</a>");
+}});
+ColumnHandlers.push({ regex: /topic_id/, render: function(buffer, content, defaultRender) {
+  if (!/^\d+$/.test(content)) {
+    return defaultRender(buffer, content);
+  }
+  buffer.push("<a href='/t/");
+  buffer.push(content);
+  buffer.push("/from-link'>Topic #");
+  buffer.push(content);
+  buffer.push("</a>");
+}});
 
 export default QueryResultComponent;

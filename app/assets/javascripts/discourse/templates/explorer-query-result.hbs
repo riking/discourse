@@ -8,6 +8,9 @@
     {{/each}}
   {{/if}}
 </div>
+{{#if hasExplain}}
+  <pre><code>{{content.explain}}</code></pre>
+{{/if}}
 <table>
   <thead>
   <tr class="headers">
@@ -18,11 +21,7 @@
   </thead>
   <tbody>
     {{#each row in rows}}
-      {{query-row-content row=row cols=columns}}
+      {{query-row-content row=row colRenders=columnHandlers extra=content}}
     {{/each}}
   </tbody>
 </table>
-{{debugger}}
-{{#if hasExplain}}
-<pre><code>{{content.explain}}</code></pre>
-{{/if}}
