@@ -2,45 +2,47 @@
   <h1>{{#link-to "explorer-index"}}{{fa-icon "chevron-left"}} {{i18n "explorer.title"}}{{/link-to}}</h1>
 
   {{d-button action="showEdit" icon="plus" label="explorer.editbutton" id="showEdit"}}
-  <h2 class="title query-name">{{i18n "explorer.query"}} {{model.name}}</h2>
+  <h2 class="query-name">{{i18n "explorer.query"}} {{model.name}}</h2>
 
-  {{code-highlighted-field value=model.query codeClass="lang-sql" classNames="query-readonly"}}
+  <div {{bind-attr class=":run-query editControlsHidden::hidden"}}>
+    {{code-highlighted-field value=model.query codeClass="lang-sql" classNames="query-readonly"}}
 
-  <div class="parameters">
-    <h3>{{i18n "explorer.parameters"}}</h3>
-    {{#each param in model.params}}
-      <div class="row">
-        <span class="name">{{param.name}}</span>
-        <span class="value">{{validating-text-field value=param.value validationObject=param checkMethod="validate"}}</span>
+    <div class="parameters">
+      <h3>{{i18n "explorer.parameters"}}</h3>
+      {{#each param in model.params}}
+        <div class="row">
+          <span class="name">{{param.name}}</span>
+          <span class="value">{{validating-text-field value=param.value validationObject=param checkMethod="validate"}}</span>
+        </div>
+      {{/each}}
+      <br>
+      {{d-button action="run" icon="chevron-right" label="explorer.run"
+          disabled=run_disabled class="btn-primary" translatedTitle=run_disabled_reason_t}}
+      <div class="options">
+        <span class="options-title">{{i18n "explorer.opt.options"}}:</span>
+        <label for="explain">{{input type="checkbox" checked=explain id="explain"}}
+          {{i18n "explorer.opt.explain"}}</label>
+        <label for="notransform">{{input type="checkbox" checked=notransform id="notransform"}}
+          {{i18n "explorer.opt.notransform"}}</label>
       </div>
-    {{/each}}
-    <br>
-    {{d-button action="run" icon="chevron-right" label="explorer.run"
-        disabled=run_disabled class="btn-primary" translatedTitle=run_disabled_reason_t}}
-    <div class="options">
-      <span class="options-title">{{i18n "explorer.opt.options"}}:</span>
-      <label for="explain">{{input type="checkbox" checked=explain id="explain"}}
-        {{i18n "explorer.opt.explain"}}</label>
-      <label for="notransform">{{input type="checkbox" checked=notransform id="notransform"}}
-        {{i18n "explorer.opt.notransform"}}</label>
     </div>
+
+    {{#if showResult}}
+      <div class="result">
+      {{#loading-spinner condition=loadingResult}}
+      {{#if errorResult}}
+        {{! one line because of white-space: pre }}
+        <div class="result-error"><span class="result-classname">{{errorResult.class}}</span>: {{errorResult.message}}</div>
+      {{else}}
+        {{query-result content=queryResult}}
+      {{/if}}
+      {{/loading-spinner}}
+      </div>
+    {{/if}}
   </div>
 
-  {{#if showResult}}
-    <div class="result">
-    {{#loading-spinner condition=loadingResult}}
-    {{#if errorResult}}
-      {{! one line because of white-space: pre }}
-      <div class="result-error"><span class="result-classname">{{errorResult.class}}</span>: {{errorResult.message}}</div>
-    {{else}}
-      {{query-result content=queryResult}}
-    {{/if}}
-    {{/loading-spinner}}
-    </div>
-  {{/if}}
-
-  <div {{bind-attr class=":edit-controls editControlsHidden:ec-hidden"}}>
-    <h2 class="title">{{#if edit_disabled}}{{fa-icon "lock"}} {{/if}}{{i18n "explorer.edit_title"}}</h2>
+  <div {{bind-attr class=":edit-controls editControlsHidden:hidden"}}>
+    <h2 class="ec-title">{{#if edit_disabled}}{{fa-icon "lock"}} {{/if}}{{i18n "explorer.edit_title"}}</h2>
     <div class="ec-item edit-query">
       {{textarea value=model.query class="query-textarea" disabled=edit_disabled}}
     </div>
@@ -57,16 +59,16 @@
         {{i18n "explorer.public_run"}}</label>
     </div>
     <div class="ec-item edit-name">
-      <h3 class="title">{{i18n "explorer.name"}}</h3>
+      <h3 class="ec-title">{{i18n "explorer.name"}}</h3>
       {{input value=model.name disabled=edit_disabled}}
     </div>
     <div class="ec-item edit-description">
-      <h3 class="title">{{i18n "explorer.description"}}</h3>
+      <h3 class="ec-title">{{i18n "explorer.description"}}</h3>
       {{textarea value=model.description disabled=edit_disabled}}
     </div>
     <div class="ec-item edit-parameters">
       {{#if any_params}}
-        <h3 class="title">{{i18n "explorer.params_edit.title"}}</h3>
+        <h3 class="ec-title">{{i18n "explorer.params_edit.title"}}</h3>
         <table class="query-params-edit">
           <thead>
           <tr>

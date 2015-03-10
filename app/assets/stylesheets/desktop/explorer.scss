@@ -18,7 +18,9 @@ $table_cell_padding: 6px 8px 5px 8px;
   .create,
   .query-list,
   .edit-controls,
-  .title {
+  .query-name,
+  .ec-title,
+  {
     margin: 10px 0;
   }
 
@@ -68,8 +70,7 @@ $table_cell_padding: 6px 8px 5px 8px;
 }
 
 .edit-controls {
-  display: block;
-  &.ec-hidden {
+  &.hidden {
     display: none;
   }
   background-color: dark-light-diff($secondary, $primary, 98%, -3%);

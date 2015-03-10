@@ -9,8 +9,17 @@ class DataExplorerSerialization
 
   class SmallPostWExcerptSerializer < ApplicationSerializer
     attributes :id, :topic_id, :post_number, :excerpt
+    attributes :username, :uploaded_avatar_id, :slug
     def excerpt
       Post.excerpt(object.cooked, 70)
+    end
+    def user
+      @user ||= User.find(object.user_id)
+    end
+    def username; user.username; end
+    def uploaded_avatar_id; user.uploaded_avatar_id; end
+    def slug
+      object.topic.slug
     end
   end
 

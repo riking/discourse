@@ -1,19 +1,9 @@
 import DiscourseController from 'discourse/controllers/controller';
 
 export default DiscourseController.extend({
-  _init: function() {
-    this.set('editControlsHidden', true);
-    //this.set('editControlsHidden', !Discourse.User.currentProp('admin'));
-    // Mark query as clean, we just got it from the server
-    const self = this;
-    Em.run.next(function() {
-      self.setProperties({
-        dirtyParse: false,
-        dirtySave: false
-      });
-    });
-  }.on('init'),
+  queryParams: ['resultId'],
 
+  resultId: null,
   explain: false,
   notransform: false,
 

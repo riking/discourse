@@ -120,15 +120,40 @@ ColumnHandlers.push({ regex: /topic_id/, render: function(buffer, content, defau
   buffer.push("</a>");
 }});
 
-AssistedHandlers['user'] = function(buffer, content, defaultRender, response) {
-  const contentId = parseInt(content, 10);
-  var obj = response.relations.user.find(function(relObj) {
-    return relObj.id === contentId;
-  });
-  if (!obj) {
+AssistedHandlers['reltime'] = function(buffer, content, defaultRender) {
+  const parsedDate = new Date(content);
+  if (!parsedDate.getTime()) {
     return defaultRender(buffer, content);
   }
 
+  buffer.push(Discourse.Formatter.relativeAge(parsedDate, {format: 'medium'}));
+};
+
+/**
+ * Helper to wrap the handler in a function that fetches the object out of the response.
+ *
+ * @param name the part of the column name before the $
+ * @param callback Function(buffer, object [, defaultRender])
+ */
+function registerRelationAssistedHandler(name, callback) {
+  AssistedHandlers[name] = function(buffer, content, defaultRender, response) {
+    const contentId = parseInt(content, 10);
+    if (isNaN(contentId)) {
+      return defaultRender(buffer, content);
+    }
+    const relationObject = response.relations[name].find(function(relObj) {
+      return relObj.id === contentId;
+    });
+    if (!relationObject) {
+      Em.Logger.warn("Couldn't find " + name + " with id " + contentId + " in query response");
+      return defaultRender(buffer, content);
+    }
+
+    callback(buffer, relationObject, defaultRender);
+  }
+}
+
+registerRelationAssistedHandler('user', function(buffer, obj) {
   buffer.push("<a href='/users/");
   buffer.push(obj.username);
   buffer.push("'>");
@@ -139,28 +164,9 @@ AssistedHandlers['user'] = function(buffer, content, defaultRender, response) {
   buffer.push(" ");
   buffer.push(obj.username);
   buffer.push("</a>");
-};
+});
 
-
-AssistedHandlers['reltime'] = function(buffer, content, defaultRender, response) {
-  const parsedDate = new Date(content);
-  if (!parsedDate.getTime()) {
-    return defaultRender(buffer, content);
-  }
-
-  buffer.push(Discourse.Formatter.relativeAge(parsedDate, {format: 'medium'}));
-};
-
-
-AssistedHandlers['badge'] = function(buffer, content, defaultRender, response) {
-  const contentId = parseInt(content, 10);
-  var obj = response.relations.badge.find(function(relObj) {
-    return relObj.id === contentId;
-  });
-  if (!obj) {
-    return defaultRender(buffer, content);
-  }
-
+registerRelationAssistedHandler('badge', function(buffer, obj) {
   // TODO It would be nice to be able to invoke the {{user-badge}} helper from here.
   // Looks like that would need a ContainerView
 
@@ -192,28 +198,37 @@ AssistedHandlers['badge'] = function(buffer, content, defaultRender, response) {
     buffer.push(Escape(obj.name));
     buffer.push("</span></a></span>");
   }
-};
+});
 
-AssistedHandlers['post'] = function(buffer, content, defaultRender, response) {
-  const contentId = parseInt(content, 10);
-  var obj = response.relations.post.find(function(relObj) {
-    return relObj.id === contentId;
-  });
-  if (!obj) {
-    return defaultRender(buffer, content);
-  }
-
+registerRelationAssistedHandler('post', function(buffer, obj) {
   /*
    <aside class="quote" data-post="35" data-topic="117">
    <div class="title" style="cursor: pointer;">
    <div class="quote-controls">
    <i class="fa fa-chevron-down" title="expand/collapse"></i>
    <a href="/t/usability-on-the-cheap-and-easy/117/35" title="go to the quoted post" class="back"></a>
-   </div><img width="20" height="20" src="/user_avatar/localhost/riking/40/75.png" class="avatar">riking:</div>
+   </div>
+   <img width="20" height="20" src="/user_avatar/localhost/riking/40/75.png" class="avatar">riking:</div>
    <blockquote>$EXCERPT</blockquote>
    </aside>
    */
-
-};
+  buffer.push("<aside class='quote' data-post='" + obj.post_number + "' data-topic='" + obj.topic_id + "'>");
+  buffer.push('<div class="title" style="cursor: pointer;">' +
+              '<div class="quote-controls">' +
+              '<i class="fa" title="expand/collapse"></i>');
+  buffer.push('<a href="');
+  buffer.push("/t/" + obj.slug + "/" + obj.topic_id + "/" + obj.post_number);
+  buffer.push('" title="go to the post" class="quote-other-topic"></a>');
+  buffer.push('</div>');
+  buffer.push(Discourse.Utilities.avatarImg({
+    size: "small",
+    avatarTemplate: avatarTemplate(obj.username, obj.uploaded_avatar_id)
+  }));
+  buffer.push(obj.username + ":");
+  buffer.push('</div>' +
+              '<blockquote>');
+  buffer.push(obj.excerpt);
+  buffer.push('</blockquote></aside>');
+});
 
 export default QueryResultComponent;
