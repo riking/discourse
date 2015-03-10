@@ -87,10 +87,10 @@ ExplorerQuery.reopenClass({
       eq.set('params', paramJsonArr.map(function(paramJson) {
         return ExplorerQueryParam.createFromJson(paramJson);
       }));
+      eq.get('params').forEach(function(p) {
+        p.reset();
+      });
     }
-    eq.get('params').forEach(function(p) {
-      p.reset();
-    });
     return eq;
   },
 

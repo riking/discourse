@@ -1,4 +1,3 @@
-
 class ExplorerController < ApplicationController
 
   before_filter :check_enabled
@@ -35,8 +34,10 @@ class ExplorerController < ApplicationController
 
     query_args = params[:params]
     query.params.each do |qparam|
-      unless query_args.include?(qparam.name) && guardian.can_edit_explorer_query_parameter?(qparam)
-        query_args[qparam.name] = qparam.calculated_default
+      unless query_args.include?(qparam.name) && query_args[qparam.name] != "" &&
+             guardian.can_edit_explorer_query_parameter?(qparam)
+
+        query_args[qparam.name] = qparam.calculated_default(self)
       end
     end
 
@@ -45,7 +46,7 @@ class ExplorerController < ApplicationController
         ActiveRecord::Base.exec_sql "SET TRANSACTION READ ONLY"
         if params[:explain] == "true"
           explain = ActiveRecord::Base.exec_sql "EXPLAIN #{query.query}", query_args
-          explain = explain.map {|r| r["QUERY PLAN"]}.join "\n"
+          explain = explain.map { |r| r["QUERY PLAN"] }.join "\n"
         end
 
         sql = <<SQL
@@ -80,7 +81,7 @@ SQL
 
       json = {success: true, columns: cols, rows: result, params: query_args}
       json[:explain] = explain if params[:explain] == "true"
-      if cols.any? {|c| c.match /\$/ }
+      if cols.any? { |c| c.match /\$/ }
         json[:relations] = DataExplorerSerialization.new.add_extra_data result
       end
       render json: json

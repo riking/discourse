@@ -72,7 +72,9 @@ export default DiscourseController.extend({
   },
 
   // this looks dumb because of combo-box
-  typeList: [{s: 'string'}, {s: 'integer'}, {s: 'int_list'}, {s: 'current_user_id'}],
+  typeList: ExplorerQueryParam.availableTypes.map(function(type) {
+    return {s: type};
+  }),
 
   dirty1: function() {
     this.set('dirtyParse', true);

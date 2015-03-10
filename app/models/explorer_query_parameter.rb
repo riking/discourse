@@ -7,21 +7,23 @@ class ExplorerQueryParameter < ActiveRecord::Base
   end
 
   def self.types
-    @types ||= Enum.new(:string, :integer, :int_list, :current_user_id)
+    @types ||= Enum.new(:string, :integer, :int_list, :current_user_id, :visible_categories)
   end
 
   def self.calculated_default_types
-    [types[:current_user_id]]
+    [types[:current_user_id], types[:visible_categories]]
   end
 
   def calculated_default?
     ExplorerQueryParameter.calculated_default_types.include? param_type
   end
 
-  def calculated_default
+  def calculated_default(controller)
     case param_type
       when ExplorerQueryParameter.types[:current_user_id]
-        current_user.nil? ? nil : current_user.id
+        controller.current_user.try(:id)
+      when ExplorerQueryParameter.types[:visible_categories]
+        Site.new(controller.guardian).categories.map(&:id)
       else
         default_value
     end
