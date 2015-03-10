@@ -30,6 +30,7 @@ const ExplorerQuery = Discourse.Model.extend({
     namesToAdd.forEach(function(name) {
       newParams.push(ExplorerQueryParam.createNew(name));
     });
+    newParams = newParams.sortBy('name');
 
     this.set('params', newParams);
   },

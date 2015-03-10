@@ -1,4 +1,4 @@
-.container.explorer {
+.explorer {
   h1 a {
     color: $primary;
     i {
@@ -19,6 +19,10 @@
     margin: 10px 0;
   }
 
+  .query-readonly {
+    height: 150px;
+  }
+
   margin-bottom: 50px;
 
   .options {
@@ -33,6 +37,12 @@
       input {
         vertical-align: bottom;
       }
+    }
+  }
+
+  .parameters {
+    .invalid {
+      background-color: dark-light-diff($danger, $secondary, 90%, -10%);
     }
   }
 }

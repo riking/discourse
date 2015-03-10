@@ -3,16 +3,19 @@
 
   <h2 class="title query-name">{{i18n "explorer.query"}} {{model.name}}</h2>
 
+  <pre class="query-readonly"><code class="lang-sql">{{model.query}}</code></pre>
+
   <div class="parameters">
-    <h3>Query Parameters</h3>
+    <h3>{{i18n "explorer.parameters"}}</h3>
     {{#each param in model.params}}
       <div class="row">
         <span class="name">{{param.name}}</span>
-        <span class="value">{{input value=param.value}}</span>
+        <span class="value">{{validating-text-field value=param.value validationObject=param checkMethod="validate"}}</span>
       </div>
     {{/each}}
     <br>
-    {{d-button action="run" icon="chevron-right" label="explorer.run" disabled=run_disabled class="btn-primary"}}
+    {{d-button action="run" icon="chevron-right" label="explorer.run"
+        disabled=run_disabled class="btn-primary" translatedTitle=run_disabled_reason_t}}
     <div class="options">
       <span class="options-title">{{i18n "explorer.opt.options"}}:</span>
       <label for="explain">{{input type="checkbox" checked=explain id="explain"}}
@@ -35,8 +38,6 @@
     </div>
   {{/if}}
 
-  <pre class="query-readonly"><code>{{model.query}}</code></pre>
-
   <div {{bind-attr class=":edit-controls editControlsHidden:ec-hidden"}}>
     {{d-button action="showEdit" icon="plus" label="explorer.editbutton" id="showEdit"}}
     <div class="query-container">
@@ -56,13 +57,13 @@
     </div>
     <div class="parameters">
       {{#if any_params}}
-        <h2 class="title">Query Parameters</h2>
+        <h2 class="title">{{i18n "explorer.params_edit.title"}}</h2>
         <table class="query-params-edit">
           <thead>
           <tr>
-            <th class="name">Parameter Name</th>
-            <th class="value">Default Value</th>
-            <th class="type">Type</th>
+            <th class="name">{{i18n "explorer.params_edit.name"}}</th>
+            <th class="value">{{i18n "explorer.params_edit.default"}}</th>
+            <th class="type">{{i18n "explorer.params_edit.type"}}</th>
           </tr>
           </thead>
           <tbody>
@@ -70,7 +71,7 @@
             <tr>
               <td class="name">{{param.name}}</td>
               <td class="value">{{input value=param.default_value}}</td>
-              <td class="type">{{combo-box content=controller.typeList value=param.type}}</td>
+              <td class="type">{{combo-box valueAttribute="s" nameProperty="s" content=typeList value=param.type}}</td>
             </tr>
           {{/each}}
           </tbody>

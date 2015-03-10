@@ -107,6 +107,7 @@ SQL
 
         ExplorerQueryParameter.new(paramJson)
       end
+      new_params_ary.sort_by! { |p| p.name }
 
       # Check for equality
       full_update, partial_update = update_param_array(new_params_ary, old_params_ary)

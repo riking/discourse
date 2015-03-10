@@ -2498,6 +2498,16 @@ en:
       run: "Run Query"
       save: "Save"
       query: "Query"
+      parameters: "Parameters"
+      params_edit:
+        title: "Edit query parameters"
+        name: "Parameter name"
+        default: "Default Value"
+        type: "Type"
+      type:
+        string: "string"
+        integer: "integer"
+        int_list: "int_list"
       opt:
         options: Options
         notransform: Do not prettify result
@@ -2510,6 +2520,11 @@ en:
       newHint: "The name of the new query"
       parameters: "Parameters"
       parameters_none: "(none)"
+      norun:
+        format: "Cannot run query because %{reason}"
+        permission: "you don't have permission to execute this query."
+        save_first: "you must save the query first."
+        invalid: "there are parameters with invalid values."
 
     google_search: |
       <h2>Search with Google</h2>

@@ -44,6 +44,8 @@ export default DiscourseController.extend({
       this.get('model').save().then(function(result) {
         self.set('dirtySave', false);
         //self.get('model').updateFromJson(result);
+
+
       }).catch(function(xhr) {
         // TODO ERROR HANDLING
         console.error(xhr);
@@ -78,6 +80,9 @@ export default DiscourseController.extend({
     }
   },
 
+  // this looks dumb because of combo-box
+  typeList: [{s: 'string'}, {s: 'integer'}, {s: 'int_list'}],
+
   dirty1: function() {
     this.set('dirtyParse', true);
     this.set('dirtySave', true);
@@ -85,7 +90,7 @@ export default DiscourseController.extend({
 
   dirty2: function() {
     this.set('dirtySave', true);
-  }.observes('query.public_run', 'query.public_view'),
+  }.observes('query.public_run', 'query.public_view', 'query.params.@each.default_value', 'query.params.@each.type'),
 
   // UI disable triggers
 
@@ -101,15 +106,23 @@ export default DiscourseController.extend({
     return !(this.get('dirtyParse') && this.get('query.can_edit'));
   }.property('query.can_edit', 'dirtyParse'),
 
-  run_disabled: function() {
-    if (!this.get('query.can_run')) return true;
-    if (this.get('dirtySave')) return true;
-    if (!this.get('any_params')) return false;
-    return !this.get('query.params').every(function (p) {
-      return !Em.isEmpty(p.get('value'));
-    });
-
+  run_disabled: Em.computed.notEmpty('run_disabled_reason'),
+  run_disabled_reason: function() {
+    if (!this.get('query.can_run')) return 'explorer.norun.permission';
+    if (this.get('dirtySave')) return 'explorer.norun.save_first';
+    if (!this.get('any_params')) return;
+    if (!this.get('query.params').every(function (p) {
+      return p.validate();
+    })) {
+      return 'explorer.norun.invalid';
+    }
   }.property('query.can_run', 'dirtySave', 'query.params.@each.value'),
+
+  run_disabled_reason_t: function() {
+    const reason = this.get('run_disabled_reason');
+    if (Em.isEmpty(reason)) return;
+    return I18n.t('explorer.norun.format', {reason: I18n.t(reason)});
+  }.property('run_disabled_reason'),
 
   save_disabled: function() {
     if (!this.get('query.can_edit')) return true; // cannot edit -> cannot save
