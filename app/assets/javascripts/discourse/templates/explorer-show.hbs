@@ -1,7 +1,7 @@
 <div class="container explorer">
-  <h1>Data Explorer</h1>
+  <h1>{{#link-to "explorer-index"}}{{fa-icon "chevron-left"}} {{i18n "explorer.title"}}{{/link-to}}</h1>
 
-  <h2 class="title query-name">{{model.name}}</h2>
+  <h2 class="title query-name">{{i18n "explorer.query"}} {{model.name}}</h2>
 
   <div class="parameters">
     <h3>Query Parameters</h3>
@@ -11,8 +11,29 @@
         <span class="value">{{input value=param.value}}</span>
       </div>
     {{/each}}
-    {{d-button action="run" icon="chevron-right" label="explorer.run" disabled=run_disabled}}
+    <br>
+    {{d-button action="run" icon="chevron-right" label="explorer.run" disabled=run_disabled class="btn-primary"}}
+    <div class="options">
+      <span class="options-title">{{i18n "explorer.opt.options"}}:</span>
+      <label for="explain">{{input type="checkbox" checked=explain id="explain"}}
+        {{i18n "explorer.opt.explain"}}</label>
+      <label for="notransform">{{input type="checkbox" checked=notransform id="notransform"}}
+        {{i18n "explorer.opt.notransform"}}</label>
+    </div>
   </div>
+
+  {{#if showResult}}
+    <div class="result">
+    {{#loading-spinner condition=loadingResult}}
+    {{#if errorResult}}
+      {{! one line because of white-space: pre }}
+      <div class="result-error"><span class="result-classname">{{errorResult.class}}</span>: {{errorResult.message}}</div>
+    {{else}}
+      {{query-result content=queryResult}}
+    {{/if}}
+    {{/loading-spinner}}
+    </div>
+  {{/if}}
 
   <pre class="query-readonly"><code>{{model.query}}</code></pre>
 
@@ -23,7 +44,7 @@
     </div>
     <div class="button-container">
       {{d-button action="parse" icon="check" label="explorer.parse" disabled=parse_disabled}}
-      {{d-button action="save" icon="caret-square-o-right" label="explorer.save" disabled=save_disabled}}
+      {{d-button action="save" icon="caret-square-o-right" label="explorer.save" disabled=save_disabled class="btn-primary"}}
     </div>
     <div class="options">
       <label for="public_view">

@@ -8,13 +8,13 @@ const ExplorerQuery = Discourse.Model.extend({
       map[param.get('name')] = param.get('value');
     });
     return map;
-  }.property('params.@each'),
+  }.property('params.@each.value'),
 
   paramsJson: function() {
     return this.get('params').map(function(param) {
       return param.getProperties('name', 'default_value', 'type');
     });
-  }.property('params.@each'),
+  }.property('params.@each.name', 'params.@each.default_value', 'params.@each.type'),
 
   setParamNames(names) {
     const ExplorerQueryParam = Discourse.ExplorerQueryParam; // TODO ES6
@@ -64,9 +64,11 @@ const ExplorerQuery = Discourse.Model.extend({
     return Em.RSVP.resolve();
   },
 
-  run() {
+  run(opts) {
+    var args = this.get('paramsMap');
     return Discourse.ajax('/explorer/run/' + this.get('id'), { type: "POST", data: {
-      params: this.get('paramValues')
+      params: args,
+      explain: opts.explain
     }});
   }
 });

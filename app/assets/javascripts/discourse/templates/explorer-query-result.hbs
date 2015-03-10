@@ -1,0 +1,24 @@
+<div class="result-params">
+  {{i18n "explorer.parameters"}}:
+  {{#if noParams}}
+    {{i18n "explorer.parameters_none"}}
+  {{else}}
+    {{#each param in parameterAry}}
+      <b>{{param.key}}</b>: <span>{{param.value}}</span>
+    {{/each}}
+  {{/if}}
+</div>
+<table>
+  <thead>
+  <tr class="headers">
+    {{#each column in columns}}
+      <th>{{column}}</th>
+    {{/each}}
+  </tr>
+  </thead>
+  <tbody>
+    {{#each row in rows}}
+      {{query-row-content row=row cols=columns}}
+    {{/each}}
+  </tbody>
+</table>

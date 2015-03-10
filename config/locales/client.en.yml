@@ -2497,11 +2497,19 @@ en:
       parse: "Check Query"
       run: "Run Query"
       save: "Save"
+      query: "Query"
+      opt:
+        options: Options
+        notransform: Do not prettify result
+        explain: Include query plan
+      downloadjson: Download result as JSON
       editbutton: "Show Edit Controls"
       public_view: "Any user can see the results of this query"
       public_run: "Any user can input values and run this query"
       create: "Create New Query"
       newHint: "The name of the new query"
+      parameters: "Parameters"
+      parameters_none: "(none)"
 
     google_search: |
       <h2>Search with Google</h2>

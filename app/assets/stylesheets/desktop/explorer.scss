@@ -1,4 +1,12 @@
 .container.explorer {
+  h1 a {
+    color: $primary;
+    i {
+      font-size: 0.95em;
+      color: $tertiary;
+      vertical-align: top;
+    }
+  }
 
   .query-container {
     margin: 10px;
@@ -12,6 +20,21 @@
   }
 
   margin-bottom: 50px;
+
+  .options {
+    display: inline-block;
+    .options-title {
+      font-weight: bold;
+      margin: 0 6px;
+    }
+    label {
+      display: inline-block;
+      margin: 0 6px;
+      input {
+        vertical-align: bottom;
+      }
+    }
+  }
 }
 
 .query-list {
@@ -44,4 +67,48 @@
   min-height: 220px;
   overflow: scroll;
   font-family: monospace;
+}
+
+.explorer .result {
+  margin: 10px 0;
+  width: 100%;
+  thead tr {
+    &.headers {
+      background-color: dark-light-diff($primary, $secondary, 80%, -60%);
+      border: 1px solid dark-light-diff($primary, $secondary, 70%, -70%);
+
+      th {
+        border: 1px solid dark-light-diff($primary, $secondary, 70%, -70%);
+        text-align: center;
+        padding: 6px 8px 5px 8px;
+        vertical-align: middle;
+      }
+    }
+  }
+  tbody {
+    td {
+      border: 1px solid dark-light-diff($primary, $secondary, 70%, -70%);
+      padding: 6px 8px 5px 8px;
+      vertical-align: middle;
+    }
+    tr:nth-child(odd) {
+      background-color: dark-light-diff($primary, $secondary, 95%, -50%);
+    }
+    tr:nth-child(even) {
+      background-color: $secondary;
+    }
+  }
+
+  .result-error {
+    background-color: dark-light-diff($danger, $secondary, 90%, -50%);
+    color: $danger;
+    font-family: monospace;
+    white-space: pre;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid;
+    .result-classname {
+      font-weight: bold;
+    }
+  }
 }

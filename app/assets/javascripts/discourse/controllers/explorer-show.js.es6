@@ -13,6 +13,9 @@ export default DiscourseController.extend({
     });
   }.on('init'),
 
+  opt_explain: false,
+  notransform: false,
+
   query: Em.computed.alias('model'),
 
   actions: {
@@ -52,12 +55,23 @@ export default DiscourseController.extend({
     run() {
       const self = this;
       this.set('loadingResult', true);
+      this.set('showResult', true);
+      self.set('errorResult', false);
 
-      this.get('model').run().then(function(result) {
-        console.log(result);
+      this.get('model').run({explain: this.get('opt_explain')}).then(function(result) {
+        if (result.success) {
+          console.log(result);
+          result.opts = self.getProperties('opt_explain', 'notransform');
+          self.set('queryResult', result);
+        } else {
+          self.set('errorResult', result);
+        }
+
       }).catch(function(xhr) {
         // TODO ERROR HANDLING
         console.error(xhr);
+        self.set('loadingResult', false);
+        self.set('errorResult', {"class": "NetworkError", message: xhr.status});
       }).finally(function() {
         self.set('loadingResult', false);
       });
@@ -88,8 +102,14 @@ export default DiscourseController.extend({
   }.property('query.can_edit', 'dirtyParse'),
 
   run_disabled: function() {
-    return !this.get('query.can_run') || this.get('dirtySave');
-  }.property('query.can_run', 'dirtySave'),
+    if (!this.get('query.can_run')) return true;
+    if (this.get('dirtySave')) return true;
+    if (!this.get('any_params')) return false;
+    return !this.get('query.params').every(function (p) {
+      return !Em.isEmpty(p.get('value'));
+    });
+
+  }.property('query.can_run', 'dirtySave', 'query.params.@each.value'),
 
   save_disabled: function() {
     if (!this.get('query.can_edit')) return true; // cannot edit -> cannot save
