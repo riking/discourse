@@ -35,8 +35,8 @@ class ExplorerController < ApplicationController
 
     query_args = params[:params]
     query.params.each do |qparam|
-      unless query_args.include? qparam.name && guardian.can_edit?(qparam)
-        query_args[qparam.name] = qparam.default_value
+      unless query_args.include?(qparam.name) && guardian.can_edit_explorer_query_parameter?(qparam)
+        query_args[qparam.name] = qparam.calculated_default
       end
     end
 
@@ -46,13 +46,13 @@ class ExplorerController < ApplicationController
         if params[:explain] == "true"
           explain = ActiveRecord::Base.exec_sql "EXPLAIN #{query.query}", query_args
           explain = explain.map {|r| r["QUERY PLAN"]}.join "\n"
-          puts explain
         end
 
         sql = <<SQL
+
 -- DataExplorer Query
 -- Query ID: #{query.id}
--- Started by: #{current_user.username}
+-- Started by: #{current_user ? current_user.username : request.remote_ip}
 WITH query AS (
 
 #{query.query}
@@ -82,7 +82,6 @@ SQL
       json[:explain] = explain if params[:explain] == "true"
       if cols.any? {|c| c.match /\$/ }
         json[:relations] = DataExplorerSerialization.new.add_extra_data result
-        # puts json[:relations].as_json
       end
       render json: json
     end

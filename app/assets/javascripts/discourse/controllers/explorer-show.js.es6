@@ -72,7 +72,7 @@ export default DiscourseController.extend({
   },
 
   // this looks dumb because of combo-box
-  typeList: [{s: 'string'}, {s: 'integer'}, {s: 'int_list'}],
+  typeList: [{s: 'string'}, {s: 'integer'}, {s: 'int_list'}, {s: 'current_user_id'}],
 
   dirty1: function() {
     this.set('dirtyParse', true);
@@ -81,7 +81,8 @@ export default DiscourseController.extend({
 
   dirty2: function() {
     this.set('dirtySave', true);
-  }.observes('query.public_run', 'query.public_view', 'query.params.@each.default_value', 'query.params.@each.type'),
+  }.observes('query.public_run', 'query.public_view', 'query.description', 'query.name',
+    'query.params.@each.default_value', 'query.params.@each.type', 'query.params.@each.public_edit'),
 
   // UI disable triggers
 

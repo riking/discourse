@@ -47,7 +47,7 @@ $table_cell_padding: 6px 8px 5px 8px;
     }
   }
 
-  .parameters {
+  .parameters, .edit-parameters {
     .invalid {
       background-color: dark-light-diff($danger, $secondary, 90%, -10%);
     }

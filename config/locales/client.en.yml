@@ -2506,6 +2506,7 @@ en:
         name: "Parameter name"
         default: "Default Value"
         type: "Type"
+        public_edit: "Users can change?"
       type:
         string: "string"
         integer: "integer"

@@ -16,7 +16,7 @@
       {{#each param in model.params}}
         <div class="row">
           <span class="name">{{param.name}}</span>
-          <span class="value">{{validating-text-field value=param.value validationObject=param checkMethod="validate"}}</span>
+          <span class="value">{{validating-text-field value=param.value validationObject=param checkMethod="validate" disabled=param.cant_edit}}</span>
         </div>
       {{/each}}
       <br>
@@ -79,14 +79,18 @@
             <th class="name">{{i18n "explorer.params_edit.name"}}</th>
             <th class="value">{{i18n "explorer.params_edit.default"}}</th>
             <th class="type">{{i18n "explorer.params_edit.type"}}</th>
+            <th class="locked">{{i18n "explorer.params_edit.public_edit"}}</th>
           </tr>
           </thead>
           <tbody>
           {{#each param in model.params}}
             <tr>
               <td class="name">{{param.name}}</td>
-              <td class="value">{{input value=param.default_value disabled=edit_disabled}}</td>
+              <td class="value">
+                {{validating-text-field value=param.default_value validationObject=param checkMethod="validateIfLocked" disabled=edit_disabled}}
+              </td>
               <td class="type">{{combo-box valueAttribute="s" nameProperty="s" content=typeList value=param.type disabled=edit_disabled}}</td>
+              <td class="locked">{{input type="checkbox" checked=param.public_edit disabled=edit_disabled}}</td>
             </tr>
           {{/each}}
           </tbody>

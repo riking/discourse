@@ -12,9 +12,9 @@ const ExplorerQuery = Discourse.Model.extend({
 
   paramsJson: function() {
     return this.get('params').map(function(param) {
-      return param.getProperties('name', 'default_value', 'type');
+      return param.getProperties('name', 'default_value', 'type', 'public_edit');
     });
-  }.property('params.@each.name', 'params.@each.default_value', 'params.@each.type'),
+  }.property('params.@each.name', 'params.@each.default_value', 'params.@each.type', 'params.@each.public_edit'),
 
   setParamNames(names) {
     const ExplorerQueryParam = Discourse.ExplorerQueryParam; // TODO ES6
@@ -88,6 +88,9 @@ ExplorerQuery.reopenClass({
         return ExplorerQueryParam.createFromJson(paramJson);
       }));
     }
+    eq.get('params').forEach(function(p) {
+      p.reset();
+    });
     return eq;
   },
 

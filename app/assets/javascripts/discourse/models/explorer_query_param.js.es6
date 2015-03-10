@@ -27,14 +27,28 @@ const ExplorerQueryParam = Discourse.Model.extend({
     }
   },
 
+  validateIfLocked(value) {
+    if (this.get('public_edit')) {
+      return true;
+    }
+    return this.validate(value);
+  },
+
   reset() {
     this.set('value', this.get('default_value'));
-  }
+  },
+
+  cant_edit: function() {
+    if (this.get('public_edit')) {
+      return false;
+    }
+    return !Discourse.User.currentProp('admin');
+  }.property('public_edit')
 });
 
 ExplorerQueryParam.reopenClass({
   createNew(name) {
-    return ExplorerQueryParam.create({name: name, default_value: "", type: "string"});
+    return ExplorerQueryParam.create({name: name, default_value: "", type: "string", public_edit: true});
   },
   createFromJson(json) {
     return ExplorerQueryParam.create(json);
