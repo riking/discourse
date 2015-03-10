@@ -83,7 +83,7 @@ SQL
 
   def save
     params.require(:id)
-    vals = params.permit(:name, :query, :public_view, :public_run)
+    vals = params.permit(:name, :query, :description, :public_view, :public_run)
 
     query = ExplorerQuery.includes(:params).find(params[:id])
     guardian.ensure_can_edit_explorer_query!(query)

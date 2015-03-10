@@ -1,9 +1,10 @@
 <div class="container explorer">
   <h1>{{#link-to "explorer-index"}}{{fa-icon "chevron-left"}} {{i18n "explorer.title"}}{{/link-to}}</h1>
 
+  {{d-button action="showEdit" icon="plus" label="explorer.editbutton" id="showEdit"}}
   <h2 class="title query-name">{{i18n "explorer.query"}} {{model.name}}</h2>
 
-  <pre class="query-readonly"><code class="lang-sql">{{model.query}}</code></pre>
+  {{code-highlighted-field value=model.query codeClass="lang-sql" classNames="query-readonly"}}
 
   <div class="parameters">
     <h3>{{i18n "explorer.parameters"}}</h3>
@@ -39,15 +40,15 @@
   {{/if}}
 
   <div {{bind-attr class=":edit-controls editControlsHidden:ec-hidden"}}>
-    {{d-button action="showEdit" icon="plus" label="explorer.editbutton" id="showEdit"}}
-    <div class="query-container">
-      {{textarea value=model.query class="query-textarea" width="300" height="450" disabled=edit_disabled}}
+    <h2 class="title">{{#if edit_disabled}}{{fa-icon "lock"}} {{/if}}{{i18n "explorer.edit_title"}}</h2>
+    <div class="ec-item edit-query">
+      {{textarea value=model.query class="query-textarea" disabled=edit_disabled}}
     </div>
-    <div class="button-container">
+    <div class="ec-item edit-buttons">
       {{d-button action="parse" icon="check" label="explorer.parse" disabled=parse_disabled}}
       {{d-button action="save" icon="caret-square-o-right" label="explorer.save" disabled=save_disabled class="btn-primary"}}
     </div>
-    <div class="options">
+    <div class="ec-item">
       <label for="public_view">
         {{input type="checkbox" checked=model.public_view disabled=edit_disabled id="public_view"}}
         {{i18n "explorer.public_view"}}</label>
@@ -55,9 +56,17 @@
         {{input type="checkbox" checked=model.public_run disabled=edit_disabled id="public_run"}}
         {{i18n "explorer.public_run"}}</label>
     </div>
-    <div class="parameters">
+    <div class="ec-item edit-name">
+      <h3 class="title">{{i18n "explorer.name"}}</h3>
+      {{input value=model.name disabled=edit_disabled}}
+    </div>
+    <div class="ec-item edit-description">
+      <h3 class="title">{{i18n "explorer.description"}}</h3>
+      {{textarea value=model.description disabled=edit_disabled}}
+    </div>
+    <div class="ec-item edit-parameters">
       {{#if any_params}}
-        <h2 class="title">{{i18n "explorer.params_edit.title"}}</h2>
+        <h3 class="title">{{i18n "explorer.params_edit.title"}}</h3>
         <table class="query-params-edit">
           <thead>
           <tr>
@@ -70,8 +79,8 @@
           {{#each param in model.params}}
             <tr>
               <td class="name">{{param.name}}</td>
-              <td class="value">{{input value=param.default_value}}</td>
-              <td class="type">{{combo-box valueAttribute="s" nameProperty="s" content=typeList value=param.type}}</td>
+              <td class="value">{{input value=param.default_value disabled=edit_disabled}}</td>
+              <td class="type">{{combo-box valueAttribute="s" nameProperty="s" content=typeList value=param.type disabled=edit_disabled}}</td>
             </tr>
           {{/each}}
           </tbody>

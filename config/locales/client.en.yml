@@ -2499,8 +2499,10 @@ en:
       save: "Save"
       query: "Query"
       parameters: "Parameters"
+      name: "Name"
+      description: "Description"
       params_edit:
-        title: "Edit query parameters"
+        title: "Query parameters"
         name: "Parameter name"
         default: "Default Value"
         type: "Type"
@@ -2513,7 +2515,8 @@ en:
         notransform: Do not prettify result
         explain: Include query plan
       downloadjson: Download result as JSON
-      editbutton: "Show Edit Controls"
+      editbutton: "Edit Query"
+      edit_title: "Edit Query"
       public_view: "Any user can see the results of this query"
       public_run: "Any user can input values and run this query"
       create: "Create New Query"

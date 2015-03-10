@@ -1,4 +1,5 @@
 .explorer {
+  margin-bottom: 50px;
   h1 a {
     color: $primary;
     i {
@@ -8,22 +9,24 @@
     }
   }
 
-  .query-container {
+  .ec-item {
     margin: 10px;
   }
 
-  .button-container,
   .create,
   .query-list,
-  h2.title {
+  .edit-controls,
+  .title {
     margin: 10px 0;
   }
 
-  .query-readonly {
+  .query-readonly pre code {
     height: 150px;
   }
 
-  margin-bottom: 50px;
+  #showEdit {
+    float: right;
+  }
 
   .options {
     display: inline-block;
@@ -63,12 +66,17 @@
 }
 
 .edit-controls {
-  visibility: visible;
+  display: block;
   &.ec-hidden {
-    visibility: hidden;
-    #showEdit {
-      visibility: visible;
-    }
+    display: none;
+  }
+  background-color: dark-light-diff($secondary, $primary, 98%, -3%);
+  padding: 6px;
+
+  .edit-name, .edit-description {
+    display: inline-block;
+    width: 25%;
+    vertical-align: top;
   }
 }
 

@@ -40,6 +40,7 @@ const ExplorerQuery = Discourse.Model.extend({
     return Discourse.ajax('/explorer/save/' + this.get('id'), { type: "POST", data: {
         name: this.get('name'),
         query: this.get('query'),
+        description: this.get('description'),
         params: this.get('paramsJson'),
         public_view: this.get('public_view'),
         public_run: this.get('public_run')

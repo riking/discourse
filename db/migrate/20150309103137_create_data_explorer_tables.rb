@@ -3,6 +3,7 @@ class CreateDataExplorerTables < ActiveRecord::Migration
     create_table :explorer_queries do |t|
       t.string :name, null: false
       t.text :query, null: false
+      t.text :description
       t.integer :creator_id, null: false
       t.boolean :public_view, default: false, null: false
       t.boolean :public_run, default: false, null: false
