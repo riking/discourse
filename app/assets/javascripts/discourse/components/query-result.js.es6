@@ -12,11 +12,14 @@ const QueryResultComponent = Ember.Component.extend({
   rows: Em.computed.alias('content.rows'),
   columns: Em.computed.alias('content.columns'),
   params: Em.computed.alias('content.params'),
+  explainText: Em.computed.alias('content.explain'),
 
+  hasExplain: Em.computed.notEmpty('content.explain'),
+  noParams: Em.computed.empty('params'),
   colCount: function() {
     return this.get('content.columns').length;
   }.property('content.columns.length'),
-  noParams: Em.computed.empty('params'),
+
   parameterAry: function() {
     let arr = [];
     const params = this.get('params');

@@ -4,6 +4,8 @@ const ExplorerQueryParam = Discourse.Model.extend({
     this.reset();
   }.on('init'),
 
+  type: Em.computed.alias('param_type'),
+
   validate(value) {
     if (value === undefined) {
       value = this.get('value');
@@ -14,13 +16,13 @@ const ExplorerQueryParam = Discourse.Model.extend({
         return !Em.isEmpty(value);
       case "integer":
         const int = parseInt(value, 10);
-        return int === (int | 0);
+        return /^\d+$/.test(value) && int === (int | 0);
       case "int_list":
         // a number, optionally followed by more numbers separated by commas that are optionally separated by spaces
         const regex = /\d+(\s*,\s*\d+)*/;
         return regex.test(value);
       default:
-        console.warn("Bad query parameter validation type");
+        console.warn("Bad query parameter validation type:", this.get('type'));
         return false;
     }
   },
@@ -35,11 +37,7 @@ ExplorerQueryParam.reopenClass({
     return ExplorerQueryParam.create({name: name, default_value: "", type: "string"});
   },
   createFromJson(json) {
-    let eq = ExplorerQueryParam.create(json);
-    if (!eq.get('type')) {
-      eq.set('type', 'string');
-    }
-    return eq;
+    return ExplorerQueryParam.create(json);
   }
 });
 

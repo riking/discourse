@@ -38,6 +38,8 @@ class ExplorerController < ApplicationController
         ActiveRecord::Base.exec_sql "SET TRANSACTION READ ONLY"
         if params[:explain] == "true"
           explain = ActiveRecord::Base.exec_sql "EXPLAIN #{query.query}", params[:params]
+          explain = explain.map {|r| r["QUERY PLAN"]}.join "\n"
+          puts explain
         end
 
         sql = <<SQL
@@ -74,7 +76,7 @@ SQL
       end
 
       result = {success: true, columns: cols, rows: result, params: params[:params]}
-      result[:explain] = explain if params[:explain]
+      result[:explain] = explain if params[:explain] == "true"
       render json: result
     end
   end
@@ -135,7 +137,9 @@ SQL
     params.require(:name)
     guardian.ensure_can_create_explorer_query!
 
-    eq = ExplorerQuery.new(name: params[:name], creator: current_user, query: "SELECT 1 value\nLIMIT :limit")
+    eq = ExplorerQuery.new(name: params[:name], creator: current_user, query: "SELECT 1 AS value\nLIMIT :limit")
+    eq_param = ExplorerQueryParameter.new(name: "limit", param_type: ExplorerQueryParameter.types[:integer], default_value: 10)
+    eq.params = [eq_param]
     eq.save
 
     render_serialized eq, ExplorerQuerySerializer

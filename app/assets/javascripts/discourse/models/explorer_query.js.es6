@@ -70,7 +70,7 @@ const ExplorerQuery = Discourse.Model.extend({
     var args = this.get('paramsMap');
     return Discourse.ajax('/explorer/run/' + this.get('id'), { type: "POST", data: {
       params: args,
-      explain: opts.explain
+      explain: !!opts.explain
     }});
   }
 });

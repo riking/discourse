@@ -1,11 +1,13 @@
+// from SE data explorer
+$table_cell_padding: 6px 8px 5px 8px;
+
 .explorer {
   margin-bottom: 50px;
   h1 a {
-    color: $primary;
+    color: $tertiary;
     i {
       font-size: 0.95em;
       color: $tertiary;
-      vertical-align: top;
     }
   }
 
@@ -78,6 +80,14 @@
     width: 25%;
     vertical-align: top;
   }
+  .edit-parameters {
+    .type .select2-container {
+      vertical-align: super;
+    }
+    td {
+      padding: $table_cell_padding;
+    }
+  }
 }
 
 .query-textarea {
@@ -98,7 +108,7 @@
       th {
         border: 1px solid dark-light-diff($primary, $secondary, 70%, -70%);
         text-align: center;
-        padding: 6px 8px 5px 8px;
+        padding: $table_cell_padding;
         vertical-align: middle;
       }
     }
@@ -106,7 +116,7 @@
   tbody {
     td {
       border: 1px solid dark-light-diff($primary, $secondary, 70%, -70%);
-      padding: 6px 8px 5px 8px;
+      padding: $table_cell_padding;
       vertical-align: middle;
     }
     tr:nth-child(odd) {

@@ -2,7 +2,8 @@ import DiscourseController from 'discourse/controllers/controller';
 
 export default DiscourseController.extend({
   _init: function() {
-    this.set('editControlsHidden', !Discourse.User.currentProp('admin'));
+    this.set('editControlsHidden', true);
+    //this.set('editControlsHidden', !Discourse.User.currentProp('admin'));
     // Mark query as clean, we just got it from the server
     const self = this;
     Em.run.next(function() {
@@ -13,7 +14,7 @@ export default DiscourseController.extend({
     });
   }.on('init'),
 
-  opt_explain: false,
+  explain: false,
   notransform: false,
 
   query: Em.computed.alias('model'),
@@ -60,10 +61,10 @@ export default DiscourseController.extend({
       this.set('showResult', true);
       self.set('errorResult', false);
 
-      this.get('model').run({explain: this.get('opt_explain')}).then(function(result) {
+      this.get('model').run({explain: this.get('explain')}).then(function(result) {
         if (result.success) {
           console.log(result);
-          result.opts = self.getProperties('opt_explain', 'notransform');
+          result.opts = self.getProperties('explain', 'notransform');
           self.set('queryResult', result);
         } else {
           self.set('errorResult', result);
