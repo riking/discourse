@@ -1,10 +1,5 @@
-class ExplorerQuerySerializer < ApplicationSerializer
-  attributes :id, :name, :query, :public_view, :public_run, :params
-  attributes :can_run, :can_edit
-
-  def can_run
-    scope.can_run_explorer_query?(object)
-  end
+class ExplorerQuerySerializer < BasicExplorerQuerySerializer
+  attributes :query, :public_run, :params, :can_edit
 
   def can_edit
     scope.can_edit?(object)

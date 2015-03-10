@@ -498,12 +498,11 @@ Discourse::Application.routes.draw do
   root to: "list#top", constraints: HomePageConstraint.new("top"), :as => "top_lists"
 
   get "explorer" => "explorer#index"
-  get "explorer/query/:id" => "explorer#query"
-  get "explorer/parse" => "explorer#parse"
   get "explorer/list" => "explorer#list"
   get "explorer/show/:id" => "explorer#show"
   post "explorer/run/:id" => "explorer#run"
-  post "explorer/save/:id" => "explorer#save", constraints: AdminConstraint.new
+  post "explorer/save/:id" => "explorer#save"
+  post "explorer/create" => "explorer#create"
 
   get "*url", to: 'permalinks#show', constraints: PermalinkConstraint.new
 end

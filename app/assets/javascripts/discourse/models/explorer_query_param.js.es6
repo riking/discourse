@@ -6,7 +6,11 @@ const ExplorerQueryParam = Discourse.Model.extend({
 
   reset() {
     this.set('value', this.get('default_value'));
-  }
+  },
+
+  type_list: function() {
+    return ["string", "integer", "int_list"];
+  }.property()
 });
 
 ExplorerQueryParam.reopenClass({

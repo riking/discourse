@@ -2500,6 +2500,8 @@ en:
       editbutton: "Show Edit Controls"
       public_view: "Any user can see the results of this query"
       public_run: "Any user can input values and run this query"
+      create: "Create New Query"
+      newHint: "The name of the new query"
 
     google_search: |
       <h2>Search with Google</h2>

@@ -1,0 +1,46 @@
+<div class="container explorer">
+  <h1>{{i18n "explorer.title"}}</h1>
+  <div class="full-width">
+    <table class="query-list">
+      <thead>
+      <tr>
+        <th>Query</th>
+        <th>Description</th>
+        <th>Access Flags</th>
+        <th class="creator">Created by</th>
+      </tr>
+      </thead>
+      <tbody>
+      {{#each query in model}}
+        <tr>
+          <td class="name">{{#link-to "explorer-show" query.id}}{{query.name}}{{/link-to}}</td>
+          <td class="desc">{{query.description}}</td>
+          <td class="flags">
+            {{#if query.public_view}}
+              Public: All users can see query results
+            {{else}}
+              Private: Query results are not visible
+            {{/if}}<br>
+            {{#if query.can_run}}
+              You can run this query
+            {{else}}
+              You cannot run this query
+            {{/if}}
+          </td>
+          <td class="creator">
+            <a href="/users/{{unbound query.creator.username}}">{{avatar query.creator imageSize="small"}} {{query.creator.username}}</a>
+          </td>
+        </tr>
+      {{/each}}
+      </tbody>
+    </table>
+  </div>
+
+  {{#if canCreate}}
+    <div class="create">
+      {{i18n "explorer.create"}}<br>
+      {{text-field value=newQueryName placeholderKey="explorer.newHint"}}
+      {{d-button icon="plus" action="create" class="no-text"}}
+    </div>
+  {{/if}}
+</div>

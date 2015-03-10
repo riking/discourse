@@ -3,13 +3,30 @@
   .query-container {
     margin: 10px;
   }
-  .button-container {
-    margin: 10px 0;
-  }
+
+  .button-container,
+  .create,
+  .query-list,
   h2.title {
     margin: 10px 0;
   }
+
   margin-bottom: 50px;
+}
+
+.query-list {
+  width: 100%;
+  td, th {
+    border: 1px solid black;
+  }
+  td.name a {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .user-small {
+    width: auto;
+  }
 }
 
 .edit-controls {

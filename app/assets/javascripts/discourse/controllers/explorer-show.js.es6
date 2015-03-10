@@ -2,7 +2,7 @@ import DiscourseController from 'discourse/controllers/controller';
 
 export default DiscourseController.extend({
   _init: function() {
-    this.set('editControlsHidden', true);
+    this.set('editControlsHidden', !Discourse.User.currentProp('admin'));
     // Mark query as clean, we just got it from the server
     const self = this;
     Em.run.next(function() {
@@ -28,6 +28,7 @@ export default DiscourseController.extend({
         self.set('dirtyParse', false);
       }).catch(function(xhr) {
         // TODO ERROR HANDLING
+        console.error(xhr);
       }).finally(function() {
         self.set('loading', false);
       });
@@ -42,6 +43,7 @@ export default DiscourseController.extend({
         //self.get('model').updateFromJson(result);
       }).catch(function(xhr) {
         // TODO ERROR HANDLING
+        console.error(xhr);
       }).finally(function() {
         self.set('loading', false);
       });
@@ -55,6 +57,7 @@ export default DiscourseController.extend({
         console.log(result);
       }).catch(function(xhr) {
         // TODO ERROR HANDLING
+        console.error(xhr);
       }).finally(function() {
         self.set('loadingResult', false);
       });

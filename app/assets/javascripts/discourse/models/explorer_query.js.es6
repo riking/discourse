@@ -2,10 +2,12 @@
 
 const ExplorerQuery = Discourse.Model.extend({
 
-  paramValues: function() {
-    return this.get('params').map(function(param) {
-      return param.get('value');
+  paramsMap: function() {
+    let map = {};
+    this.get('params').forEach(function(param) {
+      map[param.get('name')] = param.get('value');
     });
+    return map;
   }.property('params.@each'),
 
   paramsJson: function() {
@@ -76,9 +78,11 @@ ExplorerQuery.reopenClass({
     delete json.params;
 
     let eq = ExplorerQuery.create(json);
-    eq.set('params', paramJsonArr.map(function(paramJson) {
-      return ExplorerQueryParam.createFromJson(paramJson);
-    }));
+    if (paramJsonArr) {
+      eq.set('params', paramJsonArr.map(function(paramJson) {
+        return ExplorerQueryParam.createFromJson(paramJson);
+      }));
+    }
     return eq;
   },
 

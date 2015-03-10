@@ -14,7 +14,7 @@ class ExplorerController < ApplicationController
       queries = queries.where(public_view: true)
     end
 
-    render_serialized queries, ExplorerQuerySerializer
+    render_serialized queries, BasicExplorerQuerySerializer
   end
 
   def show
@@ -23,33 +23,47 @@ class ExplorerController < ApplicationController
     render_serialized query, ExplorerQuerySerializer
   end
 
-  def parse
-
-    render json: {success: true}
-  end
-
   def run
     params.require :id
 
     equery = ExplorerQuery.find(params[:id])
-    guardian.ensure_can_run_query!(equery)
+    guardian.ensure_can_run_explorer_query!(equery)
 
     result = nil
+    err = nil
+
     ActiveRecord::Base.transaction do
       ActiveRecord::Base.exec_sql "SET TRANSACTION READ ONLY"
 
-      result = ActiveRecord::Base.exec_sql <<SQL
+      sql = <<SQL
 WITH query AS (
   #{equery.query}
 )
 SELECT * FROM query;
 SQL
+      begin
+        result = ActiveRecord::Base.exec_sql(sql, *params[:params])
+      rescue PG::SyntaxError => ex
+        err = ex
+      end
     end
 
     binding.pry
 
-    render json: result
+    if err
+      render json: {success: false, message: err.message, type: err.class}
+    else
+      cols = []
+      res_ary = result.to_a
+      if res_ary.present?
+        cols = res_ary.first.keys
+      end
+
+      render json: {success: true, columns: cols, rows: result}
+    end
   end
+
+  #######
 
   def save
     params.require(:id)
@@ -61,12 +75,13 @@ SQL
     vals.keys.each do |k|
       query.send("#{k}=", vals[k])
     end
+
+    params_ary = []
     if params[:params]
-      params_ary = []
       params[:params].each do |k, v|
         params_ary[k.to_i] = v
       end
-      query.params = params_ary.map do |paramJson|
+      params_ary.map! do |paramJson|
         paramJson[:param_type] = ExplorerQueryParameter.types[paramJson[:type]]
         paramJson.delete :type
         paramJson[:default_value] = "" unless paramJson[:default_value]
@@ -75,12 +90,28 @@ SQL
       end
     end
 
-    query.save
+    ExplorerQuery.transaction do
+      if params[:params]
+        query.params = params_ary
+      end
+      query.save
+    end
+
     if query.errors.present?
       render_json_error query
     else
-      render json: success_json
+      render_serialized query, ExplorerQuerySerializer
     end
+  end
+
+  def create
+    params.require(:name)
+    guardian.ensure_can_create_explorer_query!
+
+    eq = ExplorerQuery.new(name: params[:name], creator: current_user, query: "SELECT 1 value")
+    eq.save
+
+    render_serialized eq, ExplorerQuerySerializer
   end
 
   private

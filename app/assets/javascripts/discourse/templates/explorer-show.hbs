@@ -11,6 +11,7 @@
         <span class="value">{{input value=param.value}}</span>
       </div>
     {{/each}}
+    {{d-button action="run" icon="chevron-right" label="explorer.run" disabled=run_disabled}}
   </div>
 
   <pre class="query-readonly"><code>{{model.query}}</code></pre>
@@ -33,14 +34,26 @@
         {{i18n "explorer.public_run"}}</label>
     </div>
     <div class="parameters">
-      {{#if anyParameters}}
+      {{#if any_params}}
         <h2 class="title">Query Parameters</h2>
-        {{#each param in model.params}}
-          <div class="row">
-            <span class="name">{{param.name}}</span>
-            <span class="value">{{input value=param.value}}</span>
-          </div>
-        {{/each}}
+        <table class="query-params-edit">
+          <thead>
+          <tr>
+            <th class="name">Parameter Name</th>
+            <th class="value">Default Value</th>
+            <th class="type">Type</th>
+          </tr>
+          </thead>
+          <tbody>
+          {{#each param in model.params}}
+            <tr>
+              <td class="name">{{param.name}}</td>
+              <td class="value">{{input value=param.default_value}}</td>
+              <td class="type">{{combo-box content=controller.typeList value=param.type}}</td>
+            </tr>
+          {{/each}}
+          </tbody>
+        </table>
       {{/if}}
     </div>
   </div>
