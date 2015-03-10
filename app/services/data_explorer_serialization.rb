@@ -43,7 +43,7 @@ class DataExplorerSerialization
 
   #
   def self.client_only_types
-    @client_only_types ||= ['reltime']
+    @client_only_types ||= ['reltime', 'category']
   end
 
   def self.int_type_id

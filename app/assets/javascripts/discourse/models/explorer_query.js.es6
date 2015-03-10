@@ -42,6 +42,7 @@ const ExplorerQuery = Discourse.Model.extend({
         query: this.get('query'),
         description: this.get('description'),
         params: this.get('paramsJson'),
+        params_empty: this.get('params.length') === 0,
         public_view: this.get('public_view'),
         public_run: this.get('public_run')
       }

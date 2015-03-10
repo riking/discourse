@@ -4,6 +4,10 @@ class ExplorerQueryParameter < ActiveRecord::Base
   def self.types
     @types ||= Enum.new(:string, :integer, :int_list)
   end
+
+  def self.in_place_attributes
+    @in_place_attributes ||= [:param_type, :default_value]
+  end
 end
 
 # == Schema Information

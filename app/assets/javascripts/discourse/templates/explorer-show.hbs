@@ -7,6 +7,10 @@
   <div {{bind-attr class=":run-query editControlsHidden::hidden"}}>
     {{code-highlighted-field value=model.query codeClass="lang-sql" classNames="query-readonly"}}
 
+    <div class="description">
+      <blockquote>{{query.description}}</blockquote>
+    </div>
+
     <div class="parameters">
       <h3>{{i18n "explorer.parameters"}}</h3>
       {{#each param in model.params}}

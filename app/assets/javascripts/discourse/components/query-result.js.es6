@@ -1,9 +1,11 @@
 var ColumnHandlers = [];
 var AssistedHandlers = {};
-var defaultFallback = function(buffer, content, defaultRender) { defaultRender(buffer, content); };
 const Escape = Handlebars.Utils.escapeExpression;
 
 import avatarTemplate from 'discourse/lib/avatar-template';
+import { categoryLinkHTML } from 'discourse/helpers/category-link';
+
+var defaultFallback = function(buffer, content, defaultRender) { defaultRender(buffer, content); };
 
 const QueryResultComponent = Ember.Component.extend({
   layoutName: 'explorer-query-result',
@@ -127,6 +129,23 @@ AssistedHandlers['reltime'] = function(buffer, content, defaultRender) {
   }
 
   buffer.push(Discourse.Formatter.relativeAge(parsedDate, {format: 'medium'}));
+};
+
+AssistedHandlers['category'] = function(buffer, content, defaultRender) {
+  const contentId = parseInt(content, 10);
+  if (isNaN(contentId)) {
+    return defaultRender(buffer, content);
+  }
+  const category = Discourse.Category.findById(contentId);
+  if (!category) {
+    return defaultRender(buffer, content);
+  }
+
+  const opts = {
+    link: true,
+    allowUncategorized: true
+  };
+  buffer.push(categoryLinkHTML(category, opts));
 };
 
 /**

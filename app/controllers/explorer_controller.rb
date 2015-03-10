@@ -33,11 +33,18 @@ class ExplorerController < ApplicationController
     err = nil
     explain = nil
 
+    query_args = params[:params]
+    query.params.each do |qparam|
+      unless query_args.include? qparam.name && guardian.can_edit?(qparam)
+        query_args[qparam.name] = qparam.default_value
+      end
+    end
+
     begin
       ActiveRecord::Base.connection.transaction do
         ActiveRecord::Base.exec_sql "SET TRANSACTION READ ONLY"
         if params[:explain] == "true"
-          explain = ActiveRecord::Base.exec_sql "EXPLAIN #{query.query}", params[:params]
+          explain = ActiveRecord::Base.exec_sql "EXPLAIN #{query.query}", query_args
           explain = explain.map {|r| r["QUERY PLAN"]}.join "\n"
           puts explain
         end
@@ -53,7 +60,7 @@ WITH query AS (
 ) SELECT * FROM query
 SQL
 
-        result = ActiveRecord::Base.exec_sql(sql, params[:params])
+        result = ActiveRecord::Base.exec_sql(sql, query_args)
       end
     rescue Exception => ex
       err = ex
@@ -71,7 +78,7 @@ SQL
     else
       cols = result.fields
 
-      json = {success: true, columns: cols, rows: result, params: params[:params]}
+      json = {success: true, columns: cols, rows: result, params: query_args}
       json[:explain] = explain if params[:explain] == "true"
       if cols.any? {|c| c.match /\$/ }
         json[:relations] = DataExplorerSerialization.new.add_extra_data result
@@ -94,13 +101,13 @@ SQL
       query.send("#{k}=", vals[k])
     end
 
-    # TODO perf, assigning a brand-new array is wasteful
+    # Prepare to update params
     old_params_ary = query.params
     new_params_ary = []
     full_update, partial_update = nil
     if params[:params]
       params[:params].each do |k, v|
-        new_params_ary[k.to_i] = v
+        new_params_ary[k.to_i] = v unless k == ''
       end
       new_params_ary.map! do |paramJson|
         paramJson[:param_type] = ExplorerQueryParameter.types[paramJson[:type]]
@@ -113,16 +120,17 @@ SQL
 
       # Check for equality
       full_update, partial_update = update_param_array(new_params_ary, old_params_ary)
+    elsif params[:params_empty] == 'true'
+      full_update = true
     end
 
     ExplorerQuery.transaction do
-      if params[:params]
-        if full_update
-          query.params = new_params_ary
-        elsif partial_update
-          old_params_ary.each(&:save)
-        end
+      if full_update
+        query.params = new_params_ary
+      elsif partial_update
+        old_params_ary.each(&:save)
       end
+
       query.save
     end
 
@@ -158,7 +166,8 @@ SQL
 
   def update_param_array(new, old)
     partial_updated = false
-    @MODIFY_IN_PLACE_ATTRS ||= [:param_type, :default_value]
+
+    return [true, false] if new.length != old.length
 
     old.each_with_index do |old_param, idx|
       new_param = new[idx]
@@ -166,7 +175,7 @@ SQL
         return [true, partial_updated]
       end
 
-      @MODIFY_IN_PLACE_ATTRS.each do |key|
+      ExplorerQueryParameter.in_place_attributes.each do |key|
         if new_param[key] != old_param[key]
           old_param[key] = new_param[key]
           partial_updated = true

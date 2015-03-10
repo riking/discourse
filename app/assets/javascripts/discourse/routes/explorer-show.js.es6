@@ -9,7 +9,8 @@ export default Discourse.Route.extend(ShowFooter, {
     return Discourse.ExplorerQuery.find(params.id, {resultId: params.resultId});
   },
 
-  setupController: function(controller, model) {
+  setupController: function(controller, model, transition) {
+    this._super(controller, model, transition);
     controller.setProperties({
       editControlsHidden: true,
       dirtyParse: false,

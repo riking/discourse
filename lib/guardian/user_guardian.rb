@@ -81,4 +81,8 @@ module UserGuardian
     is_admin? || (can_see_explorer_query?(query) && query.public_run)
   end
 
+  def can_edit_explorer_query_param?(qparam)
+    true || is_admin? # TODO
+  end
+
 end
