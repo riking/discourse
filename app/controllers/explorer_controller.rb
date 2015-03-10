@@ -71,9 +71,13 @@ SQL
     else
       cols = result.fields
 
-      result = {success: true, columns: cols, rows: result, params: params[:params]}
-      result[:explain] = explain if params[:explain] == "true"
-      render json: result
+      json = {success: true, columns: cols, rows: result, params: params[:params]}
+      json[:explain] = explain if params[:explain] == "true"
+      if cols.any? {|c| c.match /\$/ }
+        json[:relations] = DataExplorerSerialization.new.add_extra_data result
+        # puts json[:relations].as_json
+      end
+      render json: json
     end
   end
 

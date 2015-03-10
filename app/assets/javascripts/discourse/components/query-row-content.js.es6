@@ -8,9 +8,10 @@ const QueryRowContentComponent = Ember.Component.extend({
 
   render(buffer) {
     const row = this.get('row');
+    const response = this.get('extra');
     this.get('colRenders').forEach(function(colRender) {
       buffer.push("<td data-column-name=" + Handlebars.Utils.escapeExpression(colRender.name) + ">");
-      colRender.render(buffer, row[colRender.name], defaultRender);
+      colRender.render(buffer, row[colRender.name], defaultRender, response);
       buffer.push("</td>");
     });
   }

@@ -1,5 +1,9 @@
 var ColumnHandlers = [];
+var AssistedHandlers = {};
 var defaultFallback = function(buffer, content, defaultRender) { defaultRender(buffer, content); };
+const Escape = Handlebars.Utils.escapeExpression;
+
+import avatarTemplate from 'discourse/lib/avatar-template';
 
 const QueryResultComponent = Ember.Component.extend({
   layoutName: 'explorer-query-result',
@@ -27,17 +31,37 @@ const QueryResultComponent = Ember.Component.extend({
   }.property('params.@each'),
 
   columnHandlers: function() {
+    const self = this;
     return this.get('columns').map(function(colName) {
       let handler = defaultFallback;
 
-      ColumnHandlers.forEach(function(handlerInfo) {
-        if (handlerInfo.regex.test(colName)) {
-          handler = handlerInfo.render;
+      if (/\$/.test(colName)) {
+        var match = /(\w+)\$(\w*)/.exec(colName);
+        if (match[1] && self.get('content.relations')[match[1]] && AssistedHandlers[match[1]]) {
+          return {
+            name: colName,
+            displayName: match[2] || match[1],
+            render: AssistedHandlers[match[1]]
+          };
+        } else if (match[1] == '') {
+          // Return as "$column" for no special handling
+          return {
+            name: colName,
+            displayName: match[2] || match[1],
+            render: defaultFallback
+          }
         }
-      });
+      } else {
+        ColumnHandlers.forEach(function(handlerInfo) {
+          if (handlerInfo.regex.test(colName)) {
+            handler = handlerInfo.render;
+          }
+        });
+      }
 
       return {
         name: colName,
+        displayName: colName,
         render: handler
       };
     });
@@ -46,6 +70,14 @@ const QueryResultComponent = Ember.Component.extend({
   parent: function() { return this; }.property()
 
 });
+
+/**
+ * ColumnHandler callback arguments:
+ *  buffer: rendering buffer
+ *  content: content of the query result cell
+ *  defaultRender: call this wth (buffer, content) to fall back
+ *  extra: the entire response
+ */
 
 ColumnHandlers.push({ regex: /user_id/, render: function(buffer, content, defaultRender) {
   if (!/^\d+$/.test(content)) {
@@ -87,5 +119,101 @@ ColumnHandlers.push({ regex: /topic_id/, render: function(buffer, content, defau
   buffer.push(content);
   buffer.push("</a>");
 }});
+
+AssistedHandlers['user'] = function(buffer, content, defaultRender, response) {
+  const contentId = parseInt(content, 10);
+  var obj = response.relations.user.find(function(relObj) {
+    return relObj.id === contentId;
+  });
+  if (!obj) {
+    return defaultRender(buffer, content);
+  }
+
+  buffer.push("<a href='/users/");
+  buffer.push(obj.username);
+  buffer.push("'>");
+  buffer.push(Discourse.Utilities.avatarImg({
+    size: "small",
+    avatarTemplate: avatarTemplate(obj.username, obj.uploaded_avatar_id)
+  }));
+  buffer.push(" ");
+  buffer.push(obj.username);
+  buffer.push("</a>");
+};
+
+
+AssistedHandlers['reltime'] = function(buffer, content, defaultRender, response) {
+  const parsedDate = new Date(content);
+  if (!parsedDate.getTime()) {
+    return defaultRender(buffer, content);
+  }
+
+  buffer.push(Discourse.Formatter.relativeAge(parsedDate, {format: 'medium'}));
+};
+
+
+AssistedHandlers['badge'] = function(buffer, content, defaultRender, response) {
+  const contentId = parseInt(content, 10);
+  var obj = response.relations.badge.find(function(relObj) {
+    return relObj.id === contentId;
+  });
+  if (!obj) {
+    return defaultRender(buffer, content);
+  }
+
+  // TODO It would be nice to be able to invoke the {{user-badge}} helper from here.
+  // Looks like that would need a ContainerView
+
+  /*
+   <span id="ember2197" class="ember-view">
+   <a id="ember2201" class="ember-view" href="/badges/9/autobiographer">
+   <span id="ember2221" class="ember-view user-badge badge-type-bronze" data-badge-name="Autobiographer" title="Filled user profile information">
+   <i class="fa fa-certificate"></i>
+   Autobiographer
+   </span></a></span>
+   */
+
+  if (true) {
+    buffer.push('<span><a href="/badges/');
+    buffer.push(obj.id + '/' + Escape(obj.name));
+    buffer.push('"><span data-badge-name="');
+    buffer.push(Escape(obj.name));
+    buffer.push('" class="user-badge badge-type-');
+    buffer.push(Escape(obj.badge_type.toLowerCase()));
+    buffer.push('" title="');
+    buffer.push(Escape(obj.description));
+    buffer.push('">');
+    // icon-or-image
+    if (obj.icon.indexOf('fa-') === 0) {
+      buffer.push(" <i class='fa " + obj.icon + "'></i> ");
+    } else {
+      buffer.push(" <img src='" + obj.icon + "'> ");
+    }
+    buffer.push(Escape(obj.name));
+    buffer.push("</span></a></span>");
+  }
+};
+
+AssistedHandlers['post'] = function(buffer, content, defaultRender, response) {
+  const contentId = parseInt(content, 10);
+  var obj = response.relations.post.find(function(relObj) {
+    return relObj.id === contentId;
+  });
+  if (!obj) {
+    return defaultRender(buffer, content);
+  }
+
+  /*
+   <aside class="quote" data-post="35" data-topic="117">
+   <div class="title" style="cursor: pointer;">
+   <div class="quote-controls">
+   <i class="fa fa-chevron-down" title="expand/collapse"></i>
+   <a href="/t/usability-on-the-cheap-and-easy/117/35" title="go to the quoted post" class="back"></a>
+   </div><img width="20" height="20" src="/user_avatar/localhost/riking/40/75.png" class="avatar">riking:</div>
+   <blockquote>$EXCERPT</blockquote>
+   </aside>
+   */
+
+};
 
 export default QueryResultComponent;
