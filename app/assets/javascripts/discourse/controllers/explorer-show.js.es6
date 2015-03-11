@@ -56,18 +56,21 @@ export default DiscourseController.extend({
       self.set('errorResult', false);
 
       this.get('model').run({explain: this.get('explain')}).then(function(result) {
-        if (result.success) {
+        if (result.success && !result.errors.length) {
           result.opts = self.getProperties('explain', 'notransform');
           self.set('queryResult', result);
         } else {
+          console.error(result);
           self.set('errorResult', result);
         }
 
       }).catch(function(xhr) {
-        // TODO ERROR HANDLING
-        console.error(xhr);
-        self.set('loadingResult', false);
-        self.set('errorResult', {"class": "NetworkError", message: xhr.status});
+        if (!xhr.responseJSON) {
+          console.error(xhr);
+          self.set('errorResult', {"class": "NetworkError", message: xhr.status});
+        } else {
+          self.set('errorResult', {message: xhr.responseJSON.errors[0]});
+        }
       }).finally(function() {
         self.set('loadingResult', false);
       });
