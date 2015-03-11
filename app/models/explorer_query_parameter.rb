@@ -16,6 +16,8 @@ class ExplorerQueryParameter < ActiveRecord::Base
     case name
       when "current_user_id"
         controller.current_user.try(:id)
+      when "current_user_name"
+        controller.current_user.try(:username)
       when "visible_categories"
         Site.new(controller.guardian).categories.map(&:id)
       else

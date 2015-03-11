@@ -83,6 +83,9 @@ ExplorerQueryParam.reopenClass({
     '$current_user_id': function() {
       return Discourse.User.currentProp('id');
     },
+    '$current_user_name': function() {
+      return Discourse.User.currentProp('username');
+    },
     '$visible_categories': function() {
       return Discourse.Site.currentProp('categories').map(function (c) {
         return c.id;
