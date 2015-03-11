@@ -12,7 +12,8 @@ export default Discourse.Route.extend(ShowFooter, {
       editControlsHidden: true,
       dirtyParse: false,
       dirtySave: false,
-      queryResult: null
+      queryResult: null,
+      showResult: false
     });
     if (model.get('last_result')) {
       controller.set('queryResult', model.get('last_result'));

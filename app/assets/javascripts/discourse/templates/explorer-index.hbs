@@ -16,15 +16,16 @@
           <td class="name">{{#link-to "explorer-show" query.id}}{{query.name}}{{/link-to}}</td>
           <td class="desc">{{query.description}}</td>
           <td class="flags">
+            <!-- TODO i18n -->
             {{#if query.public_view}}
-              Public: All users can see query results
+              Query results are cached & public
             {{else}}
-              Private: Query results are not visible
+              Query results are private
             {{/if}}<br>
             {{#if query.can_run}}
-              You can run this query
+              Anyone can run this query
             {{else}}
-              You cannot run this query
+              Only admins can run this query
             {{/if}}
           </td>
           <td class="creator">

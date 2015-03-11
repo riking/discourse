@@ -4,9 +4,7 @@ class ExplorerController < ApplicationController
 
   def index
     queries = ExplorerQuery.all
-    unless guardian.is_admin?
-      queries = queries.where(public_view: true)
-    end
+    queries = queries.select { |q| guardian.can_see?(q) }
 
     render_serialized queries, BasicExplorerQuerySerializer
   end
