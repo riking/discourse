@@ -3,24 +3,18 @@ class DataExplorerSerialization
   class SmallBadgeSerializer < ApplicationSerializer
     attributes :id, :name, :badge_type, :description, :icon
     def badge_type
-      BadgeType.find(object.badge_type_id).name
+      object.badge_type.name
     end
   end
 
   class SmallPostWExcerptSerializer < ApplicationSerializer
     attributes :id, :topic_id, :post_number, :excerpt
-    attributes :username, :uploaded_avatar_id, :slug
+    attributes :username, :uploaded_avatar_id
     def excerpt
       Post.excerpt(object.cooked, 70)
     end
-    def user
-      @user ||= User.find(object.user_id)
-    end
-    def username; user.username; end
-    def uploaded_avatar_id; user.uploaded_avatar_id; end
-    def slug
-      object.topic.slug
-    end
+    def username; object.user.username; end
+    def uploaded_avatar_id; object.user.uploaded_avatar_id; end
   end
 
   # This dance is to reduce the server <-> db bandwidth, as we might need to
@@ -35,8 +29,8 @@ class DataExplorerSerialization
   def self.supported_types
     @supported_types ||= [
       {class: User, fields: [:id, :username, :uploaded_avatar_id], serializer: BasicUserSerializer},
-      {class: Badge, fields: [:id, :name, :badge_type_id, :description, :icon], serializer: SmallBadgeSerializer},
-      {class: Post, fields: [:id, :topic_id, :post_number, :cooked, :user_id], serializer: SmallPostWExcerptSerializer},
+      {class: Badge, fields: [:id, :name, :badge_type_id, :description, :icon], include: [:badge_type], serializer: SmallBadgeSerializer},
+      {class: Post, fields: [:id, :topic_id, :post_number, :cooked, :user_id], include: [:user], serializer: SmallPostWExcerptSerializer},
       {class: Topic, fields: [:id, :title, :fancy_title, :slug, :posts_count], serializer: BasicTopicSerializer}
     ]
   end
@@ -73,7 +67,7 @@ class DataExplorerSerialization
     support_info = DataExplorerSerialization.supported_types.select { |info| info[:class].to_s.downcase == m[1] }.first
     unless support_info
       if DataExplorerSerialization.client_only_types.include? m[1]
-        out[m[1]] = []
+        out[m[1]] = [] # ACK the client
       end
       return
     end
@@ -81,8 +75,16 @@ class DataExplorerSerialization
     return unless result.ftype(fnumber) == DataExplorerSerialization.int_type_id
     # Okay, insanity checks out of the way
 
-    all_ids = result.column_values(fnumber).uniq
-    all_objs = support_info[:class].select(support_info[:fields]).where(id: all_ids)
+    all_ids = result.column_values(fnumber).map { |s| s.try(:to_i) }.sort do |a, b|
+      if a.nil?
+        -1
+      elsif b.nil?
+        1
+      else
+        a <=> b
+      end
+    end.uniq
+    all_objs = support_info[:class].select(support_info[:fields]).where(id: all_ids).includes(support_info[:include])
     out[m[1]] = ActiveModel::ArraySerializer.new(all_objs, each_serializer: support_info[:serializer])
   end
 end

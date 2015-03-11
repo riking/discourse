@@ -2,9 +2,6 @@ import DiscourseController from 'discourse/controllers/controller';
 //import ExplorerQueryParam from 'discourse/models/explorer_query_param'; // TODO es6
 
 export default DiscourseController.extend({
-  queryParams: ['resultId'],
-
-  resultId: null,
   explain: false,
   notransform: false,
 
@@ -60,7 +57,6 @@ export default DiscourseController.extend({
 
       this.get('model').run({explain: this.get('explain')}).then(function(result) {
         if (result.success) {
-          console.log(result);
           result.opts = self.getProperties('explain', 'notransform');
           self.set('queryResult', result);
         } else {

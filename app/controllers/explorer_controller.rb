@@ -26,10 +26,12 @@ class ExplorerController < ApplicationController
   end
 
   def run
-    params.require :id
+    params.require :explorer_id
 
-    query = ExplorerQuery.find(params[:id])
+    query = ExplorerQuery.find(params[:explorer_id])
     guardian.ensure_can_run_explorer_query!(query)
+
+    RateLimiter.new(current_user, "query-#{query.id}", 3, 45).performed!
 
     result = nil
     err = nil
@@ -72,9 +74,11 @@ class ExplorerController < ApplicationController
     ####################
     # Execute query
 
+    time_start, time_end = nil
     begin
       ActiveRecord::Base.connection.transaction do
         ActiveRecord::Base.exec_sql "SET TRANSACTION READ ONLY" # extra safe
+        time_start = Time.now
         if params[:explain] == "true"
           explain = ActiveRecord::Base.exec_sql "EXPLAIN #{query.query}", query_args
           explain = explain.map { |r| r["QUERY PLAN"] }.join "\n"
@@ -92,9 +96,11 @@ class ExplorerController < ApplicationController
 SQL
 
         result = ActiveRecord::Base.exec_sql(sql, query_args)
+        time_end = Time.now
       end
     rescue Exception => ex
       err = ex
+      time_end = Time.now
     end
 
     ####################
@@ -107,25 +113,33 @@ SQL
       if err.is_a? ActiveRecord::StatementInvalid
         err_class = err.original_exception.class
         err_msg.gsub!("#{err_class.to_s}:", '')
+      else
+        err_msg = "#{err_class}: #{err_msg}"
       end
-      render json: {success: false, message: err_msg, class: err_class.to_s}
+      render_json_error err_msg
     else
       cols = result.fields
 
       json = {
         success: true,
-        columns: cols,
-        rows: result,
+        errors: [],
         params: query_args,
         meta: {
           name: query.slug,
-          date: Time.now,
-          user: current_user ? current_user.username : '(not logged in)',
-        }
+          date: time_start,
+          duration: ((time_end - time_start).to_f * 1000).round(1),
+          user: current_user ? current_user.username : I18n.t('js.explorer.anon_user'),
+        },
+        columns: cols,
       }
       json[:explain] = explain if params[:explain] == "true"
       if cols.any? { |c| c.match /\$/ }
         json[:relations] = DataExplorerSerialization.new.add_extra_data result
+      end
+      json[:rows] = result # last element
+
+      if query.public_view
+        query.save_last_result json
       end
       render json: json
     end

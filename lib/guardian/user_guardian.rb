@@ -65,7 +65,7 @@ module UserGuardian
 
   def can_see_explorer_query?(query)
     query && is_admin? || (
-      SiteSetting.public_data_explorer && query.public_view && !query.trashed?
+      SiteSetting.public_data_explorer && (query.public_view || query.public_run) && !query.trashed?
     )
   end
 

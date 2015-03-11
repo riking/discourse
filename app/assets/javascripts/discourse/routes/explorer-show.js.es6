@@ -1,12 +1,9 @@
 import ShowFooter from "discourse/mixins/show-footer";
 
 export default Discourse.Route.extend(ShowFooter, {
-  queryParams: {
-    resultId: {replace: true}
-  },
 
   model: function(params) {
-    return Discourse.ExplorerQuery.find(params.id, {resultId: params.resultId});
+    return Discourse.ExplorerQuery.find(params.id);
   },
 
   setupController: function(controller, model, transition) {
@@ -17,6 +14,11 @@ export default Discourse.Route.extend(ShowFooter, {
       dirtySave: false,
       queryResult: null
     });
+    if (model.get('last_result')) {
+      controller.set('queryResult', model.get('last_result'));
+      controller.set('showResult', true);
+      model.set('last_result', null);
+    }
   },
 
   titleToken: function() {

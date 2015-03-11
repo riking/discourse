@@ -40,6 +40,7 @@ en:
       long_date_with_year_without_time: "MMM D, 'YY"
       long_date_without_year_with_linebreak: "MMM D <br/>LT"
       long_date_with_year_with_linebreak: "MMM D, 'YY <br/>LT"
+      millis: "%{value}ms"
       tiny:
         half_a_minute: "< 1m"
         less_than_x_seconds:
@@ -2520,13 +2521,17 @@ en:
       deleted: "(deleted)"
       editbutton: "Edit Query"
       edit_title: "Edit Query"
-      public_view: "Any user can view this query"
+      public_view: "Any user can view the results, and the results are kept"
       public_run: "Any user can input values and run this query"
       create: "Create New Query"
       newHint: "The name of the new query"
       parameters: "Parameters"
       parameters_none: "(none)"
       reset_params: "Reset parameters to defaults"
+      run_at: "Ran at:"
+      run_time: "Execution time:"
+      run_by: "Ran by:"
+      anon_user: "(An anonymous user)"
       norun:
         format: "Cannot run query because %{reason}"
         permission: "you don't have permission to execute this query."

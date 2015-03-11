@@ -30,6 +30,10 @@ const QueryResultComponent = Ember.Component.extend({
     return this.get('meta.name') + "@" + window.location.host + "-" + isoYMD(new Date()) + ".json";
   }.property(),
 
+  millis: function() {
+    return I18n.t('dates.millis', {value: this.get('meta.duration')});
+  }.property('meta.duration'),
+
   parameterAry: function() {
     let arr = [];
     const params = this.get('params');

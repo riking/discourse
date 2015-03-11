@@ -8,6 +8,24 @@ class ExplorerQuery < ActiveRecord::Base
     s = "query-#{id}" unless s.present?
     s
   end
+
+  def redis_key
+    "explorer-result-#{id}"
+  end
+
+  def last_result
+    last = $redis.get(redis_key)
+    MultiJson.load(last) if last
+  end
+
+  def save_last_result(json)
+    $redis.set(redis_key, MultiJson.dump(json))
+  end
+
+  def public_view=(new)
+    super
+    $redis.del(redis_key) unless new
+  end
 end
 
 # == Schema Information
