@@ -15,7 +15,7 @@ export default DiscourseController.extend({
       Discourse.ajax('/explorer', {type: "POST", data: {
         name: this.get('newQueryName')
       }}).then(function(response) {
-        self.transitionToRoute("/explorer/show/" + response.explorer_query.id);
+        self.transitionToRoute("/explorer/" + response.explorer_query.id);
       }).catch(function(xhr) {
         // TODO ERROR HANDLING
         console.error(xhr);
