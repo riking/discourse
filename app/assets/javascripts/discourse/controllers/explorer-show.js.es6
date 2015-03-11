@@ -10,6 +10,24 @@ export default DiscourseController.extend({
 
   query: Em.computed.alias('model'),
 
+  editAction(name, dirtyAttr) {
+    const self = this;
+    this.set('loadingEdit', true);
+    this.set('errorEdit', null);
+
+    this.get('model')[name]().then(function() {
+      if (dirtyAttr) {
+        self.set(dirtyAttr, false);
+      }
+    }).catch(function(xhr) {
+      // TODO ERROR HANDLING
+      console.error(xhr);
+      self.set('errorEdit', xhr);
+    }).finally(function() {
+      self.set('loadingEdit', false);
+    });
+  },
+
   actions: {
     showEdit() {
       this.toggleProperty('editControlsHidden');
@@ -22,34 +40,16 @@ export default DiscourseController.extend({
     },
 
     parse() {
-      const self = this;
-      this.set('loading', true);
-
-      this.get('model').parse().then(function() {
-        self.set('dirtyParse', false);
-      }).catch(function(xhr) {
-        // TODO ERROR HANDLING
-        console.error(xhr);
-      }).finally(function() {
-        self.set('loading', false);
-      });
+      this.editAction('parse', 'dirtyParse');
     },
-
     save() {
-      const self = this;
-      this.set('loading', true);
-
-      this.get('model').save().then(function(result) {
-        self.set('dirtySave', false);
-        //self.get('model').updateFromJson(result);
-
-
-      }).catch(function(xhr) {
-        // TODO ERROR HANDLING
-        console.error(xhr);
-      }).finally(function() {
-        self.set('loading', false);
-      });
+      this.editAction('save', 'dirtySave');
+    },
+    trash() {
+      this.editAction('trash');
+    },
+    recover() {
+      this.editAction('recover');
     },
 
     run() {

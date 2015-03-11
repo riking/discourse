@@ -5,7 +5,7 @@
   <h2 class="query-name">{{i18n "explorer.query"}}: {{model.name}}</h2>
   <hr>
 
-  <div {{bind-attr class=":run-query editControlsHidden::hidden"}}>
+  <div {{bind-attr class=":run-query editControlsHidden::hidden model.deleted"}}>
 
     {{code-highlighted-field value=model.query codeClass="lang-sql" classNames="query-readonly"}}
 
@@ -52,14 +52,17 @@
     {{/if}}
   </div>
 
-  <div {{bind-attr class=":edit-controls editControlsHidden:hidden"}}>
+  <div {{bind-attr class=":edit-controls editControlsHidden:hidden model.deleted"}}>
     <div class="ec-item float-buttons">
       {{#if model.deleted}}
         {{d-button action="recover" icon="undo" label="explorer.undelete" class="btn-danger" disabled=edit_disabled}}
       {{else}}
-        {{d-button action="delete" icon="trash-o" label="explorer.delete" class="btn-danger" disabled=edit_disabled}}
+        {{d-button action="trash" icon="trash-o" label="explorer.delete" class="btn-danger" disabled=edit_disabled}}
       {{/if}}
-      {{d-button action="export" icon="download" label="explorer.downloadquery"}}
+      <a class="btn" href="?export=1" data-auto-route="true">
+        {{fa-icon "download"}}
+        {{i18n "explorer.downloadquery"}}
+      </a>
     </div>
     <h2 class="ec-title">{{#if edit_disabled}}{{fa-icon "lock"}} {{/if}}{{i18n "explorer.edit_title"}}</h2>
     <div class="ec-item edit-query">
@@ -68,6 +71,9 @@
     <div class="ec-item edit-buttons">
       {{d-button action="parse" icon="check" label="explorer.parse" disabled=parse_disabled}}
       {{d-button action="save" icon="caret-square-o-right" label="explorer.save" disabled=save_disabled class="btn-primary"}}
+      {{#if loadingEdit}}
+        {{fa-icon "spinner fa-spin"}}
+      {{/if}}
     </div>
     <div class="ec-item">
       <label for="public_view">

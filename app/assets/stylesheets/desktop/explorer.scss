@@ -52,6 +52,11 @@ $table_cell_padding: 6px 8px 5px 8px;
       background-color: dark-light-diff($success, $secondary, 90%, -10%);
     }
   }
+  .run-query, .edit-controls {
+    &.deleted {
+      background-color: dark-light-diff($danger, $secondary, 70%, -10%);
+    }
+  }
 }
 
 .explorer .run-query {
@@ -79,22 +84,7 @@ $table_cell_padding: 6px 8px 5px 8px;
   }
 }
 
-.query-list {
-  width: 100%;
-  td, th {
-    border: 1px solid black;
-  }
-  td.name a {
-    display: block;
-    width: 100%;
-    height: 100%;
-  }
-  .user-small {
-    width: auto;
-  }
-}
-
-.edit-controls {
+.explorer .edit-controls {
   &.hidden {
     display: none;
   }
@@ -118,13 +108,16 @@ $table_cell_padding: 6px 8px 5px 8px;
   .float-buttons {
     float: right;
   }
-}
 
-.query-textarea {
-  width: 540px;
-  min-height: 220px;
-  overflow: scroll;
-  font-family: monospace;
+  .query-textarea {
+    width: 540px;
+    min-height: 220px;
+    overflow: scroll;
+    font-family: monospace;
+  }
+  label {
+    max-width: 540px;
+  }
 }
 
 .explorer .result {
@@ -175,5 +168,27 @@ $table_cell_padding: 6px 8px 5px 8px;
     .result-classname {
       font-weight: bold;
     }
+  }
+}
+
+
+.query-list {
+  width: 100%;
+  td, th {
+    border: 1px solid black;
+  }
+  td {
+    padding: $table_cell_padding;
+  }
+  td.name a {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .user-small {
+    width: auto;
+  }
+  .deleted {
+    background-color: dark-light-diff($danger, $secondary, 70%, -10%);
   }
 }

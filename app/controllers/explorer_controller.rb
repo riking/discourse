@@ -3,11 +3,6 @@ class ExplorerController < ApplicationController
   before_filter :check_enabled
 
   def index
-    render nothing: true
-  end
-
-  def list
-    # TODO real data
     queries = ExplorerQuery.all
     unless guardian.is_admin?
       queries = queries.where(public_view: true)
@@ -16,8 +11,16 @@ class ExplorerController < ApplicationController
     render_serialized queries, BasicExplorerQuerySerializer
   end
 
+  skip_before_filter :check_xhr, only: [:show]
   def show
-    query = ExplorerQuery.find(params[:id])
+    query = ExplorerQuery.with_deleted.find(params[:id])
+    if params[:export]
+      response.headers['Content-Disposition'] = "attachment; filename=#{query.slug}.json"
+      response.sending_file = true
+    else
+      check_xhr
+    end
+
     guardian.ensure_can_see!(query)
     render_serialized query, ExplorerQuerySerializer
   end
@@ -128,7 +131,7 @@ SQL
     end
   end
 
-  def save
+  def update
     params.require(:id)
     vals = params.permit(:name, :query, :description, :public_view, :public_run)
 
@@ -189,6 +192,20 @@ SQL
     eq.save
 
     render_serialized eq, ExplorerQuerySerializer
+  end
+
+  def destroy
+    guardian.ensure_can_create_explorer_query!
+    eq = ExplorerQuery.find(params[:id])
+    eq.trash! current_user
+    render json: success_json
+  end
+
+  def recover
+    guardian.ensure_can_create_explorer_query!
+    eq = ExplorerQuery.with_deleted.find(params[:explorer_id])
+    eq.recover!
+    render json: success_json
   end
 
   private

@@ -498,12 +498,14 @@ Discourse::Application.routes.draw do
   # special case for top
   root to: "list#top", constraints: HomePageConstraint.new("top"), :as => "top_lists"
 
-  get "explorer" => "explorer#index"
-  get "explorer/list" => "explorer#list"
-  get "explorer/show/:id" => "explorer#show"
-  post "explorer/run/:id" => "explorer#run"
-  post "explorer/save/:id" => "explorer#save"
-  post "explorer/create" => "explorer#create"
+  resources :explorer do
+    post "run"
+    put "recover"
+    collection do
+      get "index"
+      get "show/:id" => "explorer#show"
+    end
+  end
 
   get "*url", to: 'permalinks#show', constraints: PermalinkConstraint.new
 end

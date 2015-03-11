@@ -12,7 +12,7 @@
       </thead>
       <tbody>
       {{#each query in model}}
-        <tr>
+        <tr {{bind-attr class="query.deleted"}}>
           <td class="name">{{#link-to "explorer-show" query.id}}{{query.name}}{{/link-to}}</td>
           <td class="desc">{{query.description}}</td>
           <td class="flags">

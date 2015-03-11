@@ -1,6 +1,7 @@
 //import ExplorerQueryParam from 'discourse/models/explorer_query_param' // TODO ES6
 
 const ExplorerQuery = Discourse.Model.extend({
+  deleted: false,
 
   paramsMap: function() {
     let map = {};
@@ -36,8 +37,7 @@ const ExplorerQuery = Discourse.Model.extend({
   },
 
   save() {
-    console.log('saving');
-    return Discourse.ajax('/explorer/save/' + this.get('id'), { type: "POST", data: {
+    return Discourse.ajax('/explorer/' + this.get('id'), { type: "PUT", data: {
         name: this.get('name'),
         query: this.get('query'),
         description: this.get('description'),
@@ -47,8 +47,21 @@ const ExplorerQuery = Discourse.Model.extend({
         public_run: this.get('public_run')
       }
     }).then(function(resp) {
-      console.log('saved');
       return resp;
+    });
+  },
+
+  trash() {
+    const self = this;
+    return Discourse.ajax('/explorer/' + this.get('id'), { type: "DELETE" }).then(function() {
+      self.set('deleted', true);
+    });
+  },
+
+  recover() {
+    const self = this;
+    return Discourse.ajax('/explorer/' + this.get('id') + '/recover', { type: "PUT" }).then(function() {
+      self.set('deleted', false);
     });
   },
 
@@ -77,7 +90,7 @@ const ExplorerQuery = Discourse.Model.extend({
 
   run(opts) {
     var args = this.get('paramsMap');
-    return Discourse.ajax('/explorer/run/' + this.get('id'), { type: "POST", data: {
+    return Discourse.ajax('/explorer/' + this.get('id') + "/run", { type: "POST", data: {
       params: args,
       explain: !!opts.explain
     }});
@@ -103,13 +116,13 @@ ExplorerQuery.reopenClass({
   },
 
   findAll: function() {
-    return Discourse.ajax('/explorer/list.json').then(function(queries) {
+    return Discourse.ajax('/explorer.json').then(function(queries) {
       return queries.map(function(q) { return Discourse.ExplorerQuery.createFromJson(q); });
     });
   },
 
   find: function(id) {
-    return Discourse.ajax('/explorer/show/' + id + '.json').then(function(json) {
+    return Discourse.ajax('/explorer/' + id + '.json').then(function(json) {
       return Discourse.ExplorerQuery.createFromJson(json.explorer_query);
     });
   }

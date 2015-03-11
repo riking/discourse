@@ -90,7 +90,7 @@ export default function() {
   this.route('privacy', {path: '/privacy'});
   this.route('guidelines', {path: '/guidelines'});
   this.route('explorer-index', {path: '/explorer'});
-  this.route('explorer-show', {path: '/explorer/show/:id'});
+  this.route('explorer-show', {path: '/explorer/:id'});
 
   this.resource('badges', function() {
     this.route('show', {path: '/:id/:slug'});

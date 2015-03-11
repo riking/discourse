@@ -12,7 +12,7 @@ export default DiscourseController.extend({
         return;
       }
       const self = this;
-      Discourse.ajax('/explorer/create', {type: "POST", data: {
+      Discourse.ajax('/explorer', {type: "POST", data: {
         name: this.get('newQueryName')
       }}).then(function(response) {
         self.transitionToRoute("/explorer/show/" + response.explorer_query.id);

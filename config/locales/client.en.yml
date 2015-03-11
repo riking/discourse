@@ -2517,6 +2517,7 @@ en:
         explain: Include query plan
       downloadjson: Download result as JSON
       downloadquery: Export Query
+      deleted: "(deleted)"
       editbutton: "Edit Query"
       edit_title: "Edit Query"
       public_view: "Any user can view this query"

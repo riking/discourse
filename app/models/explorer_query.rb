@@ -1,6 +1,7 @@
 class ExplorerQuery < ActiveRecord::Base
   belongs_to :creator, class_name: "User"
   has_many :params, class_name: "ExplorerQueryParameter"
+  include Trashable
 
   def slug
     s = Slug.for(name)
