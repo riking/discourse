@@ -83,6 +83,11 @@ $table_cell_padding: 6px 8px 5px 8px;
     background-color: dark-light-diff($primary, $secondary, 98%, -3%);
     border: 1px solid dark-light-diff($primary, $secondary, 70%, -70%);
   }
+  .no-run-reason {
+    font-size: 11px;
+    font-style: italic;
+    margin: 10px;
+  }
 }
 
 .explorer .edit-controls {

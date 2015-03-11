@@ -23,7 +23,7 @@
           </span>
           </div>
         {{/each}}
-        {{d-button action="resetParams" icon="undo" class="" label="explorer.reset_params"}}
+        {{d-button action="resetParams" icon="undo" class="" label="explorer.reset_params" disabled=run_disabled}}
       {{/if}}
     </div>
     <div class="buttons">
@@ -31,11 +31,12 @@
           disabled=run_disabled class="btn-primary" translatedTitle=run_disabled_reason_t}}
       <div class="options">
         <span class="options-title">{{i18n "explorer.opt.options"}}:</span>
-        <label for="explain">{{input type="checkbox" checked=explain id="explain" disable=run_disabled}}
+        <label for="explain">{{input type="checkbox" checked=explain id="explain" disabled=run_disabled}}
           {{i18n "explorer.opt.explain"}}</label>
-        <label for="notransform">{{input type="checkbox" checked=notransform id="notransform" disable=run_disabled}}
+        <label for="notransform">{{input type="checkbox" checked=notransform id="notransform" disabled=run_disabled}}
           {{i18n "explorer.opt.notransform"}}</label>
       </div>
+      {{#if run_disabled}}<span class="no-run-reason">{{run_disabled_reason_t}}</span>{{/if}}
     </div>
 
     {{#if showResult}}
