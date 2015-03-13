@@ -270,7 +270,6 @@ Discourse::Application.routes.draw do
   get "users/:username/notifications" => "users#show", constraints: {username: USERNAME_ROUTE_FORMAT}
   delete "users/:username" => "users#destroy", constraints: {username: USERNAME_ROUTE_FORMAT}
   get "users/by-external/:external_id" => "users#show"
-  get "users/by-id/:user_id" => "users#redirect"
   get "users/:username/flagged-posts" => "users#show", constraints: {username: USERNAME_ROUTE_FORMAT}
   get "users/:username/deleted-posts" => "users#show", constraints: {username: USERNAME_ROUTE_FORMAT}
   get "user-badges/:username" => "user_badges#username"

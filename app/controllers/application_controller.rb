@@ -241,8 +241,6 @@ class ApplicationController < ActionController::Base
       User.find_by(find_opts)
     elsif params[:external_id]
       SingleSignOnRecord.find_by(external_id: params[:external_id]).try(:user)
-    elsif params[:user_id]
-      User.find(params[:user_id])
     end
     raise Discourse::NotFound.new if user.blank?
 
