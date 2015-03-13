@@ -31,7 +31,7 @@ class DataExplorerSerialization
       {class: User, fields: [:id, :username, :uploaded_avatar_id], serializer: BasicUserSerializer},
       {class: Badge, fields: [:id, :name, :badge_type_id, :description, :icon], include: [:badge_type], serializer: SmallBadgeSerializer},
       {class: Post, fields: [:id, :topic_id, :post_number, :cooked, :user_id], include: [:user], serializer: SmallPostWExcerptSerializer},
-      {class: Topic, fields: [:id, :title, :fancy_title, :slug, :posts_count], serializer: BasicTopicSerializer}
+      {class: Topic, fields: [:id, :title, :slug, :posts_count], serializer: BasicTopicSerializer}
     ]
   end
 
