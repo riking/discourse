@@ -5,11 +5,6 @@ export default Discourse.Route.extend(ShowFooter, {
     return Discourse.ExplorerQuery.findAll();
   },
 
-  actions: {
-    create() {
-    }
-  },
-
   titleToken() {
     return I18n.t('explorer.title');
   }
