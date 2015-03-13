@@ -14,6 +14,10 @@ module Helpers
     provider.log_on_user(user,session,cookies)
   end
 
+  def response_json
+    MultiJson.load(response.body)
+  end
+
   def fixture_file(filename)
     return '' if filename.blank?
     file_path = File.expand_path(Rails.root + 'spec/fixtures/' + filename)
