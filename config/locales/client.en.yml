@@ -2516,6 +2516,7 @@ en:
         options: Options
         notransform: Do not prettify result
         explain: Include query plan
+      no_semicolons: "Data Explorer queries may not contain multiple statements."
       downloadjson: Download result as JSON
       downloadquery: Export Query
       deleted: "(deleted)"

@@ -117,16 +117,12 @@ describe ExplorerController do
 
   describe "prevents modification" do
     let(:equery) { Fabricate(:explorer_query) }
-    let(:victim) { Fabricate(:post, user_id: -1) }
+    let(:victim) { Fabricate(:post, cooked: '<p>Not modified Not modified Not modified</p>') }
     let(:victim_id) { victim.id }
     let(:target_id) { -2 }
 
     before do
       log_in(:admin)
-    end
-
-    after do
-      ActiveRecord::Base.exec_sql("ROLLBACK")
     end
 
     def run(sql, explain=true)
@@ -137,8 +133,9 @@ describe ExplorerController do
             params: { limit: '10' },
             explain: explain ? 'true' : 'false'
                }
-      puts response_json["errors"]
+      expect(response).to_not be_success
       verify
+      response_json
     end
 
     def verify
@@ -150,7 +147,38 @@ describe ExplorerController do
     end
 
     it "cannot execute an UPDATE" do
+      query = <<SQL
+UPDATE posts SET cooked = '<big>winner</big>' WHERE id = #{victim_id} RETURNING id
+SQL
+      expect((run query)["errors"].first).to match /read-only/
+    end
 
+    it "cannot execute a DELETE" do
+      query = <<SQL
+DELETE FROM posts WHERE id = #{victim_id} RETURNING id
+SQL
+      expect((run query)["errors"].first).to match /read-only/
+    end
+
+    it "cannot drop a table" do
+      query = <<SQL
+DROP TABLE posts
+SQL
+      expect((run query)["errors"].first).to match /syntax error/
+    end
+
+    it "cannot create an index" do
+      query = <<SQL
+CREATE INDEX foo ON posts (id, cooked)
+SQL
+      expect((run query)["errors"].first).to match /syntax error/
+    end
+
+    it "cannot lock rows" do
+      query = <<SQL
+SELECT * FROM posts FOR UPDATE
+SQL
+      expect((run query)["errors"].first).to match /read-only/
     end
 
     it "cannot commit the transaction and begin a new one" do
@@ -163,7 +191,7 @@ COMMIT;
 BEGIN TRANSACTION;
 SQL
 
-      run query
+      expect((run query)["errors"].first).to match /multiple statements/
     end
   end
 
@@ -173,7 +201,7 @@ SQL
     end
 
     it "creates, runs a query on the database" do
-      log_in(:admin)
+      admin = log_in(:admin)
 
       # Create a query
       xhr :post, :create, {name: "Integration Test Query"}
@@ -202,10 +230,13 @@ ub.badge_id badge$,
 ub.user_id user$,
 ub.post_id post$,
 p.topic_id topic$,
+t.category_id category$,
 ub.granted_at reltime$granted_at,
-ub.granted_by_id user$granted_by
+ub.granted_by_id user$granted_by,
+1 one
 FROM user_badges ub
 INNER JOIN posts p ON ub.post_id = p.id
+INNER JOIN topics t ON p.topic_id = t.id
 WHERE ub.user_id = :user_id
 ORDER BY ub.id DESC -- Take the most recent grant only
 LIMIT :limitB",
@@ -262,11 +293,24 @@ LIMIT :limitB",
             },
             explain: true
                }
-      puts response_json
+
+      # The response is correct
       expect(response).to be_success
       expect(response_json["success"]).to eq(true)
-
-      binding.pry
+      expect(response_json["columns"]).to eq(['badge$', 'user$', 'post$', 'topic$', 'category$', 'reltime$granted_at', 'user$granted_by', 'one'])
+      %w(badge user post topic category reltime).each do |relation|
+        expect(response_json["relations"]).to include(relation)
+      end
+      expect(response_json["rows"].length).to eq(1)
+      row = response_json["rows"].first
+      expect(row["badge$"]).to eq(badge.id)
+      expect(row["user$"]).to eq(admin.id)
+      expect(row["post$"]).to eq(p.id)
+      expect(row["topic$"]).to eq(t.id)
+      expect(DateTime.parse(row["reltime$granted_at"])).to eq(ub.granted_at)
+      expect(row["category$"]).to eq(t.category_id)
+      expect(row["user$granted_by"]).to eq(admin.id)
+      expect(row["one"]).to eq(1)
     end
   end
 

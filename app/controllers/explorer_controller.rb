@@ -29,6 +29,11 @@ class ExplorerController < ApplicationController
     query = ExplorerQuery.find(params[:explorer_id])
     guardian.ensure_can_run_explorer_query!(query)
 
+    # No semicolons
+    if query.query =~ /;/
+      return render_json_error I18n.t('errors.explorer.no_semicolons')
+    end
+
     RateLimiter.new(current_user, "query-#{query.id}", 3, 45).performed!
 
     result = nil
@@ -95,6 +100,7 @@ SQL
 
         result = ActiveRecord::Base.exec_sql(sql, query_args)
         time_end = Time.now
+        raise ActiveRecord::Rollback
       end
     rescue Exception => ex
       err = ex
@@ -149,6 +155,10 @@ SQL
 
     query = ExplorerQuery.includes(:params).find(params[:id])
     guardian.ensure_can_edit_explorer_query!(query)
+
+    if params[:query] =~ /;/
+      return render_json_error I18n.t('errors.explorer.no_semicolons')
+    end
 
     vals.keys.each do |k|
       query.send("#{k}=", vals[k])
