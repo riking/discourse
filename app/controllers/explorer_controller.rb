@@ -34,8 +34,6 @@ class ExplorerController < ApplicationController
       return render_json_error I18n.t('errors.explorer.no_semicolons')
     end
 
-    RateLimiter.new(current_user, "query-#{query.id}", 3, 45).performed!
-
     result = nil
     err = nil
     explain = nil
@@ -74,22 +72,35 @@ class ExplorerController < ApplicationController
       end
     end
 
+    # Check for cached results
+    if (lresult = query.last_result).present?
+      # Only accept if parameters are identical
+      if lresult["params"] == query_args
+        last_execute = Time.zone.parse(lresult["meta"]["date"])
+        # Reject if query has been modified
+        if last_execute > query.updated_at
+          return render json: lresult
+        end
+      end
+    end
+
+    # Rate limit
+    RateLimiter.new(current_user, "query-#{query.id}", 3, 45).performed!
+
     ####################
     # Execute query
 
     time_start, time_end = nil
     begin
       ActiveRecord::Base.connection.transaction do
-        ActiveRecord::Base.exec_sql "SET TRANSACTION READ ONLY" # extra safe
+        # Setting transaction to read only prevents shoot-in-foot actions like SELECT FOR UPDATE
+        ActiveRecord::Base.exec_sql "SET TRANSACTION READ ONLY"
         time_start = Time.now
-        if params[:explain] == "true"
-          explain = ActiveRecord::Base.exec_sql "EXPLAIN #{query.query}", query_args
-          explain = explain.map { |r| r["QUERY PLAN"] }.join "\n"
-        end
 
+        # SQL comments are for the benefits of admins investigating slow queries
         sql = <<SQL
   -- DataExplorer Query
-  -- Query ID: #{query.id}
+  -- Query: /explorer/#{query.id}
   -- Started by: #{current_user ? current_user.username : request.remote_ip}
   WITH query AS (
 
@@ -100,6 +111,12 @@ SQL
 
         result = ActiveRecord::Base.exec_sql(sql, query_args)
         time_end = Time.now
+
+        if params[:explain] == "true"
+          explain = ActiveRecord::Base.exec_sql "EXPLAIN #{query.query}", query_args
+          explain = explain.map { |r| r["QUERY PLAN"] }.join "\n"
+        end
+
         raise ActiveRecord::Rollback
       end
     rescue Exception => ex
@@ -120,6 +137,7 @@ SQL
       else
         err_msg = "#{err_class}: #{err_msg}"
       end
+
       render_json_error err_msg
     else
       cols = result.fields
@@ -145,6 +163,7 @@ SQL
       if query.public_view
         query.save_last_result json
       end
+
       render json: json
     end
   end
