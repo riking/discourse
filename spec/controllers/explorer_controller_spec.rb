@@ -18,15 +18,19 @@ describe ExplorerController do
   end
 
   context 'permissions matrix' do
+    let(:query_t_t) { Fabricate(:explorer_query, public_view: true, public_run: true) }
+    let(:query_f_t) { Fabricate(:explorer_query, public_view: false, public_run: true) }
+    let(:query_t_f) { Fabricate(:explorer_query, public_view: true, public_run: false) }
+    let(:query_f_f) { Fabricate(:explorer_query, public_view: false, public_run: false) }
+    let(:query_deleted) { Fabricate(:explorer_query, public_view: true, public_run: true, deleted_at: Time.now) }
     before do
       ExplorerQuery.delete_all
 
-      Fabricate(:explorer_query, public_view: true, public_run: true)
-      Fabricate(:explorer_query, public_view: false, public_run: true)
-      Fabricate(:explorer_query, public_view: true, public_run: false)
-      Fabricate(:explorer_query, public_view: false, public_run: false)
-
-      Fabricate(:explorer_query, public_view: true, public_run: true, deleted_at: Time.now)
+      query_t_t
+      query_f_t
+      query_t_f
+      query_f_f
+      query_deleted
     end
 
     describe 'index' do
@@ -110,12 +114,113 @@ describe ExplorerController do
     end
 
 
-    context 'show' do
+    describe 'show' do
+      context "as admin" do
+        before do
+          log_in(:admin)
+        end
 
+        it "shows a public query" do
+          xhr :get, :show, { id: query_f_t.id }
+          expect(response).to be_success
+        end
+        it "shows an admin-only query" do
+          xhr :get, :show, { id: query_f_f.id }
+          expect(response).to be_success
+        end
+        it "shows a deleted query" do
+          xhr :get, :show, { id: query_deleted.id }
+          expect(response).to be_success
+        end
+        it "is visible when data explorer is not public" do
+          site_settings true, false
+          xhr :get, :show, { id: query_f_t.id }
+          expect(response).to be_success
+          settings_reset
+        end
+        it "is 404 when data explorer is disabled" do
+          site_settings false, false
+          xhr :get, :show, { id: query_f_t.id }
+          expect(response).to be_not_found
+          settings_reset
+        end
+      end
+
+      context "as normal user" do
+        before do
+          log_in(:user)
+        end
+
+        it "shows a public query" do
+          xhr :get, :show, { id: query_f_t.id }
+          expect(response).to be_success
+        end
+        it "does not show an admin-only query" do
+          xhr :get, :show, { id: query_f_f.id }
+          expect(response).to be_forbidden
+        end
+        it "does not show a deleted query" do
+          xhr :get, :show, { id: query_deleted.id }
+          expect(response).to be_forbidden
+        end
+        it "is forbidden when data explorer is not public" do
+          site_settings true, false
+          xhr :get, :show, { id: query_f_t.id }
+          expect(response).to be_forbidden
+          settings_reset
+        end
+        it "is forbidden when data explorer is disabled" do
+          site_settings true, false
+          xhr :get, :show, { id: query_f_t.id }
+          expect(response).to be_forbidden
+          settings_reset
+        end
+      end
+
+      context "public_view" do
+        it "keeps the query results" do
+          query_t_t.query = "SELECT 1 AS value"
+
+          xhr :post, :run, {
+                explorer_id: query_t_t.id,
+                explain: false
+                   }
+          expect(response).to be_success
+
+          xhr :get, :show, { id: query_t_t.id }
+          expect(response_json["explorer_query"]["last_result"]["rows"].first["value"]).to eq('1')
+        end
+
+        it "removes the query results when public_view is turned off" do
+          query = Fabricate(:explorer_query)
+          query.query = "SELECT :param AS value"
+          qp = ExplorerQueryParameter.new(name: 'param')
+          query.params = [qp]
+          query.public_view = true
+          query.public_run = true
+          query.save
+
+          xhr :post, :run, {
+                     explorer_id: query.id,
+                     explain: false,
+                     params: { param: 2 }
+                   }
+          expect(response_json["rows"].first["value"]).to eq('2')
+
+          xhr :get, :show, { id: query.id }
+          expect(response_json["explorer_query"]["last_result"]["rows"].first["value"]).to eq('2')
+
+          query.public_view = false
+          query.save
+
+          xhr :get, :show, { id: query.id }
+          expect(response_json["explorer_query"]["last_result"]).to be_nil
+        end
+      end
     end
   end
 
-  describe "prevents modification" do
+  describe "prevents modification of the database" do
     let(:equery) { Fabricate(:explorer_query) }
     let(:victim) { Fabricate(:post, cooked: '<p>Not modified Not modified Not modified</p>') }
     let(:victim_id) { victim.id }
@@ -303,14 +408,14 @@ LIMIT :limitB",
       end
       expect(response_json["rows"].length).to eq(1)
       row = response_json["rows"].first
-      expect(row["badge$"]).to eq(badge.id)
-      expect(row["user$"]).to eq(admin.id)
-      expect(row["post$"]).to eq(p.id)
-      expect(row["topic$"]).to eq(t.id)
-      expect(DateTime.parse(row["reltime$granted_at"])).to eq(ub.granted_at)
-      expect(row["category$"]).to eq(t.category_id)
-      expect(row["user$granted_by"]).to eq(admin.id)
-      expect(row["one"]).to eq(1)
+      expect(row["badge$"]).to eq(b.id.to_s)
+      expect(row["user$"]).to eq(admin.id.to_s)
+      expect(row["post$"]).to eq(p.id.to_s)
+      expect(row["topic$"]).to eq(t.id.to_s)
+      expect(Time.zone.parse(row["reltime$granted_at"]).to_i).to eq(ub.granted_at.to_i)
+      expect(row["category$"]).to eq(t.category_id.to_s)
+      expect(row["user$granted_by"]).to eq(admin.id.to_s)
+      expect(row["one"]).to eq(1.to_s)
     end
   end
 
