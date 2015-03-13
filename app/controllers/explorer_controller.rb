@@ -255,11 +255,11 @@ SQL
   def check_enabled
     return if Rails.env.development?
 
-    unless SiteSetting.enable_data_explorer
-      raise Discourse::NotFound
-    end
     unless guardian.is_admin? || SiteSetting.public_data_explorer
       raise Discourse::InvalidAccess
+    end
+    unless SiteSetting.enable_data_explorer
+      raise Discourse::NotFound
     end
   end
 end

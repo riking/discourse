@@ -13,6 +13,7 @@ export default Discourse.Route.extend(ShowFooter, {
       dirtyParse: false,
       dirtySave: false,
       queryResult: null,
+      errorResult: null,
       showResult: false
     });
     if (model.get('last_result')) {
