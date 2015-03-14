@@ -2516,6 +2516,11 @@ en:
         options: Options
         notransform: Do not prettify result
         explain: Include query plan
+      tooltip:
+        public_view: "The results of this query are publicly cached."
+        nonpublic_view: "The results of this query are not saved."
+        can_run: "You can run this query."
+        cannot_run: "You cannot run this query."
       no_semicolons: "Data Explorer queries may not contain multiple statements."
       downloadjson: Download result as JSON
       downloadquery: Export Query

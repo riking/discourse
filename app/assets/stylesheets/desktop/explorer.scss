@@ -16,7 +16,6 @@ $table_cell_padding: 6px 8px 5px 8px;
   }
 
   .create,
-  .query-list,
   .edit-controls,
   .query-name,
   .description,
@@ -24,6 +23,10 @@ $table_cell_padding: 6px 8px 5px 8px;
   .result-about,
   {
     margin: 10px 0;
+  }
+
+  .query-list {
+    margin: 20px 0;
   }
 
   #showEdit {
@@ -126,20 +129,16 @@ $table_cell_padding: 6px 8px 5px 8px;
   }
 }
 
-.explorer .result {
-  margin: 10px 0;
-  width: 100%;
+.explorer {
   thead tr {
-    &.headers {
-      background-color: dark-light-diff($primary, $secondary, 80%, -60%);
-      border: 1px solid dark-light-diff($primary, $secondary, 70%, -70%);
+    background-color: dark-light-diff($primary, $secondary, 80%, -60%);
+    border: 1px solid dark-light-diff($primary, $secondary, 70%, -70%);
 
-      th {
-        border: 1px solid dark-light-diff($primary, $secondary, 70%, -70%);
-        text-align: center;
-        padding: $table_cell_padding;
-        vertical-align: middle;
-      }
+    th {
+      border: 1px solid dark-light-diff($primary, $secondary, 70%, -70%);
+      text-align: center;
+      padding: $table_cell_padding;
+      vertical-align: middle;
     }
   }
   tbody {
@@ -155,6 +154,11 @@ $table_cell_padding: 6px 8px 5px 8px;
       background-color: $secondary;
     }
   }
+}
+
+.explorer .result {
+  margin: 10px 0;
+  width: 100%;
 
   #result-download {
     float: right;
@@ -178,10 +182,10 @@ $table_cell_padding: 6px 8px 5px 8px;
 }
 
 
-.query-list {
+.explorer .query-list {
   width: 100%;
-  td, th {
-    border: 1px solid black;
+  thead tr th {
+    background-color: dark-light-diff($primary, $secondary, 90%, -50%);
   }
   td {
     padding: $table_cell_padding;
@@ -196,5 +200,13 @@ $table_cell_padding: 6px 8px 5px 8px;
   }
   .deleted {
     background-color: dark-light-diff($danger, $secondary, 70%, -10%);
+  }
+  .flags {
+    width: 30px;
+  }
+  .flags span {
+    display: inline-block;
+    text-align: center;
+    min-width: 13px;
   }
 }

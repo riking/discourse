@@ -6,8 +6,8 @@
       <tr>
         <th>Query</th>
         <th>{{i18n "explorer.description"}}</th>
-        <th>Access Flags</th>
         <th class="creator">Created by</th>
+        <th>Access Flags</th>
       </tr>
       </thead>
       <tbody>
@@ -15,21 +15,29 @@
         <tr {{bind-attr class="query.deleted"}}>
           <td class="name">{{#link-to "explorer-show" query.id}}{{query.name}}{{/link-to}}</td>
           <td class="desc">{{query.description}}</td>
+          <td class="creator">
+            <a href="/users/{{unbound query.creator.username}}">{{avatar query.creator imageSize="small"}} {{query.creator.username}}</a>
+          </td>
           <td class="flags">
             <!-- TODO i18n -->
             {{#if query.public_view}}
-              Query results are cached & public
+              <span title="{{i18n "explorer.tooltip.public_view"}}">
+                {{fa-icon "clock-o"}}
+              </span>
             {{else}}
-              Query results are private
-            {{/if}}<br>
-            {{#if query.can_run}}
-              Anyone can run this query
-            {{else}}
-              Only admins can run this query
+              <span title="{{i18n "explorer.tooltip.nonpublic_view"}}">
+                {{fa-icon "flash"}}
+              </span>
             {{/if}}
-          </td>
-          <td class="creator">
-            <a href="/users/{{unbound query.creator.username}}">{{avatar query.creator imageSize="small"}} {{query.creator.username}}</a>
+            {{#if query.can_run}}
+              <span title="{{i18n "explorer.tooltip.can_run"}}">
+                {{fa-icon "check-circle-o"}}
+              </span>
+            {{else}}
+              <span title="{{i18n "explorer.tooltip.cannot_run"}}">
+                {{fa-icon "times-circle-o"}}
+              </span>
+            {{/if}}
           </td>
         </tr>
       {{/each}}
