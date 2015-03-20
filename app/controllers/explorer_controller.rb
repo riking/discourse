@@ -77,8 +77,8 @@ class ExplorerController < ApplicationController
       # Only accept if parameters are identical
       if lresult["params"] == query_args
         last_execute = Time.zone.parse(lresult["meta"]["date"])
-        # Reject if query has been modified
-        if last_execute > query.updated_at
+        # Reject if query has been modified, or it's been 24 hours
+        if (last_execute > query.updated_at) && (last_execute + 1.days > Time.now)
           return render json: lresult
         end
       end
