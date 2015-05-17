@@ -1,0 +1,39 @@
+<div class="result-info">
+  <a class="btn" id="result-download" {{bind-attr download=downloadName}} data-auto-route="true">
+    {{fa-icon "download"}}
+    {{i18n "explorer.downloadjson"}}
+  </a>
+  <div class="result-about">
+    {{i18n "explorer.run_at"}} {{format-date meta.date format="medium" leaveAgo="true"}}
+    <br>
+    {{i18n "explorer.run_time"}} {{millis}}
+    <br>
+    {{i18n "explorer.run_by"}} {{meta.user}}
+    <br>
+    {{i18n "explorer.parameters"}}:
+    {{#if noParams}}
+      {{i18n "explorer.parameters_none"}}
+    {{else}}
+      {{#each param in parameterAry}}
+        <b>{{param.key}}</b>: <span>{{param.value}}</span>
+      {{/each}}
+    {{/if}}
+  </div>
+</div>
+{{#if hasExplain}}
+  <pre><code>{{content.explain}}</code></pre>
+{{/if}}
+<table>
+  <thead>
+  <tr class="headers">
+    {{#each handler in columnHandlers}}
+      <th>{{handler.displayName}}</th>
+    {{/each}}
+  </tr>
+  </thead>
+  <tbody>
+    {{#each row in rows}}
+      {{query-row-content row=row colRenders=columnHandlers extra=content}}
+    {{/each}}
+  </tbody>
+</table>

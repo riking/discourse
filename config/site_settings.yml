@@ -771,6 +771,10 @@ backups:
     default: ''
     regex: "^[^\\.]*$"
 
+plugins:
+  enable_data_explorer: false
+  public_data_explorer: false
+
 uncategorized:
   version_checks:
     client: true

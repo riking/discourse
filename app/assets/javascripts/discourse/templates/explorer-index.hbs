@@ -1,0 +1,55 @@
+<div class="container explorer">
+  <h1>{{#link-to "explorer-index"}}{{i18n "explorer.title"}}{{/link-to}}</h1>
+  <div class="full-width">
+    <table class="query-list">
+      <thead>
+      <tr>
+        <th>Query</th>
+        <th>{{i18n "explorer.description"}}</th>
+        <th class="creator">Created by</th>
+        <th>Access Flags</th>
+      </tr>
+      </thead>
+      <tbody>
+      {{#each query in model}}
+        <tr {{bind-attr class="query.deleted"}}>
+          <td class="name">{{#link-to "explorer-show" query.id}}{{query.name}}{{/link-to}}</td>
+          <td class="desc">{{query.description}}</td>
+          <td class="creator">
+            <a href="/users/{{unbound query.creator.username}}">{{avatar query.creator imageSize="small"}} {{query.creator.username}}</a>
+          </td>
+          <td class="flags">
+            <!-- TODO i18n -->
+            {{#if query.public_view}}
+              <span title="{{i18n "explorer.tooltip.public_view"}}">
+                {{fa-icon "clock-o"}}
+              </span>
+            {{else}}
+              <span title="{{i18n "explorer.tooltip.nonpublic_view"}}">
+                {{fa-icon "flash"}}
+              </span>
+            {{/if}}
+            {{#if query.can_run}}
+              <span title="{{i18n "explorer.tooltip.can_run"}}">
+                {{fa-icon "check-circle-o"}}
+              </span>
+            {{else}}
+              <span title="{{i18n "explorer.tooltip.cannot_run"}}">
+                {{fa-icon "times-circle-o"}}
+              </span>
+            {{/if}}
+          </td>
+        </tr>
+      {{/each}}
+      </tbody>
+    </table>
+  </div>
+
+  {{#if canCreate}}
+    <div class="create">
+      {{i18n "explorer.create"}}<br>
+      {{text-field value=newQueryName placeholderKey="explorer.newHint"}}
+      {{d-button icon="plus" action="create" class="no-text"}}
+    </div>
+  {{/if}}
+</div>

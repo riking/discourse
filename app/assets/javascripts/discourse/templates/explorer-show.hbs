@@ -1,0 +1,123 @@
+<div class="container explorer">
+  <h1>{{#link-to "explorer-index"}}{{fa-icon "chevron-left"}} {{i18n "explorer.title"}}{{/link-to}}</h1>
+
+  {{d-button action="showEdit" icon="plus" label="explorer.editbutton" id="showEdit"}}
+  <h2 class="query-name">{{i18n "explorer.query"}}: {{model.name}}</h2>
+  <hr>
+
+  <div {{bind-attr class=":run-query editControlsHidden::hidden model.deleted"}}>
+
+    {{code-highlighted-field value=model.query codeClass="lang-sql" classNames="query-readonly"}}
+
+    <div class="description">
+      {{query.description}}
+    </div>
+    <div class="parameters">
+      {{#if any_params}}
+        <h3>{{i18n "explorer.parameters"}}</h3>
+        {{#each param in model.params}}
+          <div class="run-param">
+            <span class="name">{{param.name}}</span>
+          <span class="value">
+            {{validating-text-field value=param.value validationObject=param checkMethod="validate" disabled=param.cant_edit extraClass=param.isComputedValueClass}}
+          </span>
+          </div>
+        {{/each}}
+        {{d-button action="resetParams" icon="undo" class="" label="explorer.reset_params" disabled=run_disabled}}
+      {{/if}}
+    </div>
+    <div class="buttons">
+      {{d-button action="run" icon="chevron-right" label="explorer.run"
+          disabled=run_disabled class="btn-primary" translatedTitle=run_disabled_reason_t}}
+      <div class="options">
+        <span class="options-title">{{i18n "explorer.opt.options"}}:</span>
+        <label for="explain">{{input type="checkbox" checked=explain id="explain" disabled=run_disabled}}
+          {{i18n "explorer.opt.explain"}}</label>
+        <label for="notransform">{{input type="checkbox" checked=notransform id="notransform" disabled=run_disabled}}
+          {{i18n "explorer.opt.notransform"}}</label>
+      </div>
+      {{#if run_disabled}}<span class="no-run-reason">{{run_disabled_reason_t}}</span>{{/if}}
+    </div>
+
+    {{#if showResult}}
+      <div class="result">
+      {{#loading-spinner condition=loadingResult}}
+      {{#if errorResult}}
+        {{! one line because of white-space: pre }}
+        <div class="result-error"><span class="result-classname">{{errorResult.class}}</span>: {{errorResult.message}}</div>
+      {{else}}
+        {{query-result content=queryResult}}
+      {{/if}}
+      {{/loading-spinner}}
+      </div>
+    {{/if}}
+  </div>
+
+  <div {{bind-attr class=":edit-controls editControlsHidden:hidden model.deleted"}}>
+    <div class="ec-item float-buttons">
+      {{#if model.deleted}}
+        {{d-button action="recover" icon="undo" label="explorer.undelete" class="btn-danger" disabled=edit_disabled}}
+      {{else}}
+        {{d-button action="trash" icon="trash-o" label="explorer.delete" class="btn-danger" disabled=edit_disabled}}
+      {{/if}}
+      <a class="btn" href="?export=1" data-auto-route="true">
+        {{fa-icon "download"}}
+        {{i18n "explorer.downloadquery"}}
+      </a>
+    </div>
+    <h2 class="ec-title">{{#if edit_disabled}}{{fa-icon "lock"}} {{/if}}{{i18n "explorer.edit_title"}}</h2>
+    <div class="ec-item edit-query">
+      {{textarea value=model.query class="query-textarea" disabled=edit_disabled}}
+    </div>
+    <div class="ec-item edit-buttons">
+      {{d-button action="parse" icon="check" label="explorer.parse" disabled=parse_disabled}}
+      {{d-button action="save" icon="caret-square-o-right" label="explorer.save" disabled=save_disabled class="btn-primary"}}
+      {{#if loadingEdit}}
+        {{fa-icon "spinner fa-spin"}}
+      {{/if}}
+    </div>
+    <div class="ec-item">
+      <label for="public_view">
+        {{input type="checkbox" checked=model.public_view disabled=edit_disabled id="public_view"}}
+        {{i18n "explorer.public_view"}}</label>
+      <label for="public_run">
+        {{input type="checkbox" checked=model.public_run disabled=edit_disabled id="public_run"}}
+        {{i18n "explorer.public_run"}}</label>
+    </div>
+    <div class="ec-item edit-name">
+      <h3 class="ec-title">{{i18n "explorer.name"}}</h3>
+      {{input value=model.name disabled=edit_disabled}}
+    </div>
+    <div class="ec-item edit-description">
+      <h3 class="ec-title">{{i18n "explorer.description"}}</h3>
+      {{textarea value=model.description disabled=edit_disabled}}
+    </div>
+    <div class="ec-item edit-parameters">
+      {{#if any_params}}
+        <h3 class="ec-title">{{i18n "explorer.params_edit.title"}}</h3>
+        <table class="query-params-edit">
+          <thead>
+          <tr>
+            <th class="name">{{i18n "explorer.params_edit.name"}}</th>
+            <th class="value">{{i18n "explorer.params_edit.default"}}</th>
+            <th class="type">{{i18n "explorer.params_edit.type"}}</th>
+            <th class="locked">{{i18n "explorer.params_edit.public_edit"}}</th>
+          </tr>
+          </thead>
+          <tbody>
+          {{#each param in model.params}}
+            <tr>
+              <td class="name">{{param.name}}</td>
+              <td class="value">
+                {{validating-text-field value=param.default_value validationObject=param checkMethod="validateIfLocked" disabled=edit_disabled extraClass=param.isComputedValueClass}}
+              </td>
+              <td class="type">{{combo-box valueAttribute="s" nameProperty="s" content=typeList value=param.type disabled=edit_disabled}}</td>
+              <td class="locked">{{input type="checkbox" checked=param.public_edit disabled=edit_disabled}}</td>
+            </tr>
+          {{/each}}
+          </tbody>
+        </table>
+      {{/if}}
+    </div>
+  </div>
+</div>

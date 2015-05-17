@@ -89,6 +89,8 @@ export default function() {
   this.route('tos', {path: '/tos'});
   this.route('privacy', {path: '/privacy'});
   this.route('guidelines', {path: '/guidelines'});
+  this.route('explorer-index', {path: '/explorer'});
+  this.route('explorer-show', {path: '/explorer/:id'});
 
   this.route('new-topic', {path: '/new-topic'});
 

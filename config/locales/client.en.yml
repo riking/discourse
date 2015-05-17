@@ -40,6 +40,7 @@ en:
       long_date_with_year_without_time: "MMM D, 'YY"
       long_date_without_year_with_linebreak: "MMM D <br/>LT"
       long_date_with_year_with_linebreak: "MMM D, 'YY <br/>LT"
+      millis: "%{value}ms"
       tiny:
         half_a_minute: "< 1m"
         less_than_x_seconds:
@@ -2545,6 +2546,59 @@ en:
         reader:
           name: Reader
           description: Read every post in a topic with more than 100 posts
+
+    explorer:
+      title: "Data Explorer"
+      parse: "Check Query"
+      run: "Run Query"
+      save: "Save"
+      query: "Query"
+      parameters: "Parameters"
+      name: "Name"
+      description: "Description"
+      params_edit:
+        title: "Query parameters"
+        name: "Parameter name"
+        default: "Default Value"
+        type: "Type"
+        public_edit: "Users can change?"
+      type:
+        string: "string"
+        integer: "integer"
+        int_list: "int_list"
+      opt:
+        options: Options
+        notransform: Do not prettify result
+        explain: Include query plan
+      tooltip:
+        public_view: "The results of this query are publicly cached."
+        nonpublic_view: "The results of this query are not saved."
+        can_run: "You can run this query."
+        cannot_run: "You cannot run this query."
+      no_semicolons: "Data Explorer queries may not contain multiple statements."
+      downloadjson: Download result as JSON
+      downloadquery: Export Query
+      deleted: "(deleted)"
+      editbutton: "Edit Query"
+      edit_title: "Edit Query"
+      public_view: "Any user can view the results, and the results are kept. (Disabling will remove results)"
+      public_run: "Any user can input values and run this query (except locked parameters)"
+      create: "Create New Query"
+      newHint: "The name of the new query"
+      parameters: "Parameters"
+      parameters_none: "(none)"
+      reset_params: "Reset parameters to defaults"
+      run_at: "Ran at:"
+      run_time: "Execution time:"
+      run_by: "Ran by:"
+      anon_user: "(An anonymous user)"
+      norun:
+        format: "Cannot run query because %{reason}"
+        permission: "you don't have permission to execute this query."
+        save_first: "you must save the query first."
+        invalid: "there are parameters with invalid values."
+      delete: "Delete Query"
+      undelete: "Undelete Query"
 
     google_search: |
       <h2>Search with Google</h2>

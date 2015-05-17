@@ -90,6 +90,8 @@ en:
         other: ! '%{count} errors prohibited this %{model} from being saved'
     embed:
       load_from_remote: "There was an error loading that post."
+    explorer:
+      no_semicolons: "Data Explorer queries may not contain multiple statements."
 
   activemodel:
     errors:

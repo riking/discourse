@@ -52,6 +52,11 @@ class UsersController < ApplicationController
     end
   end
 
+  def redirect
+    @user = fetch_user_from_params
+    redirect_to controller: :users, action: :show, username: @user.username_lower
+  end
+
   def card_badge
   end
 
