@@ -3,7 +3,7 @@ require_dependency 'letter_avatar'
 class UserAvatarsController < ApplicationController
   DOT = Base64.decode64("R0lGODlhAQABALMAAAAAAIAAAACAAICAAAAAgIAAgACAgMDAwICAgP8AAAD/AP//AAAA//8A/wD//wBiZCH5BAEAAA8ALAAAAAABAAEAAAQC8EUAOw==")
 
-  skip_before_filter :redirect_to_login_if_required, :check_xhr, :verify_authenticity_token, only: [:show, :show_letter]
+  skip_before_filter :preload_json, :redirect_to_login_if_required, :check_xhr, :verify_authenticity_token, only: [:show, :show_letter]
 
   def refresh_gravatar
     user = User.find_by(username_lower: params[:username].downcase)
@@ -24,6 +24,8 @@ class UserAvatarsController < ApplicationController
     params.require(:version)
     params.require(:size)
 
+    no_cookies
+
     return render_dot if params[:version] != LetterAvatar.version
 
     image = LetterAvatar.generate(params[:username].to_s, params[:size].to_i)
@@ -35,6 +37,9 @@ class UserAvatarsController < ApplicationController
   end
 
   def show
+
+    no_cookies
+
     # we need multisite support to keep a single origin pull for CDNs
     RailsMultisite::ConnectionManagement.with_hostname(params[:hostname]) do
       show_in_site(RailsMultisite::ConnectionManagement.current_hostname)

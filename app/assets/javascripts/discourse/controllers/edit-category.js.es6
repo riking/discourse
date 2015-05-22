@@ -5,7 +5,6 @@ import { categoryBadgeHTML } from 'discourse/helpers/category-link';
 // Modal for editing / creating a category
 export default ObjectController.extend(ModalFunctionality, {
   foregroundColors: ['FFFFFF', '000000'],
-  categoryUploadUrl: '/category/uploads',
   editingPermissions: false,
   selectedTab: null,
   saving: false,

@@ -296,6 +296,9 @@ Discourse.Utilities = {
           }
           return;
       }
+    } else if (data.errors && data.errors.length > 0) {
+      bootbox.alert(data.errors.join("\n"));
+      return;
     }
     // otherwise, display a generic error message
     bootbox.alert(I18n.t('post.errors.upload'));
@@ -308,11 +311,11 @@ Discourse.Utilities = {
 
     @method cropAvatar
     @param {String} url The url of the avatar
-    @param {String} fileType The file type of the uploaded file
     @returns {Promise} a promise that will eventually be the cropped avatar.
   **/
-  cropAvatar: function(url, fileType) {
-    if (Discourse.SiteSettings.allow_animated_avatars && fileType === "image/gif") {
+  cropAvatar: function(url) {
+    const extension = /\.(\w{2,})$/.exec(url)[1];
+    if (Discourse.SiteSettings.allow_animated_avatars && extension === "gif") {
       // can't crop animated gifs... let the browser stretch the gif
       return Ember.RSVP.resolve(url);
     } else {
@@ -342,7 +345,7 @@ Discourse.Utilities = {
           // draw the image into the canvas
           canvas.getContext("2d").drawImage(img, x, y, dimension, dimension, 0, 0, size, size);
           // retrieve the image from the canvas
-          resolve(canvas.toDataURL(fileType));
+          resolve(canvas.toDataURL("image/" + extension));
         };
         // launch the onload event
         image.src = url;
