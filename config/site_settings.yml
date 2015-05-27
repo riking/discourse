@@ -142,7 +142,7 @@ basic:
     default: 'BF1E2E|F1592A|F7941D|9EB83B|3AB54A|12A89D|25AAE2|0E76BD|652D90|92278F|ED207B|8C6238|231F20|808281|B3B5B4|283890'
   category_style:
     client: true
-    default: 'bar'
+    default: 'bullet'
     enum: 'CategoryStyleSetting'
     preview: '<span class="badge-wrapper {{value}}"><span class="badge-category-parent-bg" style="background-color: #aaa;"></span><span class="badge-category-bg" style="background-color: #777;"></span><span style="color: #fff;" data-drop-close="true" class="badge-category clear-badge">Category</span></span>'
   enable_mobile_theme:
@@ -188,11 +188,6 @@ login:
   allow_new_registrations:
     client: true
     default: true
-  # The default value of enable_google_logins changed from true to false.
-  # See db/migrate/20140521220115_google_openid_default_has_changed.rb
-  enable_google_logins:
-    client: true
-    default: false
   enable_google_oauth2_logins:
     client: true
     default: false
@@ -240,6 +235,7 @@ login:
   sso_overrides_avatar:
     default: false
     client: true
+  sso_not_approved_url: ''
   email_domains_blacklist:
     default: 'mailinator.com'
     type: list
@@ -532,11 +528,14 @@ files:
   s3_access_key_id: ''
   s3_secret_access_key: ''
   s3_region:
-    default: ''
+    default: 'us-east-1'
     enum: 'S3RegionSiteSetting'
   s3_upload_bucket:
     default: ''
-    regex: "^[^A-Z._]+$"
+    regex: '^[^A-Z_.]+$' # can't use '.' when using HTTPS
+  s3_cdn_url:
+    default: ''
+    regex: '^https?:\/\/.+[^\/]$'
   allow_profile_backgrounds:
     client: true
     default: true
@@ -552,6 +551,9 @@ files:
     default: ''
     type: url_list
     client: true
+  avatar_sizes:
+    default: '20|25|32|45|60|120'
+    type: list
 
 trust:
   default_trust_level:
@@ -769,7 +771,7 @@ backups:
   s3_backup_bucket:
     client: false
     default: ''
-    regex: "^[^\\.]*$"
+    regex: "^[^A-Z_.]+$" # can't use '.' when using HTTPS
 
 plugins:
   enable_data_explorer: false
@@ -848,10 +850,10 @@ uncategorized:
     default: 14
   cold_age_days_medium:
     client: true
-    default: 60
+    default: 90
   cold_age_days_high:
     client: true
-    default: 120
+    default: 180
 
   # Warnings
   educate_until_posts: 2

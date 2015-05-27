@@ -6,14 +6,11 @@ export default Em.Mixin.create({
     Em.warn("You should implement `uploadDone`");
   },
 
-  deleteDone() {
-    Em.warn("You should implement `deleteDone`");
-  },
-
   _initialize: function() {
     const $upload = this.$(),
           csrf = Discourse.Session.currentProp("csrfToken"),
-          uploadUrl = this.getWithDefault("uploadUrl", "/uploads");
+          uploadUrl = Discourse.getURL(this.getWithDefault("uploadUrl", "/uploads")),
+          reset = () => this.setProperties({ uploading: false, uploadProgress: 0});
 
     this.messageBus.subscribe("/uploads/" + this.get("type"), upload => {
       if (upload && upload.url) {
@@ -21,6 +18,7 @@ export default Em.Mixin.create({
       } else {
         Discourse.Utilities.displayErrorForUpload(upload);
       }
+      reset();
     });
 
     $upload.fileupload({
@@ -55,10 +53,7 @@ export default Em.Mixin.create({
 
     $upload.on("fileuploadfail", (e, data) => {
       Discourse.Utilities.displayErrorForUpload(data);
-    });
-
-    $upload.on("fileuploadalways", () => {
-      this.setProperties({ uploading: false, uploadProgress: 0});
+      reset();
     });
   }.on("didInsertElement"),
 

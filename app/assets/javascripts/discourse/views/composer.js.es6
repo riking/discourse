@@ -59,7 +59,7 @@ const ComposerView = Discourse.View.extend(Ember.Evented, {
 
   resize: function() {
     const self = this;
-    Em.run.scheduleOnce('afterRender', function() {
+    Ember.run.scheduleOnce('afterRender', function() {
       const h = $('#reply-control').height() || 0;
       self.movePanels.apply(self, [h + "px"]);
 
@@ -116,11 +116,17 @@ const ComposerView = Discourse.View.extend(Ember.Evented, {
     const $replyControl = $('#reply-control'),
         self = this;
 
+    const resizer = function() {
+      Ember.run(function() {
+        self.resize();
+      });
+    };
+
     $replyControl.DivResizer({
-      resize: this.resize.bind(self),
+      resize: resizer,
       onDrag(sizePx) { self.movePanels.apply(self, [sizePx]); }
     });
-    afterTransition($replyControl, this.resize.bind(self));
+    afterTransition($replyControl, resizer);
     this.ensureMaximumDimensionForImagesInPreview();
     this.set('controller.view', this);
 
@@ -321,6 +327,8 @@ const ComposerView = Discourse.View.extend(Ember.Evented, {
           Discourse.Utilities.displayErrorForUpload(upload);
         }
       }
+      // reset upload state
+      reset();
     });
 
     $uploadTarget.fileupload({
@@ -352,7 +360,7 @@ const ComposerView = Discourse.View.extend(Ember.Evented, {
                 cancelledByTheUser = true;
                 // might trigger a "fileuploadfail" event with status = 0
                 jqHXR.abort();
-                // doesn't trigger the "fileuploadalways" event
+                // make sure we always reset the uploading status
                 reset();
               }
               // unbind
@@ -369,12 +377,11 @@ const ComposerView = Discourse.View.extend(Ember.Evented, {
     });
 
     $uploadTarget.on("fileuploadfail", (e, data) => {
+      reset();
       if (!cancelledByTheUser) {
         Discourse.Utilities.displayErrorForUpload(data);
       }
     });
-
-    $uploadTarget.on("fileuploadalways", reset);
 
     // contenteditable div hack for getting image paste to upload working in
     // Firefox. This is pretty dangerous because it can potentially break

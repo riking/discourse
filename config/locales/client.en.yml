@@ -424,6 +424,7 @@ en:
 
       change_about:
         title: "Change About Me"
+        error: "There was an error changing ths value."
 
       change_username:
         title: "Change Username"
@@ -441,6 +442,7 @@ en:
       change_avatar:
         title: "Change your profile picture"
         gravatar: "<a href='//gravatar.com/emails' target='_blank'>Gravatar</a>, based on"
+        gravatar_title: "Change your avatar on Gravatar's website"
         refresh_gravatar_title: "Refresh your Gravatar"
         letter_based: "System assigned profile picture"
         uploaded_avatar: "Custom picture"
@@ -995,6 +997,7 @@ en:
         go_top: "top"
         go_bottom: "bottom"
         go: "go"
+        jump_bottom: "jump to last post"
         jump_bottom_with_number: "jump to post %{post_number}"
         total: total posts
         current: current post
@@ -1201,8 +1204,8 @@ en:
         other: "(post withdrawn by author, will be automatically deleted in %{count} hours unless flagged)"
       expand_collapse: "expand/collapse"
       gap:
-        one: "1 post hidden"
-        other: "{{count}} posts hidden"
+        one: "view 1 hidden reply"
+        other: "view {{count}} hidden replies"
       more_links: "{{count}} more..."
 
       unread: "Post is unread"
@@ -2071,6 +2074,8 @@ en:
       impersonate:
         title: "Impersonate"
         help: "Use this tool to impersonate a user account for debugging purposes. You will have to log out once finished."
+        not_found: "That user can't be found."
+        invalid: "Sorry, you may not impersonate that user."
 
       users:
         title: 'Users'
