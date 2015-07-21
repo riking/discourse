@@ -52,23 +52,16 @@
 
 
   &.bullet { //bullet category style
-    line-height: 1;
+    display: inline-flex;
+    align-items: baseline;
     margin-right: 10px;
-
-    h3 & {
-      line-height: .9;
-    }
 
     span.badge-category {
       color: $primary !important;
-      vertical-align: text-top;
-      line-height: 1;
-      margin-left: 4px;
-      padding-left: 2px;
-      display: inline;
+      display: inline-block;
 
       #search-dropdown & {
-        margin-top: 0;
+        margin-top: -2px;
       }
 
       .extra-info-wrapper & {
@@ -77,9 +70,12 @@
    }
 
    .badge-category-parent-bg, .badge-category-bg {
-     display: inline-block;
      width: 10px;
      height: 10px;
+     margin-right: 5px;
+     display: inline-block;
+     line-height: 1;
+
      &:before {
        content: "\a0";
      }
@@ -88,10 +84,9 @@
    span {
      &.badge-category-parent-bg { //subcategory style
        width: 5px;
-       line-height: 1;
+       margin-right: 0;
        & + .badge-category-bg {
          width: 5px;
-         line-height: 1;
        }
      }
    }
@@ -138,7 +133,7 @@
     text-overflow: ellipsis;
 
     .d-dropdown & {
-      max-width: 100px;
+      max-width: 90px;
     }
   }
 
@@ -170,12 +165,12 @@
     }
 
     li.bar>.badge-category {
-      background: dark-light-diff($primary, $secondary, 95%, -65%) !important;
+      background: dark-light-diff($primary, $secondary, 90%, -65%) !important;
       color: $primary !important;
     }
 
     li.bullet>.badge-category {
-      background: dark-light-diff($primary, $secondary, 95%, -65%) !important;
+      background: dark-light-diff($primary, $secondary, 90%, -65%) !important;
       color: $primary !important;
 
       .badge-category-bg {
@@ -197,7 +192,7 @@
       }
     }
     .cat {
-        line-height: 0;
+        line-height: 1;
       }
     .badge-wrapper {
       &.bar {
@@ -270,9 +265,9 @@
 
   &.clicks {
     font-weight: normal;
-    background-color: #ddd;
+    background-color: dark-light-diff($primary, $secondary, 85%, -65%);
     top: -1px;
-    color: #888;
+    color: dark-light-diff($primary, $secondary, 50%, -45%);
     position: relative;
     margin-left: 2px;
     border: none;

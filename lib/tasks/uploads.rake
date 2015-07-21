@@ -6,21 +6,19 @@ require "digest/sha1"
 
 task "uploads:backfill_shas" => :environment do
   RailsMultisite::ConnectionManagement.each_connection do |db|
-    puts "Backfilling #{db}"
-    Upload.select([:id, :sha, :url]).find_each do |u|
-      if u.sha.nil?
+    puts "Backfilling #{db}..."
+    Upload.where(sha1: nil).find_each do |u|
+      begin
+        path = Discourse.store.path_for(u)
+        u.sha1 = Digest::SHA1.file(path).hexdigest
+        u.save!
         putc "."
-        path = "#{Rails.root}/public/#{u.url}"
-        sha = Digest::SHA1.file(path).hexdigest
-        begin
-          Upload.update_all ["sha = ?", sha], ["id = ?", u.id]
-        rescue ActiveRecord::RecordNotUnique
-          # not a big deal if we've got a few duplicates
-        end
+      rescue Errno::ENOENT
+        putc "X"
       end
     end
   end
-  puts "done"
+  puts "", "Done"
 end
 
 ################################################################################
@@ -98,6 +96,7 @@ end
 task "uploads:migrate_to_s3" => :environment do
   require "file_store/s3_store"
   require "file_store/local_store"
+  require "db_helper"
 
   ENV["RAILS_DB"] ? migrate_to_s3 : migrate_to_s3_all_sites
 end
@@ -152,7 +151,7 @@ def migrate_to_s3
     end
 
     # remap the URL
-    remap(from, to)
+    DbHelper.remap(from, to)
 
     putc "."
   end
@@ -365,143 +364,15 @@ def regenerate_missing_optimized
 end
 
 ################################################################################
-#                           migrate_to_new_pattern                             #
+#                             migrate_to_new_scheme                            #
 ################################################################################
 
-task "uploads:migrate_to_new_pattern" => :environment do
-  ENV["RAILS_DB"] ? migrate_to_new_pattern : migrate_to_new_pattern_all_sites
+task "uploads:start_migration" => :environment do
+  SiteSetting.migrate_to_new_scheme = true
+  puts "Migration started!"
 end
 
-def migrate_to_new_pattern_all_sites
-  RailsMultisite::ConnectionManagement.each_connection { migrate_to_new_pattern }
-end
-
-def migrate_to_new_pattern
-  db = RailsMultisite::ConnectionManagement.current_db
-
-  puts "Migrating uploads to new pattern for '#{db}'..."
-  migrate_uploads_to_new_pattern
-
-  puts "Migrating optimized images to new pattern for '#{db}'..."
-  migrate_optimized_images_to_new_pattern
-
-  puts "Done!"
-end
-
-def migrate_uploads_to_new_pattern
-  if Upload.where(sha1: nil).exists?
-    puts "Computing missing SHAs..."
-
-    Upload.where(sha1: nil).find_each do |upload|
-      path = Discourse.store.path_for(upload)
-      size = File.size(path) rescue 0
-      if size > 0
-        upload.sha1 = Digest::SHA1.file(path).hexdigest
-        upload.save
-        putc "."
-      else
-        upload.destroy
-        putc "X"
-      end
-    end
-
-    puts
-  end
-
-  puts "Moving uploads to new location..."
-  Upload.where.not(sha1: nil)
-        .where("url LIKE '/uploads/%'")
-        .where("url NOT LIKE '/uploads/%/original/%'")
-        .find_each do |upload|
-    path = Discourse.store.path_for(upload)
-    if File.exists?(path)
-      file = File.open(path)
-      # copy file to new location
-      url = Discourse.store.store_upload(file, upload)
-      file.try(:close!) rescue nil
-      # remap URLs
-      remap(upload.url, url)
-      # remove old file
-      FileUtils.rm(path, force: true) rescue nil
-      putc "."
-    else
-      # upload.destroy
-      putc "X"
-    end
-  end
-
-  puts
-end
-
-def migrate_optimized_images_to_new_pattern
-  if OptimizedImage.where(sha1: nil).exists?
-    puts "Computing missing SHAs..."
-
-    OptimizedImage.where(sha1: nil).find_each do |optimized_image|
-      path = Discourse.store.path_for(optimized_image)
-      size = File.size(path) rescue 0
-      if size > 0
-        optimized_image.sha1 = Digest::SHA1.file(path).hexdigest
-        optimized_image.save
-        putc "."
-      else
-        optimized_image.destroy
-        putc "X"
-      end
-    end
-
-    puts
-  end
-
-  puts "Moving optimized images to new location..."
-  OptimizedImage.where.not(sha1: nil)
-                .where("width > 0 AND height > 0")
-                .where("url LIKE '/uploads/%/_optimized/%'")
-                .where("url NOT LIKE '/uploads/%/optimized/%'")
-                .find_each do |optimized_image|
-    path = Discourse.store.path_for(optimized_image)
-    if File.exists?(path)
-      file = File.open(path)
-      # copy file to new location
-      url = Discourse.store.store_optimized_image(file, optimized_image)
-      file.try(:close!) rescue nil
-      # remap URLs
-      remap(optimized_image.url, url)
-      # remove old file
-      FileUtils.rm(path, force: true) rescue nil
-      putc "."
-    else
-      optimized_image.destroy
-      putc "X"
-    end
-  end
-
-  puts
-end
-
-REMAP_SQL ||= "
-  SELECT table_name, column_name
-    FROM information_schema.columns
-   WHERE table_schema = 'public'
-     AND is_updatable = 'YES'
-     AND (data_type LIKE 'char%' OR data_type LIKE 'text%')
-ORDER BY table_name, column_name
-"
-
-def remap(from, to)
-  connection ||= ActiveRecord::Base.connection.raw_connection
-  remappable_columns ||= connection.async_exec(REMAP_SQL).to_a
-
-  remappable_columns.each do |rc|
-    table_name = rc["table_name"]
-    column_name = rc["column_name"]
-    begin
-      connection.async_exec("
-        UPDATE #{table_name}
-           SET #{column_name} = REPLACE(#{column_name}, $1, $2)
-         WHERE #{column_name} IS NOT NULL
-           AND #{column_name} <> REPLACE(#{column_name}, $1, $2)", [from, to])
-    rescue
-    end
-  end
+task "uploads:stop_migration" => :environment do
+  SiteSetting.migrate_to_new_scheme = false
+  puts "Migration stoped!"
 end

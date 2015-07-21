@@ -3,6 +3,12 @@ require_dependency 'plugin/instance'
 require_dependency 'auth/default_current_user_provider'
 require_dependency 'version'
 
+# Prevents errors with reloading dev with conditional includes
+if Rails.env.development?
+  require_dependency 'file_store/s3_store'
+  require_dependency 'file_store/local_store'
+end
+
 module Discourse
 
   require 'sidekiq/exception_handler'
@@ -78,11 +84,18 @@ module Discourse
     @anonymous_top_menu_items ||= Discourse.anonymous_filters + [:category, :categories, :top]
   end
 
+  PIXEL_RATIOS ||= [1, 2, 3]
+
   def self.avatar_sizes
-    # Don't cache until we can get a notification from site settings to expire cache
-    set = Set.new(SiteSetting.avatar_sizes.split("|").map(&:to_i))
-    # add retinas which are 2x dpi
-    set.to_a.each { |size| set << size * 2 }
+    # TODO: should cache these when we get a notification system for site settings
+    set = Set.new
+
+    SiteSetting.avatar_sizes.split("|").map(&:to_i).each do |size|
+      PIXEL_RATIOS.each do |pixel_ratio|
+        set << size * pixel_ratio
+      end
+    end
+
     set
   end
 
@@ -347,7 +360,9 @@ module Discourse
   end
 
   def self.sidekiq_redis_config
-    { url: $redis.url, namespace: 'sidekiq' }
+    conf = GlobalSetting.redis_config.dup
+    conf[:namespace] = 'sidekiq'
+    conf
   end
 
   def self.static_doc_topic_ids

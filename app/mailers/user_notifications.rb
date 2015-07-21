@@ -53,9 +53,8 @@ class UserNotifications < ActionMailer::Base
     @base_url = Discourse.base_url
 
     min_date = opts[:since] || @user.last_emailed_at || @user.last_seen_at || 1.month.ago
-    min_date = 2.month.ago
 
-    @site_name = SiteSetting.title
+    @site_name = SiteSetting.email_prefix.presence || SiteSetting.title
 
     @header_color = ColorScheme.hex_for_name('header_background')
     @last_seen_at = short_date(@user.last_seen_at || @user.created_at)
@@ -241,7 +240,7 @@ class UserNotifications < ActionMailer::Base
 
     # category name
     category = Topic.find_by(id: post.topic_id).category
-    if opts[:show_category_in_subject] && post.topic_id && !category.uncategorized?
+    if opts[:show_category_in_subject] && post.topic_id && category && !category.uncategorized?
       show_category_in_subject = category.name
 
       # subcategory case

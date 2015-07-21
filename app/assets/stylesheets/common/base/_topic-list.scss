@@ -1,8 +1,10 @@
 .show-more {
-  position: absolute;
-  top: 4px;
   width: 100%;
   z-index: 1;
+  &.has-topics {
+    position: absolute;
+    top: 7px;
+  }
 }
 
 .list-controls {
@@ -17,7 +19,6 @@
 .topic-list {
   width: 100%;
   border-collapse: collapse;
-  background: rgba($secondary, .8);
 
   > tbody > tr {
     &.has-excerpt .star {
@@ -196,7 +197,7 @@ ol.category-breadcrumb {
   overflow-x: hidden;
   overflow-y: auto;
   position: absolute;
-  border: 1px solid scale-color-diff();
+  border: 1px solid dark-light-diff($primary, $secondary, 90%, -60%);
   background-color: $secondary;
   z-index: 100;
 
@@ -231,6 +232,13 @@ ol.category-breadcrumb {
   h2 {
     float: left;
     margin: 5px 0 10px;
+
+    .top-date-string {
+      color: scale-color($primary, $lightness: 60%);
+      font-weight: normal;
+      font-size: 0.7em;
+      text-transform: uppercase;
+    }
   }
 
   button {
@@ -245,7 +253,7 @@ ol.category-breadcrumb {
 
     @include unselectable;
 
-    border: 1px solid scale-color-diff();
+    border: 1px solid dark-light-diff($primary, $secondary, 90%, -60%);
     padding: 5px;
     background: $secondary;
     position: absolute;

@@ -144,7 +144,9 @@ class ApplicationController < ActionController::Base
   def set_current_user_for_logs
     if current_user
       Logster.add_to_env(request.env,"username",current_user.username)
+      response.headers["X-Discourse-Username"] = current_user.username
     end
+    response.headers["X-Discourse-Route"] = "#{controller_name}/#{action_name}"
   end
 
   def set_locale
@@ -212,6 +214,10 @@ class ApplicationController < ActionController::Base
     @guardian ||= Guardian.new(current_user)
   end
 
+  def current_homepage
+    current_user ? SiteSetting.homepage : SiteSetting.anonymous_homepage
+  end
+
   def serialize_data(obj, serializer, opts=nil)
     # If it's an array, apply the serializer as an each_serializer to the elements
     serializer_opts = {scope: guardian}.merge!(opts || {})
@@ -263,7 +269,8 @@ class ApplicationController < ActionController::Base
       find_opts[:active] = true unless opts[:include_inactive]
       User.find_by(find_opts)
     elsif params[:external_id]
-      SingleSignOnRecord.find_by(external_id: params[:external_id]).try(:user)
+      external_id = params[:external_id].gsub(/\.json$/, '')
+      SingleSignOnRecord.find_by(external_id: external_id).try(:user)
     end
     raise Discourse::NotFound if user.blank?
 
@@ -300,7 +307,7 @@ class ApplicationController < ActionController::Base
 
     def preload_current_user_data
       store_preloaded("currentUser", MultiJson.dump(CurrentUserSerializer.new(current_user, scope: guardian, root: false)))
-      serializer = ActiveModel::ArraySerializer.new(TopicTrackingState.report([current_user.id]), each_serializer: TopicTrackingStateSerializer)
+      serializer = ActiveModel::ArraySerializer.new(TopicTrackingState.report(current_user.id), each_serializer: TopicTrackingStateSerializer)
       store_preloaded("topicTrackingStates", MultiJson.dump(serializer))
     end
 

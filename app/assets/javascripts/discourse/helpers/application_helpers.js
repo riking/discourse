@@ -4,36 +4,23 @@ var safe = Handlebars.SafeString;
 var registerUnbound = require('discourse/helpers/register-unbound', null, null, true).default;
 var avatarTemplate = require('discourse/lib/avatar-template', null, null, true).default;
 
-/**
-  Bound avatar helper.
-
-  @method bound-avatar
-  @for Handlebars
-**/
 Em.Handlebars.helper('bound-avatar', function(user, size, uploadId) {
   if (Em.isEmpty(user)) {
     return new safe("<div class='avatar-placeholder'></div>");
   }
+
   var username = Em.get(user, 'username');
+  if (arguments.length < 4) { uploadId = Em.get(user, 'uploaded_avatar_id'); }
+  var avatar = Em.get(user, 'avatar_template') || avatarTemplate(username, uploadId);
 
-  if(arguments.length < 4){
-    uploadId = Em.get(user, 'uploaded_avatar_id');
-  }
-
-  return new safe(Discourse.Utilities.avatarImg({
-    size: size,
-    avatarTemplate: avatarTemplate(username, uploadId)
-  }));
-}, 'username', 'uploaded_avatar_id');
+  return new safe(Discourse.Utilities.avatarImg({ size: size, avatarTemplate: avatar }));
+}, 'username', 'uploaded_avatar_id', 'avatar_template');
 
 /*
  * Used when we only have a template
  */
 Em.Handlebars.helper('bound-avatar-template', function(avatarTemplate, size) {
-  return new safe(Discourse.Utilities.avatarImg({
-    size: size,
-    avatarTemplate: avatarTemplate
-  }));
+  return new safe(Discourse.Utilities.avatarImg({ size: size, avatarTemplate: avatarTemplate }));
 });
 
 registerUnbound('raw-date', function(dt) {

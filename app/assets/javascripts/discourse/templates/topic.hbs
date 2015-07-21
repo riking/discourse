@@ -37,7 +37,7 @@
               {{#if model.details.loaded}}
                 {{topic-status topic=model}}
                 <a href='{{unbound model.url}}' {{action "jumpTop"}} class='fancy-title'>
-                  {{{model.fancy_title}}}
+                  {{{model.fancyTitle}}}
                 </a>
               {{/if}}
 
@@ -125,7 +125,7 @@
   <div class='container'>
     {{#conditional-loading-spinner condition=noErrorYet}}
       {{#if model.notFoundHtml}}
-        {{{model.notFoundHtml}}}
+        <div class='not-found'>{{{model.notFoundHtml}}}</div>
       {{else}}
         <div class="topic-error">
           <div>{{model.message}}</div>

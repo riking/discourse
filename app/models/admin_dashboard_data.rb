@@ -1,24 +1,36 @@
 require_dependency 'mem_info'
 
 class AdminDashboardData
+  include StatsCacheable
 
-  REPORTS = [
+  GLOBAL_REPORTS ||= [
     'visits',
     'signups',
     'topics',
     'posts',
-    'flags',
-    'users_by_trust_level',
+    'time_to_first_response',
+    'topics_with_no_response',
     'likes',
+    'flags',
     'bookmarks',
     'emails',
+  ]
+
+  PAGE_VIEW_REPORTS ||= ['page_view_total_reqs'] + ApplicationRequest.req_types.keys.select { |r| r =~ /^page_view_/ && r !~ /mobile/ }.map { |r| r + "_reqs" }
+
+  PRIVATE_MESSAGE_REPORTS ||= [
     'user_to_user_private_messages',
     'system_private_messages',
-    'moderator_warning_private_messages',
     'notify_moderators_private_messages',
     'notify_user_private_messages',
-    'page_view_total_reqs'
-  ] + ApplicationRequest.req_types.keys.map{|r| r + "_reqs"}
+    'moderator_warning_private_messages',
+  ]
+
+  HTTP_REPORTS ||= ApplicationRequest.req_types.keys.select { |r| r =~ /^http_/ }.map { |r| r + "_reqs" }.sort
+
+  USER_REPORTS ||= ['users_by_trust_level']
+
+  MOBILE_REPORTS ||= ['mobile_visits'] + ApplicationRequest.req_types.keys.select {|r| r =~ /mobile/}.map { |r| r + "_reqs" }
 
   def problems
     [ rails_env_check,
@@ -46,13 +58,9 @@ class AdminDashboardData
 
 
   def self.fetch_stats
-    AdminDashboardData.new
+    AdminDashboardData.new.as_json
   end
-  def self.fetch_cached_stats
-    # The DashboardStats job is responsible for generating and caching this.
-    stats = $redis.get(stats_cache_key)
-    stats ? JSON.parse(stats) : nil
-  end
+
   def self.stats_cache_key
     'dash-stats'
   end
@@ -63,7 +71,12 @@ class AdminDashboardData
 
   def as_json(_options = nil)
     @json ||= {
-      reports: REPORTS.map { |type| Report.find(type).as_json },
+      global_reports: AdminDashboardData.reports(GLOBAL_REPORTS),
+      page_view_reports: AdminDashboardData.reports(PAGE_VIEW_REPORTS),
+      private_message_reports: AdminDashboardData.reports(PRIVATE_MESSAGE_REPORTS),
+      http_reports: AdminDashboardData.reports(HTTP_REPORTS),
+      user_reports: AdminDashboardData.reports(USER_REPORTS),
+      mobile_reports: AdminDashboardData.reports(MOBILE_REPORTS),
       admins: User.admins.count,
       moderators: User.moderators.count,
       suspended: User.suspended.count,
@@ -75,9 +88,8 @@ class AdminDashboardData
     }
   end
 
-  def self.recalculate_interval
-    # Could be configurable, multisite need to support it.
-    30 # minutes
+  def self.reports(source)
+    source.map { |type| Report.find(type).as_json }
   end
 
   def rails_env_check

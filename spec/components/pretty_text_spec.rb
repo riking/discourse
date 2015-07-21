@@ -9,10 +9,11 @@ describe PrettyText do
   describe "Cooking" do
 
     describe "with avatar" do
+      let(:default_avatar) { "//test.localhost/uploads/default/avatars/42d/57c/46ce7ee487/{size}.png" }
 
       before(:each) do
         eviltrout = User.new
-        eviltrout.stubs(:avatar_template).returns("//test.localhost/uploads/default/avatars/42d/57c/46ce7ee487/{size}.png")
+        User.stubs(:default_template).returns(default_avatar)
         User.expects(:find_by).with(username_lower: "eviltrout").returns(eviltrout)
       end
 
@@ -323,10 +324,37 @@ describe PrettyText do
     SiteSetting.s3_upload_bucket = "test"
     SiteSetting.s3_cdn_url = "https://awesome.cdn"
 
-    raw = "<img src='#{Discourse.store.absolute_base_url}/original/9/9/99c9384b8b6d87f8509f8395571bc7512ca3cad1.jpg'"
-    cooked = "<p><img src='https://awesome.cdn/original/9/9/99c9384b8b6d87f8509f8395571bc7512ca3cad1.jpg'></p>"
+    # add extra img tag to ensure it does not blow up
+    raw = "<img><img src='#{Discourse.store.absolute_base_url}/original/9/9/99c9384b8b6d87f8509f8395571bc7512ca3cad1.jpg'"
+    cooked = "<p><img><img src='https://awesome.cdn/original/9/9/99c9384b8b6d87f8509f8395571bc7512ca3cad1.jpg'></p>"
 
     expect(PrettyText.cook(raw)).to match_html(cooked)
+  end
+
+  describe 'tables' do
+    before do
+      PrettyText.reset_context
+    end
+
+    after do
+      PrettyText.reset_context
+    end
+
+    it 'allows table html' do
+      SiteSetting.allow_html_tables = true
+      PrettyText.reset_context
+      table = "<table class='fa-spin'><thead><tr>\n<th class='fa-spin'>test</th></tr></thead><tbody><tr><td>a</td></tr></tbody></table>"
+      match = "<table class=\"md-table\"><thead><tr> <th>test</th> </tr></thead><tbody><tr><td>a</td></tr></tbody></table>"
+      expect(PrettyText.cook(table)).to match_html(match)
+
+    end
+
+    it 'allows no tables when not enabled' do
+      SiteSetting.allow_html_tables = false
+      table = "<table><thead><tr><th>test</th></tr></thead><tbody><tr><td>a</td></tr></tbody></table>"
+      expect(PrettyText.cook(table)).to match_html("")
+    end
+
   end
 
 end

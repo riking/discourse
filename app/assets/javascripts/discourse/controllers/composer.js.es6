@@ -115,7 +115,7 @@ export default Ember.ObjectController.extend(Presence, {
     const c = this.get('model');
     if (c) {
       opts = opts || {};
-      const wmd = $('#wmd-input'),
+      const wmd = $('.wmd-input'),
             val = wmd.val() || '',
             position = opts.position === "cursor" ? wmd.caret() : val.length,
             caret = c.appendText(text, position, opts);
@@ -332,9 +332,9 @@ export default Ember.ObjectController.extend(Presence, {
       this.set('similarTopicsMessage', message);
     }
 
-    Discourse.Topic.findSimilarTo(title, body).then(function (newTopics) {
+    this.store.find('similar-topic', {title, raw: body}).then(function(newTopics) {
       similarTopics.clear();
-      similarTopics.pushObjects(newTopics);
+      similarTopics.pushObjects(newTopics.get('content'));
 
       if (similarTopics.get('length') > 0) {
         message.set('similarTopics', similarTopics);
@@ -343,7 +343,6 @@ export default Ember.ObjectController.extend(Presence, {
         messageController.send("hideMessage", message);
       }
     });
-
   },
 
   saveDraft() {
@@ -537,7 +536,7 @@ export default Ember.ObjectController.extend(Presence, {
   },
 
   closeAutocomplete() {
-    $('#wmd-input').autocomplete({ cancel: true });
+    $('.wmd-input').autocomplete({ cancel: true });
   },
 
   showOptions() {

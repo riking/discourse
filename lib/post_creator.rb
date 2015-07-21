@@ -28,6 +28,7 @@ class PostCreator
   #   cook_method             - Method of cooking the post.
   #                               :regular - Pass through Markdown parser and strip bad HTML
   #                               :raw_html - Perform no processing
+  #                               :raw_email - Imported from an email
   #   via_email               - Mark this post as arriving via email
   #   raw_email               - Full text of arriving email (to store)
   #
@@ -192,7 +193,8 @@ class PostCreator
   # discourse post.
   def create_embedded_topic
     return unless @opts[:embed_url].present?
-    TopicEmbed.create!(topic_id: @post.topic_id, post_id: @post.id, embed_url: @opts[:embed_url])
+    embed = TopicEmbed.new(topic_id: @post.topic_id, post_id: @post.id, embed_url: @opts[:embed_url])
+    rollback_from_errors!(embed) unless embed.save
   end
 
   def handle_spam

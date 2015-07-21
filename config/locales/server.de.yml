@@ -133,8 +133,11 @@ de:
   rss_description:
     latest: "Aktuelle Themen"
     hot: "Beliebte Themen"
+    posts: "Letzte Beiträge"
   too_late_to_edit: "Dieser Beitrag wurde vor zu langer Zeit erstellt. Er kann nicht mehr bearbeitet oder gelöscht werden."
   excerpt_image: "Bild"
+  queue:
+    delete_reason: "Aus der Moderations-Warteschlange für Beiträge gelöscht"
   groups:
     errors:
       can_not_modify_automatic: "Du kannst eine automatisch verwaltete Gruppe nicht verändern."
@@ -170,7 +173,7 @@ de:
 
       - Behandle deine Gesprächspartner mit demselben Respekt, den du von ihnen erwartest.
 
-      - Kritk ist in Ordnung, aber bitte kritisiere nur *Ideen*, nicht Menschen.
+      - Kritik ist in Ordnung, aber bitte kritisiere nur *Ideen*, nicht Menschen.
 
       Beachte bitte auch [unsere Richtlinien](/guidelines). Dieser Hilfetext wird nur bei deinen ersten %{education_posts_text} Beiträgen angezeigt.
     avatar: |
@@ -244,7 +247,7 @@ de:
     no_info_other: "<div class='missing-profile'>%{name} hat noch nichts in das 'Über mich'-Feld des Nutzerprofils eingetragen</div>"
   vip_category_name: "Lounge"
   vip_category_description: "Eine Kategorie exklusiv für Mitglieder mit Vertrauensstufe 3 oder höher."
-  meta_category_name: "Meta"
+  meta_category_name: "Feedback"
   meta_category_description: "Diskussionen über dieses Forum, seine Organisation, wie es funktioniert und wie wir es verbessern können."
   staff_category_name: "Mitarbeiter"
   staff_category_description: "Geschützte Kategorie für Mitarbeiter. Themen sind nur für Administratoren und Moderatoren sichtbar."
@@ -383,6 +386,7 @@ de:
     continue_button: "Weiter zu %{site_name}"
     welcome_to: "Willkommen bei %{site_name}!"
     approval_required: "Bevor du auf das Forum zugreifen kannst, muss dein neues Konto noch von einem Moderator genehmigt werden. Du erhältst eine E-Mail, sobald dies geschehen ist!"
+    missing_session: "Wir können nicht erkennen ob dein Konto angelegt wurde. Bitte stelle sicher dass Cookies aktiviert sind."
   post_action_types:
     off_topic:
       title: 'Am Thema vorbei'
@@ -582,8 +586,6 @@ de:
     gc_warning: 'Dein Server verwendet die Standardparameter für Rubys Garbage-Collector, die nicht optimal sind. Lese dieses Thema über Performanzeinstellungen (en): <a href="http://meta.discourse.org/t/tuning-ruby-and-rails-for-discourse/4126">Tuning Ruby and Rails for Discourse</a>.'
     sidekiq_warning: 'Sidekiq läuft nicht. Viele Aufgaben, wie zum Beispiel das Versenden von Mails, werden asynchron durch Sidekiq ausgeführt. Stelle sicher, dass mindestens eine Sidekiq-Prozess läuft. <a href="https://github.com/mperham/sidekiq">Mehr über Sidekiq erfährst du hier (en)</a>.'
     memory_warning: 'Dein Server läuft mit weniger als 1 GB Hauptspeicher. Mindestens 1 GB Hauptspeicher werden empfohlen.'
-    enable_google_logins_warning: "ACHTUNG! Die derzeit von dir genutzte Methode für die Authentifizierung mit Google wird ab dem 20. April 2015 nicht mehr unterstützt! Bitte <a href='https://meta.discourse.org/t/configuring-google-login-for-discourse/15858' target='_blank'>steige möglichst bald auf die neue Methode um!</a>"
-    both_googles_warning: "Sowohl enable_google_logins als auch enable_google_oauth2_logins sind in den Einstellungen aktiviert. Bitte deaktiviere enable_google_logins."
     google_oauth2_config_warning: 'Der Server ist für Anmeldung und Login mit Google OAuth2 (enable_google_oauth2_logins)  konfiguriert, aber die Client-ID und das Client-Gemeheimnis sind nicht gesetzt. Trage diese in den <a href="/admin/site_settings">Einstellung</a> ein. <a href="https://meta.discourse.org/t/configuring-google-login-for-discourse/15858" target="_blank">Eine Anleitung zu diesem Thema findest du hier</a>.'
     facebook_config_warning: 'Der Server erlaubt die Anmeldung mit Facebook (enable_facebook_logins), aber die App ID und der Geheimcode sind nicht gesetzt. Besuche <a href="/admin/site_settings">die Einstellungen</a> um die fehlenden Einträge hinzuzufügen. <a href="https://github.com/discourse/discourse/wiki/The-Discourse-Admin-Quick-Start-Guide#enable-facebook-logins" target="_blank">Besuche den Leitfaden um mehr zu erfahren</a>.'
     twitter_config_warning: 'Der Server erlaubt die Anmeldung mit Twitter (enable_twitter_logins), aber der Schlüssel und der Geheimcode sind nicht gesetzt. Besuche <a href="/admin/site_settings">die Einstellungen</a> um die fehlenden Einträge hinzuzufügen. <a href="https://github.com/discourse/discourse/wiki/The-Discourse-Admin-Quick-Start-Guide#enable-twitter-logins" target="_blank">Besuche den Leitfaden um mehr zu erfahren</a>.'
@@ -644,7 +646,6 @@ de:
     max_topic_title_length: "Maximale zulässige Titellänge von Themen in Zeichen."
     min_private_message_title_length: "Minimale zulässige Titellänge von Nachrichten in Zeichen."
     min_search_term_length: "Minimale zulässige Länge der Suche in Zeichen."
-    allow_uncategorized_topics: "Erlaube Themen ohne Kategorie"
     uncategorized_description: "Beschreibung der Kategorie für unkategorisierte Themen. Leer lassen, wenn keine Beschreibung erwünscht ist."
     allow_duplicate_topic_titles: "Erlaube Themen mit identischen und doppelten Titeln."
     unique_posts_mins: "Minuten, nach denen ein Nutzer denselben Inhalt noch einmal posten kann."
@@ -668,7 +669,6 @@ de:
     show_subcategory_list: "Zeige Liste von Unterkategorien statt einer Liste von Themen wenn eine Kategorie ausgewählt wird."
     fixed_category_positions: "Falls aktiviert können Kategorien in einer fest vorgegebenen Reihenfolge angeordnet werden. Andernfalls werden Kategorien nach Aktivität sortiert aufgelistet."
     add_rel_nofollow_to_user_content: "Füge mit Ausnahme interner Links allen nutzergenerierten Inhalten 'rel nofollow' hinzu (inkludiert übergeordnete Domains). Die Änderung dieser Einstellung erfordert, dass du sämtliche Markdown-Beiträge aktualisierst."
-    exclude_rel_nofollow_domains: "Liste aller Domains, durch senkrechte Striche getrennt, bei denen 'nofollow' nicht hinzugefügt wird (tld.com erlaubt auch sub.tld.com)."
     post_excerpt_maxlength: "Maximale Länge eines Beitrags-Auszuges bzw. -Zusammfassung."
     post_onebox_maxlength: "Maximale Länge eines Onebox-Discourse-Beitrags in Zeichen."
     onebox_domains_whitelist: "Liste von Domains, deren Inhalte für Oneboxen erlaubt sind; diese Domains sollten OpenGraph oder oEmbed unterstützen. Teste ihre Kompatibilität unter http://iframely.com/debug"
@@ -708,7 +708,7 @@ de:
     notify_mods_when_user_blocked: "Wenn ein Benutzer automatisch gesperrt wird, sende eine Mail an alle Moderatoren."
     flag_sockpuppets: "Wenn ein neuer Nutzer auf ein Thema antwortet, das von einem anderen neuen Nutzer aber mit der gleichen IP-Adresse begonnen wurde, markiere beide Beiträge als Werbung."
     traditional_markdown_linebreaks: "Traditionelle Zeilenumbrüche in Markdown, welche zwei nachfolgende Leerzeichen für einen Zeilenumbruch benötigen."
-    post_undo_action_window_mins: "Sekunden, die ein Nutzer hat, um Aktionen auf Beiträgen rückgängig zu machen (Like, Meldung, usw.)."
+    post_undo_action_window_mins: "Minuten, die ein Nutzer hat, um Aktionen auf Beiträgen rückgängig zu machen (Like, Meldung, usw.)."
     ga_tracking_code: "Google Analytics Trackingcode, zum Beispiel: UA-12345678-9; siehe http://google.com/analytics"
     ga_domain_name: "Google Analytics Domänenname, zum Beispiel: mysite.com; siehe http://google.com/analytics"
     ga_universal_tracking_code: "Google Universal Analytics (analytics.js) tracking code code, beispielsweise: UA-12345678-9; Siehe http://google.com/analytics"
@@ -753,17 +753,13 @@ de:
     max_username_length: "Maximale Länge für Benutzernamen in Zeichen. WARNUNG: EXISTIERENDE BENUTZER, DEREN BENUTZERNAMEN LÄNGER SIND, WERDEN DIE WEBSITE NICHT MEHR BENUTZEN KÖNNEN."
     min_password_length: "Minimale Länge des Passworts."
     block_common_passwords: "Erlaube kein Passwort unter den 10000 meist verwendeten Passwörter."
-    enable_sso: "Aktiviere Single-Sign-On mittels einer externen Seite (ACHTUNG: kann bei fehlerhafter Konfiguration die Anmeldung aller Benutzer unmöglich machen, DICH SELBST EINGESCHLOSSEN! Deaktiviert außerdem Einladungen.)"
     enable_sso_provider: "Aktiviere das Discourse SSO Anbieter Protokoll unter /session/sso_provider; benötigt sso_secret."
     sso_url: "URL des Single Sign On Endpunkts"
     sso_secret: "Geheime Zeichenkette die als Schlüssel für die Authentifizierung von SSO-Informationen verwendet wird. Sollte unbedingt 10 Zeichen oder länger sein."
-    sso_overrides_email: "Überschreibt lokale mit externer E-Mail-Adresse aus den SSO Daten (WARNUNG: es können dennoch Unterschiede auf Grund von Normalisierung lokaler E-Mail-Adressen auftreten)"
-    sso_overrides_username: "Überschreibt lokale Benutzernamen mit externen Seiten-Usernamen von SSO Daten (WARNUNG: Diskrepanzen können aufgrund von Unterschieden in Benutzernamenlängen/-anforderungen, auftreten)"
-    sso_overrides_name: "Ersetzt den lokal gespeicherten vollen Namen mit dem vollen Namen der externen Seite aus den SSO Daten"
     sso_overrides_avatar: "Überschreibt den Avatar des Benutzers mit dem Avatar aus der SSO Payload. Wenn aktiv, dann sollte allow_uploaded_avatars deaktiviert werden."
+    sso_not_approved_url: "Nicht genehmigte SSO-Accounts zu dieser URL weiterleiten"
     enable_local_logins: "Aktiviere Login mit lokal gespeicherten Benutzernamen und Passwörtern. (Anmerkung: muss aktiviert sein, damit Einladungen funktionieren)"
     allow_new_registrations: "Erlaube das Registrieren neuer Benutzerkonten. Wird dies deaktiviert, so kann niemand mehr ein neues Konto erstellen."
-    enable_google_logins: "(Veraltet) Google-Authentifizierung aktivieren. Dies verwendet OpenID zur Authentifizierung und wurde von Google für veraltet erklärt. Neue Installationen werden hiermit NICHT funktionieren; benutze statt dessen Google Oauth2. Existierende Installationen müssen bis 20. April 2015 auf Google Oauth2 umsteigen."
     enable_yahoo_logins: "Aktiviere Yahoo Authentifizierung."
     enable_google_oauth2_logins: "Google Oauth2-Authentifizierung aktivieren. Dies ist der momentan von Google unterstützte Authentifizierungs-Mechanismus. Benötigt Client-ID und Secret."
     google_oauth2_client_id: "Client-ID deiner Google-Anwendung."
@@ -796,6 +792,7 @@ de:
     max_topics_per_day: "Maximale Anzahl der Themen, die ein Nutzer pro Tag erstellen kann."
     max_private_messages_per_day: "Maximale Zahl Direktnachrichten, die ein Nutzer pro Tag erstellen kann."
     max_invites_per_day: "Maximale Zahl an Einladungen, die ein Nutzer pro Tag verschicken kann."
+    max_topic_invitations_per_day: "Maximale Zahl an Themen-Einladungen, die ein Nutzer pro Tag verschicken kann."
     suggested_topics: "Anzahl der empfohlenen Themen am Ende eines Themas."
     limit_suggested_to_category: "Zeige nur Themen der aktuellen Kategorie in vorgeschlagenen Themen."
     clean_up_uploads: "Lösche verwaiste Uploads, um illegales Hosting zu vermeiden. ACHTUNG: du solltest ein Backup deines /uploads-Verzeichnis erstellen, bevor du diese Funktion aktivierst."
@@ -860,9 +857,6 @@ de:
     topic_views_heat_low: "Aufrufe-Feld leicht hervorheben, sobald das Thema so oft gelesen wurde."
     topic_views_heat_medium: "Aufrufe-Feld mäßig hervorheben, sobald das Thema so oft gelesen wurde."
     topic_views_heat_high: "Aufrufe-Feld stark hervorheben, sobald das Thema so oft gelesen wurde."
-    cold_age_days_low: "Aktivitäts-Feld leicht hervorheben, wenn das Thema so viele Tage alt ist."
-    cold_age_days_medium: "Aktivitäts-Feld mäßig hervorheben, wenn das Thema so viele Tage alt ist."
-    cold_age_days_high: "Aktivitäts-Feld stark hervorheben, wenn das Thema so viele Tage alt ist."
     history_hours_low: "Bearbeitungs-Symbol leicht hervorheben, wenn der Beitrag innerhalb so vieler Stunden nach Erstellen bearbeitet wird."
     history_hours_medium: "Bearbeitungs-Symbol mäßig hervorheben, wenn der Beitrag innerhalb so vieler Stunden nach Erstellen bearbeitet wird."
     history_hours_high: "Bearbeitungs-Symbol stark hervorheben, wenn der Beitrag innerhalb so vieler Stunden nach Erstellen bearbeitet wird."
@@ -942,7 +936,6 @@ de:
     warn_reviving_old_topic_age: "Wenn jemand beginnt auf ein Thema zu antworten, dessen letzte Antwort älter als diese Anzahl an Tagen ist, wird eine Warnung angezeigt. Deaktiviere dies durch setzen auf 0."
     autohighlight_all_code: "Erzwinge Syntaxhervorhebung für alle Quellcode-Blöcke, auch dann wenn keine Sprache angeben wurde."
     highlighted_languages: "Es wurden Syntaxregeln zur Hervorhebung von Textstellen hinzugefügt. (Achtung: Werden zu viele Sprachen hinzugefügt, kann das die Performance beeinflussen) siehe: https://highlightjs.org/static/demo/ für eine Demo."
-    embeddable_host: "Host, der Kommentare aus diesem Discourse Forum einbetten darf. Nur Hostname ohne http://"
     feed_polling_enabled: "NUR WENN EINGEBETTET: Bestimmt, ob Inhalte eines RSS-/ATOM-Feeds als zusätzliche Beiträge dargestellt werden."
     feed_polling_url: "NUR WENN EINGEBETTET: URL des einzubettenden RSS-/ATOM-Feeds."
     embed_by_username: "Discourse-Benutzername des Benutzers, der die eingebetteten Themen erstellt."
@@ -955,6 +948,7 @@ de:
     notify_about_flags_after: "Wenn es Markierungen gibt, dich nach nach dieser Anzahl von Stunden behandelt wurden, sende eine E-Mail an den contact_email. Setze dies auf 0 um es zu deaktivieren."
     enable_cdn_js_debugging: "Ermöglicht die Anzeige vollständiger Fehler auf /logs, indem alle eingebetteten JavaScripts Cross-Origin Zugriffsberechtigungen erhalten."
     show_create_topics_notice: "Administratoren eine Warnmeldung anzeigen, wenn im Forum weniger als 5 öffentlich sichtbare Themen existieren."
+    delete_drafts_older_than_n_days: Lösche Entwürfe, die mehr als (n) Tage alt sind.
     vacuum_db_days: "Führe VACUUM FULL ANALYZE aus, um nach Migrationen Speicher in der Datenbank zurückzugewinnen (zum Deaktivieren auf 0 setzen)"
     prevent_anons_from_downloading_files: "Nichtangemeldeten Benutzern das Herunterladen von Anhängen verbieten. WARNUNG: dies verhindert auch das Herunterladen jeglicher Ressourcen für Website-Anpassungen, die als Anhänge gespeichert wurden."
     enable_emoji: "Aktiviere emoji"
@@ -1004,7 +998,7 @@ de:
   original_poster: "Autor des ersten Beitrags"
   most_posts: "Autor der meisten Beiträge"
   most_recent_poster: "Autor des jüngsten Beitrags"
-  frequent_poster: "Autor regelmäßiger Beiträge"
+  frequent_poster: "Autor vieler Beiträge"
   redirected_to_top_reasons:
     new_user: "Willkommen bei unserer Community! Dies sind die derzeit am beliebtesten Themen."
     not_seen_in_a_month: "Willkommen zurück! Wir haben dich länger nicht gesehen. Während deiner Abwesenheit waren dies die beliebtesten Themen."
@@ -1062,7 +1056,7 @@ de:
     not_allowed_from_ip_address: "Du kannst dich von dieser IP-Adresse aus nicht als %{username} anmelden."
     admin_not_allowed_from_ip_address: "Du kannst dich von dieser IP-Adresse aus nicht als Administrator anmelden."
     suspended: "Du kannst dich bis zum %{date} nicht anmelden."
-    suspended_with_reason: "Du kannst dich bis zum %{date} nicht mehr anmelden. Grund des Ausschlusses: %{reason}"
+    suspended_with_reason: "Dieser Nutzer ist bis zum %{date} suspendiert: %{reason}"
     errors: "%{errors}"
     not_available: " Nicht verfügbar. Versuche %{suggestion}?"
     something_already_taken: "Etwas ist schief gelaufen. Möglicherweise ist der Benutzername bereits registriert. Probiere den 'Passwort vergessen'-Link."
@@ -1084,8 +1078,6 @@ de:
     email:
       not_allowed: "ist für diesen Mailprovider nicht erlaubt. Bitte verwende eine andere Mailadresse."
       blocked: "ist nicht erlaubt."
-    ip_address:
-      blocked: "ist blockiert."
   invite_mailer:
     subject_template: "%{invitee_name} hat dich zum Thema '%{topic_title}' auf %{site_domain_name} eingeladen"
     text_body_template: |
@@ -1122,38 +1114,8 @@ de:
     subject_template: "[%{site_name}] Test der Mailzustellbarkeit"
   new_version_mailer:
     subject_template: "[%{site_name}] Neue Discourse Version, Update verfügbar"
-    text_body_template: |
-      Eine neue Version von [Discourse](http://www.discourse.org) ist verfügbar.
-
-      Deine Version: %{installed_version}
-      Neue Version: **%{new_version}**
-
-      Dies könnte interessant sein:
-
-      - Erkundige dich über Neues im [GitHub Changelog](https://github.com/discourse/discourse/commits/master).
-
-      - Upgrade deine Version unter [%{base_url}/admin/upgrade](%{base_url}/admin/upgrade) mit dem "Upgrade"-Knopf.
-
-      - Besuche [meta.discourse.org](http://meta.discourse.org) für Neuigkeiten, Diskussionen und Unterstützung für Discourse.
   new_version_mailer_with_notes:
     subject_template: "[%{site_name}] Update verfügbar"
-    text_body_template: |
-      Eine neue Version von [Discourse](http://www.discourse.org) ist verfügbar.
-
-      Deine Version: %{installed_version}
-      Neue Version: **%{new_version}**
-
-      So geht's weiter:
-
-      - Lies nach, was sich in der neuen Version [geändert hat](https://github.com/discourse/discourse/commits/master).
-
-      - Aktualisiere dein Forum mit dem "Upgrade" Knopf auf [%{base_url}/admin/upgrade](%{base_url}/admin/upgrade).
-
-      - Besuche [meta.discourse.org](http://meta.discourse.org) für weitere Neuigkeiten, Diskussionen und Hilfestellungen rund um Discourse.
-
-      ### Versionshinweise
-
-      %{notes}
   flags_reminder:
     flags_were_submitted:
       one: "Folgende Markierungen wurden währen der letzten Stunden vorgenommen."
@@ -1175,7 +1137,6 @@ de:
     disagreed: "Danke für deine Meldung. Wir sehen uns das an."
     deferred: "Danke für deine Meldung. Wir sehen uns das an."
     deferred_and_deleted: "Danke für deine Meldung. Wir haben den Beitrag entfernt."
-  temporarily_closed_due_to_flags: "Der Diskussionsstrang wurde wegen zahlreicher Meldungen aus der Community vorübergehend geschlossen."
   system_messages:
     post_hidden:
       subject_template: "Beitrag wegen Meldungen aus der Community versteckt"
@@ -1215,7 +1176,6 @@ de:
         [prefs]: %{user_preferences_url}
     backup_succeeded:
       subject_template: "Sicherung erfolgreich abgeschlossen"
-      text_body_template: "Backup erfolgreich durchgeführt.\nDu kannst das neue Backup unter [Admin > Backups](/admin/backups) herunterladen."
     backup_failed:
       subject_template: "Sicherung fehlgeschlagen"
       text_body_template: |
@@ -1277,18 +1237,8 @@ de:
         Es ist kein Konto mit dieser E-Mail-Adresse bekannt. Versuche die Nachricht von einer anderen, im Forum registrierten E-Mail-Adresse zu verschicken oder kontaktiere einen Mitarbeiter.
     email_reject_empty:
       subject_template: "[%{site_name}] E-Mail-Problem -- Kein Inhalt"
-      text_body_template: |
-        Entschuldigung, aber mit deiner E-Mail-Nachricht an %{destination} (Titel: %{former_title}) gab es ein Problem.
-
-        Wir konnten in deiner E-Mail keinen Inhalt finden. Bitte stelle sicher, dass deine Antwort am Beginn der E-Mail steht -- Inline-Antworten können wir leider nicht verarbeiten.
-
-        Wenn du diese Fehlermeldung erhälst obwohl die E-Mail einen gültigen Inhalt hatte, versuche es bitte noch einmal und sende die E-Mail dabei als HTML (nicht als "Nur Text").
     email_reject_parsing:
       subject_template: "[%{site_name}] E-Mail-Problem -- Inhalt nicht erkannt"
-      text_body_template: |
-        Entschuldigung, aber mit deiner E-Mail-Nachricht an %{destination} (Titel: %{former_title}) gab es ein Problem.
-
-        Wir konnten in der eingesandten E-Mail deine Antwort nicht finden. **Bitte stelle sicher, dass deine gesamte Antwort zu Beginn der E-Mail steht** -- Inline-Antworten können wir leider nicht verarbeiten.
     email_reject_invalid_access:
       subject_template: "[%{site_name}] E-Mail-Problem -- Nicht erlaubt"
       text_body_template: |
@@ -1324,22 +1274,10 @@ de:
         Keine der Empfänger-Adressen ist uns bekannt. Bitte stelle sicher, dass die Ziel-Adresse in einer "An:" Zeile steht (nicht "Cc:" oder "Bcc:") und dass du die E-Mail an die richtige Adresse schickst, die dir von unseren Mitarbeitern genannt wurde.
     email_reject_topic_not_found:
       subject_template: "[%{site_name}] E-Mail Problem -- Thema nicht gefunden"
-      text_body_template: |
-        Entschuldigung, aber mit deiner E-Mail-Nachricht an %{destination} (Titel: %{former_title}) gab es ein Problem.
-
-        Das Thema ist uns nicht bekannt oder es wurde gelöscht. Wenn du glaubst, dass dies ein Irrtum ist, nimm bitte Kontakt mit einem unserer Mitarbeiter auf.
     email_reject_topic_closed:
       subject_template: "[%{site_name}] E-Mail Problem -- Thema geschlossen"
-      text_body_template: |
-        Entschuldigung, aber mit deiner E-Mail-Nachricht an %{destination} (Titel: %{former_title}) gab es ein Problem.
-
-        Das Thema wurde geschlossen. Wenn du glaubst das dies ein Irrtum ist, nimm bitte Kontakt mit einem unserer Mitarbeiter auf.
     email_reject_auto_generated:
       subject_template: "[%{site_name}] E-Mail Problem -- Automatisch erzeugte Antwort"
-      text_body_template: |
-        Entschuldigung, aber deine E-Mail-Nachricht an %{destination} (Titel: %{former_title}) hat nicht funktioniert.
-
-        Wir nehmen keine automatisch generierten Antworten an. Wenn du glaubst dass dies ein Irrtum ist, dann kontaktiere bitte einen unserer Mitarbeiter.
     email_error_notification:
       subject_template: "[%{site_name}] E-Mail-Problem -- POP-Authentifizierungsfehler"
       text_body_template: |
@@ -1501,9 +1439,6 @@ de:
       read_more: "Weiterlesen"
       more_topics: "Es gab %{new_topics_since_seen} andere neue Themen."
       more_topics_category: "Weitere neue Themen:"
-      posts:
-        one: "1 Beitrag"
-        other: "%{count} Beiträge"
     forgot_password:
       subject_template: "[%{site_name}] Passwort zurückgesetzt"
       text_body_template: |
@@ -1627,80 +1562,6 @@ de:
     title: "Nutzungsbedingungen"
   privacy_topic:
     title: "Datenschutzrichtlinie"
-  badges:
-    long_descriptions:
-      autobiographer: |
-        Blah blah blah
-        Blah blah blah
-      first_like: |
-        Blah blah blah
-        Blah blah blah
-      first_link: |
-        Blah blah blah
-        Blah blah blah
-      first_quote: |
-        Blah blah blah
-        Blah blah blah
-      first_share: |
-        Blah blah blah
-        Blah blah blah
-      read_guidelines: |
-        Blah blah blah
-        Blah blah blah
-      reader: |
-        Blah blah blah
-        Blah blah blah
-      editor: |
-        Blah blah blah
-        Blah blah blah
-      first_flag: |
-        Meldungen sind für ein gutes Klima in der Community sehr wichtig. Wenn du einen Beitrag findest, der die Aufmerksamkeit eines Moderators benötigt, zögere bitte nicht eine Meldung abzugeben.
-        Du kannst den Meldungs-Dialog auch benutzen, um einem anderen Nutzer eine <b>Direktnachricht</b> zu senden, sobald du Vertrauensstufe 1 erreicht hast.
-      nice_share: |
-        Blah blah blah
-        Blah blah blah
-      welcome: |
-        Blah blah blah
-        Blah blah blah
-      anniversary: |
-        Blah blah blah
-        Blah blah blah
-      good_share: |
-        Blah blah blah
-        Blah blah blah
-      great_share: |
-        Blah blah blah
-        Blah blah blah
-      nice_post: |
-        Blah blah blah
-        Blah blah blah
-      nice_topic: |
-        Blah blah blah
-        Blah blah blah
-      good_post: |
-        Blah blah blah
-        Blah blah blah
-      good_topic: |
-        Blah blah blah
-        Blah blah blah
-      great_post: |
-        Blah blah blah
-        Blah blah blah
-      great_topic: |
-        Blah blah blah
-        Blah blah blah
-      basic: |
-        Blah blah blah
-        Blah blah blah
-      member: |
-        Blah blah blah
-        Blah blah blah
-      regular: |
-        Blah blah blah
-        Blah blah blah
-      leader: |
-        Blah blah blah
-        Blah blah blah
   admin_login:
     success: "E-Mail gesendet"
     error: "Fehler!"

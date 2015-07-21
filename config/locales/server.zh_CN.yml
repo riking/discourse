@@ -126,6 +126,7 @@ zh_CN:
   rss_description:
     latest: "最新主题"
     hot: "最热主题"
+    posts: "最新帖子"
   too_late_to_edit: "这个主题在很早之前创建。不能被编辑或者被删除。"
   excerpt_image: "图片"
   queue:
@@ -238,7 +239,7 @@ zh_CN:
     no_info_other: "<div class='missing-profile'>%{name} 尚未在他们的资料中的关于我部分填写任何信息</div>"
   vip_category_name: "贵宾室"
   vip_category_description: "高于信任等级3的用户参与讨论的分类。"
-  meta_category_name: "站务"
+  meta_category_name: "页面反馈"
   meta_category_description: "讨论该站点的站务、组织、如何运作和如何改善它。"
   staff_category_name: "职员"
   staff_category_description: "职员私有的分类。只有管理员和版主才能阅览主题。"
@@ -352,7 +353,7 @@ zh_CN:
       almost_x_years:
         other: "将近 %{count} 年前"
   password_reset:
-    no_token: "抱歉，密码修改链接已过期。再登录一次并选择“我忘记了密码”获得一个新的链接。"
+    no_token: "对不起，这个修改密码的链接已经太老了，请您选择忘记密码得到新的链接"
     choose_new: "请选择一个新密码"
     choose: "请选择一个密码"
     update: '更新密码'
@@ -565,6 +566,14 @@ zh_CN:
       title: "总量"
       xaxis: "天"
       yaxis: "总请求数"
+    time_to_first_response:
+      title: "第一个回复时间"
+      xaxis: "天"
+      yaxis: "平均时间（小时）"
+    topics_with_no_response:
+      title: "没有回复的帖子"
+      xaxis: "天"
+      yaxis: "总量"
   dashboard:
     rails_env_warning: "你的服务器运行在 %{env} 模式。"
     ruby_version_warning: "你正在使用 Ruby 2.0.0，这个版本有较多的问题。请升级至 p247 或更新版。"
@@ -572,8 +581,6 @@ zh_CN:
     gc_warning: '你的服务器使用的是缺省的 ruby 垃圾回收参数，这个配置无法提供最高性能。请阅读此性能调优文档：<a href="http://meta.discourse.org/t/tuning-ruby-and-rails-for-discourse/4126">Tuning Ruby and Rails for Discourse</a>。'
     sidekiq_warning: 'Sidekiq 不在运行。很多任务，例如发送电子邮件，是异步的被 sidekiq 调度执行的。请确保至少运行一个 sidekiq 进程。<a href="https://github.com/mperham/sidekiq" target="_blank">了解 Sidekiq</a>。'
     memory_warning: '你的服务器环境内存少于 1GB，我们建议至少要有 1GB 内存。'
-    enable_google_logins_warning: "警告。Google 将在2015年4月20日停止支持 OpenID 登录。请<a href='https://meta.discourse.org/t/configuring-google-login-for-discourse/15858' target='_blank'>使用新方法！</a>"
-    both_googles_warning: "你在站点设置中同时启用了 enable_google_logins 和 enable_google_oauth2_logins。禁用 enable_google_logins。"
     google_oauth2_config_warning: '服务器允许使用 Google Oauth2 登录（enable_google_oauth2_logins），但是 client id 和 client secret 没有被设定。 到<a href="/admin/site_settings">站点设置</a>更新此设定。 <a href="https://meta.discourse.org/t/configuring-google-login-for-discourse/15858" target="_blank">参考设定指南</a>。'
     facebook_config_warning: '服务器允许使用 Facebook 账号登录（enable_facebook_logins），但是 app id 和 app secret 没有被设定。 到<a href="/admin/site_settings">站点设置</a>更新此设定。<a href="https://github.com/discourse/discourse/wiki/The-Discourse-Admin-Quick-Start-Guide#enable-facebook-logins" target="_blank">参考设定指南</a>。'
     twitter_config_warning: '服务器允许使用 Twitter 账号登录（enable_twitter_logins），但是 key 和 secret 没有被设定。 到<a href="/admin/site_settings">站点设置</a>更新此设定。<a href="https://github.com/discourse/discourse/wiki/The-Discourse-Admin-Quick-Start-Guide#enable-twitter-logins" target="_blank">参考设定指南</a>。'
@@ -634,7 +641,7 @@ zh_CN:
     max_topic_title_length: "标题允许的最大字符数"
     min_private_message_title_length: "消息标题允许的最小字符数"
     min_search_term_length: "搜索条件允许的最少字符数"
-    allow_uncategorized_topics: "允许发表未分类的帖子"
+    allow_uncategorized_topics: "允许发表没有分类的帖子。警告：如果又任何未分类的帖子，你必须给他们重新分类后才能关闭该选项。"
     uncategorized_description: "未分类分类的描述。留空则无描述。"
     allow_duplicate_topic_titles: "允许主题有相同，重复的标题"
     unique_posts_mins: "多少分钟之后才允许一个用户再次发表包含相同内容的帖子"
@@ -657,8 +664,9 @@ zh_CN:
     category_featured_topics: "在分类 /categories 页面中每个分类显示的主题数目。在修改这个值之后，分类页面需要 15 分钟后完成更新。"
     show_subcategory_list: "进入分类时显示子分类列表而不是主题列表。"
     fixed_category_positions: "如果选择，你将可以设置一个固定的分类顺序。如果不选择，分类将按照活动的顺序显示。"
+    fixed_category_positions_on_create: "如果选择了，目录排序将会在话题创建对话框中被包含(要求固定目录位置选项)"
     add_rel_nofollow_to_user_content: "添加 rel nofollow 属性到所有的用户内容，除了内部链接（包括父域名）。如果你更改了这个，你必须重新调制所有帖子，以该命令：“rake posts:rebake”"
-    exclude_rel_nofollow_domains: "不添加 nofollow 标签到一列逗号分割的域名（使用父域名，例如 tld.com，将自动允许子域名，例如 sub.tld.com）"
+    exclude_rel_nofollow_domains: "不添加 nofollow 链接的域名列表。填写 tld.com 将自动包括 sub.tld.com。最少你应该填写顶级域名来让爬虫获得所有内容。如果你的网站包含其他域名，增加他们。"
     post_excerpt_maxlength: "帖子摘要的最大字符长度"
     post_onebox_maxlength: "Onebox 处理后的 Discourse 帖子的最大字符长度"
     onebox_domains_whitelist: "对这些站点启用 Onebox 的域名列表；这些域名应该支持 OpenGraph 或 oEmbed。在此测试他们：http://iframely.com/debug"
@@ -744,17 +752,17 @@ zh_CN:
     max_username_length: "最大用户名长度。警告：所有现用户名大于此限制长度的用户都将无法访问站点。"
     min_password_length: "最小密码长度。"
     block_common_passwords: "不允许使用 10,000 个最常用的密码。"
-    enable_sso: "启用通过外部站点单点登录（注意：如果没有正确配置就启用可能会使得所有人都无法登陆，包括你；同时禁用邀请功能）"
+    enable_sso: "启用通过外部站点单点登录（警告：用户的邮件地址必须被外部站点验证！）"
     enable_sso_provider: "在 /session/sso_provider endpoint 实现 Discourse SSO 提供方协议，要求设置 sso_secret"
     sso_url: "单点登录 URL 入口点"
     sso_secret: "秘密字符串，用于验证秘密的 SSO 信息，请保证是 10 个字符或者更长"
-    sso_overrides_email: "用 SSO 信息中的外部邮件地址覆盖本地邮件地址（警告：因为对本地邮件的统一处理，这个邮件地址可能不同）"
-    sso_overrides_username: "用 SSO 信息中的外部用户名覆盖用户名（警告：因为对本地用户名的统一处理，用户名的长度或者要求可能不同）"
-    sso_overrides_name: "从 SSO 负荷中的外部站点全名中覆盖本地全名"
+    sso_overrides_email: "每一次登录时，用 SSO 信息中的外部站点的邮件地址覆盖本地邮件地址，并且阻止本地的邮件地址修改。（警告：因格本地邮件的正规化，邮件地址可能会有所差异）"
+    sso_overrides_username: "每一次登录时，用 SSO 信息中的外部站点的用户名覆盖本地用户名，并且阻止本地的用户名修改。（警告：因格本地用户名的长度和其他要求，用户名可能会有所差异）"
+    sso_overrides_name: "每一次登录时，用 SSO 信息中的外部站点的全名覆盖本地全名，并且阻止本地的全名修改。"
     sso_overrides_avatar: "用单点登录信息中的外部站点头像覆盖用户头像。如果启用，强烈建议禁用 allow_uploaded_avatars"
+    sso_not_approved_url: "重定向未受许可的单点登录账号至这个 URL"
     enable_local_logins: "启用本地用户名和密码验证。（注意：邀请特性需要该选项）"
     allow_new_registrations: "允许新用户注册。取消选择将阻止任何人创建一个新账户。"
-    enable_google_logins: "（废弃）启用 Google 验证。这是 OpenID 的验证方案，已被 Google 废弃。新论坛将无法使用它。使用 Google Oauth2 替代它。现存论坛必须在2015年4月20日前切换至 Google Oauth。"
     enable_yahoo_logins: "启用 Yahoo 帐号验证登录"
     enable_google_oauth2_logins: "启用 Google Oauth2 验证。这是目前 Google 推荐的验证方案。需要 key 和 secret。"
     google_oauth2_client_id: "Google 应用的 Client ID"
@@ -800,6 +808,8 @@ zh_CN:
     s3_access_key_id: "将用于上传图片的 Amazon S3 access key。"
     s3_secret_access_key: "将用于上传图片的 Amazon S3 secret key。"
     s3_region: "将用于上传图片的 Amazon S3 区域名。"
+    s3_cdn_url: "用户 S3 资料的 CDN URL（例如：https://cdn.somewhere.com）。警告：在改变该设置后你必须重制所有老帖子。"
+    avatar_sizes: "自动生成的头像大小列表。"
     enable_flash_video_onebox: "在 Onebox 启用嵌入 swf 和 flv 链接（Adobe Flash）。警告：可能增加安全风险。"
     default_invitee_trust_level: "受邀用户的缺省信任等级（0-4）。"
     default_trust_level: "所有新用户的缺省信任等级（0-4）。警告！改变此项将提高广告泛滥的风险。"
@@ -852,9 +862,9 @@ zh_CN:
     topic_views_heat_low: "多少次浏览后，该视图将稍稍高亮。"
     topic_views_heat_medium: "多少次浏览后，该视图将明显高亮。"
     topic_views_heat_high: "多少次浏览后，该视图将强烈高亮。"
-    cold_age_days_low: "在讨论开始多少天后，最后活跃日期将轻微高亮。"
-    cold_age_days_medium: "在讨论开始多少天后，最后活跃日期将明显高亮。"
-    cold_age_days_high: "在讨论开始多少天后，最后活跃日期将强烈高亮。"
+    cold_age_days_low: "在讨论开始多少天后，最后活跃日期将轻微暗淡。"
+    cold_age_days_medium: "在讨论开始多少天后，最后活跃日期将明显暗淡。"
+    cold_age_days_high: "在讨论开始多少天后，最后活跃日期将显著暗淡。"
     history_hours_low: "帖子在编辑后编辑指示器轻微高亮的小时数"
     history_hours_medium: "帖子在编辑后编辑指示器明显高亮的小时数"
     history_hours_high: "帖子在编辑后编辑指示器强烈高亮的小时数"
@@ -922,19 +932,21 @@ zh_CN:
     sequential_replies_threshold: "用户可以在一个主题内多次回复而不被提醒连续发送多个回复的通知。"
     enable_mobile_theme: "为移动设备启用移动友好的主题，但也能切换回完整站点。如果你想要使用自定义的响应式主题请禁用它。"
     dominating_topic_minimum_percent: "用户在主题中的帖子占到多少百分比时使得用户主导话题。"
+    daily_performance_report: "每日分析 NGINX 日志并且发布详情主题到职员才能看到的主题"
     suppress_uncategorized_badge: "不要为主题列表中的未分类主题显示徽章。"
     global_notice: "为所有访客显示“紧急的”全局横幅，留空隐藏它（可以使用 HTML）"
     disable_edit_notifications: "当 'download_remote_images_to_local' 启用时禁用系统编辑提醒。"
     full_name_required: "全名是用户个人信息的必填项。"
     enable_names: "在用户的个人信息、用户卡片和邮件中显示全名。禁用将在所有地方隐藏全名。"
     display_name_on_posts: "在用户的帖子中显示他们的全名以及他们的 @username。"
+    show_time_gap_days: "如果两个帖子发表间隔多天，在主题中显示时间间隔提示。"
     invites_per_page: "默认在用户页显示邀请。"
     short_progress_text_threshold: "在主题中的帖子数超过这个设定后，进度条将只显示当前的帖子数。如果你更改了进度条的宽度，你需要修改这个值。"
     default_code_lang: "默认语法高亮语言，使用 GitHub 代码块（lang-auto、ruby、python或者其他等等。）"
     warn_reviving_old_topic_age: "当有人开始回复最后一贴超过一定天数前的主题时，将有一个警告显示，不鼓励他们复活一个老的讨论。将其设置为 0 以禁用。"
     autohighlight_all_code: "即使未显式设定语言，仍为所有预编排代码块应用语法高亮。"
     highlighted_languages: "包含语法高亮规则。（警告：包含太多的语言可能会印象性能）见：https://highlightjs.org/static/demo/ 查看演示"
-    embeddable_host: "能从这个 Discourse 论坛嵌入评论的主机。\n仅主机名，不要以 http:// 开头"
+    embeddable_hosts: "能从这个 Discourse 论坛嵌入评论的主机。仅主机名，不要以 http:// 开头"
     feed_polling_enabled: "仅用于嵌入：是否将 RSS/ATOM 订阅为帖子。"
     feed_polling_url: "仅用于嵌入：RSS/ATOM 订阅的 URL。"
     embed_by_username: "创建嵌入主题的 Discourse 的用户名。"
@@ -947,6 +959,7 @@ zh_CN:
     notify_about_flags_after: "如果有标记没有在设定小时后处理，发送一封邮件给 contact_email。设为 0 将禁用。"
     enable_cdn_js_debugging: "为包含的 js 启动跨源访问 /logs 权限以显示合适的错误。"
     show_create_topics_notice: "如果站点只有少于 5 篇的公开帖子时，显示一条请管理员创建帖子的提示。"
+    delete_drafts_older_than_n_days: 删除超过 n 天得草稿。
     vacuum_db_days: "在数据库迁移后使用完整扫描回收数据库空间（设置 0 为禁用）"
     prevent_anons_from_downloading_files: "禁止匿名用户下载附件。警告：这将禁止他们访问任何发表在帖子中的非图片资源。"
     slug_generation_method: "选择一个链接生成方式。“encoded”将生成以百分号编码的链接。“none”将禁用自定义链接，只生成默认链接。"
@@ -955,6 +968,7 @@ zh_CN:
     enforce_square_emoji: "强制为所有 emojis 设置正方形比例。"
     approve_post_count: "新用户需要被审核的帖子数量"
     approve_unless_trust_level: "该信任等级之下的用户的帖子必须被审核"
+    notify_about_queued_posts_after: "如果有帖子等待了设定的小时数后仍在等候处理，发送一封邮件给联络邮件地址。设为 0 将禁用这些邮件。"
     errors:
       invalid_email: "电子邮箱地址无效。"
       invalid_username: "没有这个用户名的用户。"
@@ -1003,9 +1017,9 @@ zh_CN:
     not_seen_in_a_month: "欢迎回来！我们已经好久没见到你了。这些是你不在时的最热门主题。"
   move_posts:
     new_topic_moderator_post:
-      other: "我已经移动了 %{conut} 个帖子到新的主题：%{topic_link}"
+      other: "我已经移动了 %{count} 个帖子到新的主题：%{topic_link}"
     existing_topic_moderator_post:
-      other: "我已经移动了 %{conut} 个帖子到了一个已存在的主题：%{topic_link}"
+      other: "我已经移动了 %{count} 个帖子到了一个已存在的主题：%{topic_link}"
   change_owner:
     post_revision_text: "所有权从 %{old_user} 转移至 %{new_user}"
   emoji:
@@ -1047,7 +1061,7 @@ zh_CN:
     not_allowed_from_ip_address: "你不能以 %{username} 身份从该 IP 地址登陆。"
     admin_not_allowed_from_ip_address: "你不能从该 IP 地址以管理员身份登录。"
     suspended: "你要等到 %{date} 之后才能登录。"
-    suspended_with_reason: "你要等到 %{date} 之后才能登录。你被封禁的理由是 %{reason}"
+    suspended_with_reason: "账号被禁止登录至 {{date}}：%{reason}"
     errors: "%{errors}"
     not_available: "不可用，试试 %{suggestion}？"
     something_already_taken: "出了一些问题，可能此用户名或电子邮箱已经被注册。试试 忘记密码链接吧。"
@@ -1070,7 +1084,8 @@ zh_CN:
       not_allowed: "本站不允许使用该邮箱服务商提供的电子邮箱，请使用其它邮箱地址。"
       blocked: "不被允许。"
     ip_address:
-      blocked: "被封禁。"
+      blocked: "不允许从你的 IP 地址注册新用户。"
+      max_new_accounts_per_registration_ip: "不允许从你的 IP 地址注册新用户（达到上限）。联系一个职员。"
   invite_mailer:
     subject_template: "%{invitee_name} 邀请你参与 %{site_domain_name} 主题 '%{topic_title}' "
     text_body_template: |
@@ -1155,18 +1170,18 @@ zh_CN:
   new_version_mailer:
     subject_template: "[%{site_name}] 有新的 Discourse 版本，可供升级"
     text_body_template: |
-      有新版本的 Discourse 可供升级。
+      有新版本的 [Discourse](http://www.discourse.org) 可供升级。
 
       你的版本：%{installed_version}
       新版本：**%{new_version}**
 
       你可能想要：
 
-      - 查看 [GitHub 改动日志](https://github.com/discourse/discourse/commits/master) 中的更新内容。
+      - 查看[GitHub 改动日志](https://github.com/discourse/discourse/commits/master)中更新的内容。
 
-      - 访问 [%{base_url}/admin/upgrade](%{base_url}/admin/upgrade)，然后按下“升级”按钮。
+      - 浏览器访问 [%{base_url}/admin/upgrade](%{base_url}/admin/upgrade)  升级。
 
-      - 访问 [meta.discourse.org](http://meta.discourse.org) 获取 Discourse 的最新资讯、讨论和支持。
+      - 访问 [meta.discourse.org（英文）](http://meta.discourse.org) 获取 Discourse 的最新资讯、讨论和支持。也可访问 [meta.discoursecn.org 非官方的中文支持论坛](http://meta.discoursecn.org) 获得支持。
   new_version_mailer_with_notes:
     subject_template: "[%{site_name}] 可以升级"
     text_body_template: |
@@ -1177,11 +1192,11 @@ zh_CN:
 
       你可能想要：
 
-      - 查看[GitHub 改动日志](https://github.com/discourse/discourse/commits/master)中的更新内容。
+      - 查看[GitHub 改动日志](https://github.com/discourse/discourse/commits/master)中更新的内容。
 
-      - 访问 [%{base_url}/admin/upgrade](%{base_url}/admin/upgrade) ，然后按下“升级”按钮。
+      - 浏览器访问 [%{base_url}/admin/upgrade](%{base_url}/admin/upgrade)  升级。
 
-      - 访问 [meta.discourse.org](http://meta.discourse.org) 获取 Discourse 的最新资讯、讨论和支持。
+      - 访问 [meta.discourse.org（英文）](http://meta.discourse.org) 获取 Discourse 的最新资讯、讨论和支持。也可访问 [meta.discoursecn.org 非官方的中文支持论坛](http://meta.discoursecn.org) 获得支持。
 
       ### 发行注记
 
@@ -1194,6 +1209,13 @@ zh_CN:
     how_to_disable: '你可以通过修改“notify about flags after”设置项以禁用或改变邮件提醒设置。'
     subject_template:
       other: "%{count} 个标记需要被处理"
+  queued_posts_reminder:
+    subject_template:
+      other: "[%{site_name}] %{count} 个帖子等待审核"
+    text_body_template: |
+      你好，
+
+      新用户的帖子等待被审核。[你可以审核通过或者禁止他们](%{base_url}/queued-posts)。
   flag_reasons:
     off_topic: "你的帖子被标记为 **偏离主题**：鉴于当前的主题标题和第一个帖子，社群成员们感觉它不适合处于这个主题中。"
     inappropriate: "你的帖子被标记为 **不恰当**：社群成员感觉它有冒犯或者侮辱的意味，亦或是它违反了[社群准则](/guidelines)。"
@@ -1205,7 +1227,7 @@ zh_CN:
     disagreed: "感谢通知我们。我们正在了解情况。"
     deferred: "感谢通知我们。我们正在调查情况。"
     deferred_and_deleted: "感谢通知我们。我们已经删除了帖子。"
-  temporarily_closed_due_to_flags: "帖子因为多次社群标记暂时关闭"
+  temporarily_closed_due_to_flags: "主题因为大量的社群标记暂时关闭"
   system_messages:
     post_hidden:
       subject_template: "%{site_name} 提示：由于论坛用户标记，系统隐藏了你的帖子"
@@ -1223,77 +1245,6 @@ zh_CN:
         然而，如果帖子再次被社群标记并隐藏，它将被隐藏并等待版主处理——并且可能导致进一步的措施，包括禁止你的用户帐号的可能。
 
         想了解更多，请查看我们的[社群指引](%{base_url}/guidelines)。
-    usage_tips:
-      text_body_template: |
-        这条消息包含了一些可以让你快速开始的技巧提示。
-
-        ## 保持滚动
-
-        没有下一页按钮或者页码——要阅读更多，**只需要继续向下滚动页面！**
-
-        当新的帖子加载后，它们会自动显示。
-
-        ## 我在哪儿？
-
-        - 要搜索，访问你的用户页面或者菜单，使用 **右上角的图标<kbd>☰</kbd>按钮**。
-
-        - 任何主题标题点击后都将引导你至下一个未读的帖子。使用最后一次活动时间和帖子数量跳至主题顶部或底部。
-
-        - 当在阅读主题时，通过点击帖子标题回到顶部 &uarr;。点击右下角的绿色进度条使用完整导航控制，或使用键盘上的 <kbd>home</kbd> 和 <kbd>end</kbd>键。
-
-            <img src="/images/welcome/progress-bar.png" width="143" height="39">
-
-        ## 我怎么回复？
-
-        - 要回复整个主题，使用页面最底下的回复按钮 <img src="/images/welcome/reply-topic.png" width="29" height="25">。
-
-        - 要回复特定的帖子，使用那个帖子的回复按钮 <img src="/images/welcome/reply-post.png" width="29" height="25">。
-
-        - 如果你想把讨论导向另一个方向，但是保持讨论之间的联系，请使用帖子右侧的“回复为联结主题”<img src="/images/welcome/reply-as-linked-topic.png" width="15" height="25">。
-
-        若想在你的回复中引用什么，选择想要引用的文字，然后点击任何回复按钮。
-
-        每一个帖子最下方有功能按钮。
-
-        <img src="/images/welcome/quote-reply.png" width="350" height="129">
-
-        （要引用整个帖子，使用编辑器工具栏的导入引用按钮。）
-
-        要在你的回复中提到某人，键入 `@`，自动完成将会弹出。
-
-        <img src="/images/welcome/username-completion.png" width="230" height="131">
-
-        要使用[标准绘文字（Emoji）](http://www.emoji.codes/)，先键入`:`或传统表情符`:)` :smile:
-
-        ## 我还能做什么？
-
-        <img src="/images/welcome/like-link-flag-bookmark.png" width="169" height="46">
-
-        要让别人知道你喜欢他们的帖子，使用 **赞** 按钮。如果你觉得一个帖子有问题，请使用 **标记** 按钮以私下地让它们或者我们的职员了解情况。
-
-        你可以分享一个帖子的链接，或者是收藏一个帖子以在用户也中引用他们。
-
-        ## 谁在跟我交谈？
-
-        当有人回复你的帖子，引用你的帖子或者使用`@用户名`提及到你的时候，一个数字将会立即出现在页面右上角。使用它查看 **通知**。
-
-        <img src="/images/welcome/notification-panel.png" width="178" height="59">
-
-        不用担心错过他人的回复 —— 当别人回复你的帖子（和消息）时你不在站点上，你将会收到邮件提醒。
-
-        ## 哪一个是新讨论？
-
-        默认情况，小于两天的对话都是新对话。并且所有你参与的讨论（回复过的、创建的或阅读了很长一段时间的）将自动被追踪。
-
-        你将会在主题名字附近见到蓝底的数字指示：
-
-        <img src="/images/welcome/topics-new-unread.png" width="368" height="89">
-
-        你可以通过帖子下方的控制选项改变每一个主题的通知状态（也可以设置每一个分类的状态）。要改变你追踪帖子的方式，或近期主题的范围，查看[你的用户设置](%{base_url}/my/preferences)。
-
-        ## 为什么我不能做某些事？
-
-        新用户因为某些安全原因被限制。只要你参与了讨论，你将会得到社群的信任，成为一个真正的成员，并且这些限制将自动被移除。当达到了一个足够的[信任等级](https://meta.discourse.org/t/what-do-user-trust-levels-do/4924)，你将会得到适当的权限帮助管理社群。
     welcome_user:
       subject_template: "欢迎来到 %{site_name}！"
       text_body_template: |
@@ -1311,7 +1262,7 @@ zh_CN:
       text_body_template: "感谢你接受邀请加入%{site_name} —— 欢迎！\n\n我们为你创建了账号：**%{username}**，同时你已经登录了。你可以在任何时候访问[你的用户设置][prefs]来修改它。\n\n要再次登入，或者：\n\n1. 永远 **使用收到邀请的邮箱地址**登录，。否则我们就无法分辨是不是你本人！\n\n2. 在 %{site_name} 的[用户设置][prefs]页面创建一个密码，然后使用该密码来登入。 \n\n%{new_user_tips}\n\n我们始终相信[讨论应该文明](%{base_url}/guidelines)。\n\n好好享受你在论坛的时光吧！\n\n（如果你在新用户级别需要和[职员](%{base_url}/about)沟通的话，直接回复这个消息。）\n\n[prefs]: %{user_preferences_url}\n"
     backup_succeeded:
       subject_template: "备份成功完成"
-      text_body_template: "备份成功。\n访问[管理 > 备份](/admin/backups)下载你的新备份文件。"
+      text_body_template: "备份成功。\n\n访问[管理 > 备份](%{base_url}/admin/backups)下载你的新备份文件。"
     backup_failed:
       subject_template: "备份失败"
       text_body_template: |
@@ -1376,7 +1327,7 @@ zh_CN:
       text_body_template: |
         我们很抱歉，但是你发送至 %{destination}（名为 %{former_title}）的邮件无法发送。
 
-        我们没有在邮件中找到任何内容。请确定你的回复位于邮件的最上方 —— 我们不能处理行内回复。
+        我们没有在你的邮件中找到任何内容。请确定你的回复位于邮件的最上方 —— 我们不能处理行内回复。
 
         如果你确实包含了内容但还收到了这个通知，试试包含 HTML 内容（而非纯文本）。
     email_reject_parsing:
@@ -1421,23 +1372,22 @@ zh_CN:
         在论坛中找不到该地址。请确认在你的发送到（而非抄送或密送）中填写的是站点的地址，并且你正在将邮件发送至论坛职员提供的邮件地址。
     email_reject_topic_not_found:
       subject_template: "[%{site_name}] 邮件问题 -- 主题未找到"
-      text_body_template: |+
+      text_body_template: |
         十分抱歉，无法将你的信息发表到 %{destination} (titled %{former_title}) 。
 
-        我们没有找到该主题，可能其已被删除，如果你确认有问题，请与我们的工作人员联系。
-
+        你回复的主题不存在了，可能它已被删除？如果你确定这是个错误，联系职员。
     email_reject_topic_closed:
       subject_template: "[%{site_name}] 邮件问题 -- 主题已关闭"
       text_body_template: |
         我们很抱歉，但是你发送至 %{destination}（名为 %{former_title}）的邮件无法发送。
 
-        主题已经关闭。如果你相信这其中有错误，联系一个职员成员。
+        你回复的主题现在已经被关闭并不再接受回复。如果你确定这是个错误，联系职员。
     email_reject_auto_generated:
       subject_template: "[%{site_name}] 邮件问题 -- 自动生成的回复"
       text_body_template: |
         我们很抱歉，但是你发送至 %{destination}（名为 %{former_title}）的邮件无法发送。
 
-        你的邮件回复是自动生成的，我们不接受这种内容。如果你相信这其中有错误，联系一个职员成员。
+        你的邮件回复被标记为“自动生成的”，我们不接受这种内容。如果你确定这是个错误，联系职员。
     email_error_notification:
       subject_template: "[%{site_name}] 电子邮件错误 -- POP 验证错误"
       text_body_template: |
@@ -1592,14 +1542,12 @@ zh_CN:
       new_activity: "在你的主题和帖子里的动态："
       top_topics: "热门帖子"
       other_new_topics: "热门主题"
-      unsubscribe: "这封来自 %{site_link} 的摘要邮件是你一段时间没有访问后发送给你的。点击 %{unsubscribe_link} 取消订阅。"
+      unsubscribe: "这是封来自%{site_link}的摘要邮件，因为你长时间没有访问而发送。%{unsubscribe_link}取消订阅。"
       click_here: "点击此处"
       from: "%{site_name} 摘要"
       read_more: "阅读更多"
       more_topics: "有其他 %{new_topics_since_seen} 个新主题。"
       more_topics_category: "更多新主题："
-      posts:
-        other: "%{count} 个帖子"
     forgot_password:
       subject_template: "[%{site_name}] 密码重置"
       text_body_template: |
@@ -1827,8 +1775,8 @@ zh_CN:
       <h2>小技巧</h2>
       <p>
       <ul>
-      <li>匹配有优先级。所以有疑问时，搜索标题</li>
-      <li>独一无二的、不常见的单词将总是产生最好的结果</li>
+      <li>匹配有优先级区别。不确定时，搜索标题</li>
+      <li>独一无二的不常见的单词将总是产生最好的结果</li>
       <li>只要有可能，限制你的搜索范围至一个特定的分类、用户或主题</li>
       </ul>
       </p>
@@ -1836,90 +1784,22 @@ zh_CN:
       <p>
       <table>
       <tr><td><code>order:views</code></td><td><code>order:latest</code></td><td colspan=3></td></tr>
-      <tr><td><code>status:open</code></td><td><code>status:closed</code></td><td><code>status:archived</code></td><td><code>status:noreplies</code></td><td><code>status:singleuser</code></td></tr>
+      <tr><td><code>status:open</code></td><td><code>status:closed</code></td><td><code>status:archived</code></td><td><code>status:noreplies</code></td><td><code>status:single_user</code></td></tr>
       <tr><td><code>category:foo</code></td><td><code>user:foo</code></td><td colspan=3></td></tr>
       <tr><td><code>in:likes</code></td><td><code>in:posted</code></td><td><code>in:watching</code></td><td><code>in:tracking</code></td><td><code>in:private</code></td></tr>
-      <tr><td><code>in:bookmarks</code></td><td colspan=4></td></tr>
+      <tr><td><code>in:bookmarks</code></td><td><code>in:first</code></td><td colspan=3></td></tr>
+      <tr><td><code>posts_count:num</code></td><td><code>min_age:days</code></td><td><code>max_age:days</code></td> <td colspan=2></td></tr>
       </table>
       </p>
       <p>
-      <code>彩虹 category:公园 status:open order:latest</code> 将搜索在“公园”分类中没有关闭或存档中的包含“彩虹”的主题，并按最后一个帖子的日期来排序。
-      </p>
-  badges:
-    long_descriptions:
-      autobiographer: |
-        啦啦啦
-        啦啦啦
-      first_like: |
-        啦啦啦
-        啦啦啦
-      first_link: |
-        啦啦啦
-        啦啦啦
-      first_quote: |
-        啦啦啦
-        啦啦啦
-      first_share: |
-        啦啦啦
-        啦啦啦
-      read_guidelines: |
-        啦啦啦
-        啦啦啦
-      reader: |
-        啦啦啦
-        啦啦啦
-      editor: |
-        啦啦啦
-        啦啦啦
-      first_flag: |
-        标记对你社群的健康及其重要。如果你注意任何需要版主注意的帖子，请不要犹豫直接标记。当你达到信任等级 1 时，你也可以使用标记对话框发送<b>消息</b>给用户。
-      nice_share: |
-        啦啦啦
-        啦啦啦
-      welcome: |
-        啦啦啦
-        啦啦啦
-      anniversary: |
-        啦啦啦
-        啦啦啦
-      good_share: |
-        啦啦啦
-        啦啦啦
-      great_share: |
-        啦啦啦
-        啦啦啦
-      nice_post: |
-        啦啦啦
-        啦啦啦
-      nice_topic: |
-        啦啦啦
-        啦啦啦
-      good_post: |
-        啦啦啦
-        啦啦啦
-      good_topic: |
-        啦啦啦
-        啦啦啦
-      great_post: |
-        啦啦啦
-        啦啦啦
-      great_topic: |
-        啦啦啦
-        啦啦啦
-      basic: |
-        啦啦啦
-        啦啦啦
-      member: |
-        啦啦啦
-        啦啦啦
-      regular: |
-        啦啦啦
-        啦啦啦
-      leader: |
-        啦啦啦
-        啦啦啦
+      <code>彩虹 category:公园 status:open order:latest</code> 将搜索在“公园”分类中没有关闭或存档中的名字包含“彩虹”的主题，并按最后一个帖子的日期来排序。 </p>
   admin_login:
     success: "邮件已发送"
     error: "错误！"
     email_input: "管理员邮件"
     submit_button: "发送邮件"
+  discourse_hub:
+    access_token_problem: "告诉管理员：请更新站点设置，应使用正确的 discourse_org_access_key。"
+  performance_report:
+    initial_post_raw: 这个主题包括你网站的每日性能报告
+    initial_topic_title: 网站性能报告

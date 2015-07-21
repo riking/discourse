@@ -25,7 +25,7 @@ export default RestModel.extend({
   baseUrl: Discourse.computed.url('itemsLoaded', 'user.username_lower', '/user_actions.json?offset=%@&username=%@'),
 
   filterBy(filter) {
-    this.setProperties({ filter, itemsLoaded: 0, content: [] });
+    this.setProperties({ filter, itemsLoaded: 0, content: [], lastLoadedUrl: null });
     return this.findItems();
   },
 
@@ -68,6 +68,7 @@ export default RestModel.extend({
       if (result && result.user_actions) {
         const copy = Em.A();
         result.user_actions.forEach(function(action) {
+          action.title = Discourse.Emoji.unescape(action.title);
           copy.pushObject(Discourse.UserAction.create(action));
         });
 

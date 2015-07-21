@@ -107,8 +107,9 @@ basic:
   post_menu:
     client: true
     type: list
-    default: 'like|share|flag|edit|bookmark|delete|admin|reply'
+    default: 'like-count|like|share|flag|edit|bookmark|delete|admin|reply'
     choices:
+     - like-count
      - like
      - edit
      - flag
@@ -168,6 +169,11 @@ basic:
   fixed_category_positions:
     client: true
     default: false
+
+  fixed_category_positions_on_create:
+    client: true
+    default: false
+
   show_subcategory_list:
     default: false
     client: true
@@ -258,6 +264,9 @@ users:
     default: 20
     min: 8
     max: 60
+  reserved_usernames:
+    type: list
+    default: "admin|moderator|administrator|mod|sys|system|community|info|you|name|username|user|nickname|discourse|discourseorg|discourseforum"
   min_password_length:
     client: true
     default: 8
@@ -377,6 +386,9 @@ posting:
   traditional_markdown_linebreaks:
     client: true
     default: false
+  allow_html_tables:
+    client: true
+    default: false
   suppress_reply_directly_below:
     client: true
     default: true
@@ -410,6 +422,9 @@ posting:
   display_name_on_posts:
     client: true
     default: false
+  show_time_gap_days:
+    default: 7
+    client: true
   short_progress_text_threshold:
     client: true
     default: 10000
@@ -445,6 +460,9 @@ posting:
   approve_unless_trust_level:
     default: 0
     enum: 'TrustLevelSetting'
+  notify_about_queued_posts_after:
+    default: 24
+    min: 0
 
 email:
   email_time_window_mins:
@@ -610,6 +628,7 @@ trust:
   tl3_promotion_min_duration:
     default: 14
     min: 0
+    max: 20000
   tl3_requires_likes_given:
     default: 30
     min: 0
@@ -722,16 +741,19 @@ developer:
     default: 15000
   flush_timings_secs:
     client: true
-    default: 10
+    default: 20
   active_user_rate_limit_secs: 60
   verbose_localization:
     default: false
     client: true
+  migrate_to_new_scheme:
+    hidden: true
+    default: false
 
 embedding:
-  embeddable_host:
-      default: ''
-      regex: "^(?!http).+" # don't allow this to start with http:// or https://
+  embeddable_hosts:
+    default: ''
+    type: host_list
   feed_polling_enabled: false
   feed_polling_url: ''
   embed_by_username:
@@ -792,11 +814,15 @@ uncategorized:
     default: 'ascii'
     enum: 'SlugSetting'
 
+  permalink_normalizations:
+    default: ''
+    type: list
+
   # Search
   min_search_term_length:
     client: true
     default: 3
-  max_similar_results: 7
+  max_similar_results: 5
   minimum_topics_similar: 50
 
   new_topic_duration_minutes: 2880
@@ -860,6 +886,9 @@ uncategorized:
   sequential_replies_threshold: 2
   dominating_topic_minimum_percent: 20
 
+  # Reporting
+  daily_performance_report: false
+
   global_notice:
     default: ""
     client: true
@@ -871,10 +900,16 @@ uncategorized:
   lounge_category_id:
     default: -1
     hidden: true
+
   meta_category_id:
     default: -1
     hidden: true
+
   staff_category_id:
+    default: -1
+    hidden: true
+
+  performance_report_topic_id:
     default: -1
     hidden: true
 
@@ -892,10 +927,12 @@ uncategorized:
 
   disable_edit_notifications: false
 
-  vacuum_db_days: 90
+  vacuum_db_days: 9000
   last_vacuum:
     default: 0
     hidden: true
+
+  delete_drafts_older_than_n_days: 180
 
   tos_topic_id:
     default: -1

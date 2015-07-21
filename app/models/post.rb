@@ -6,6 +6,7 @@ require_dependency 'enum'
 require_dependency 'post_analyzer'
 require_dependency 'validators/post_validator'
 require_dependency 'plugin/filter'
+require_dependency 'email_cook'
 
 require 'archetype'
 require 'digest/sha1'
@@ -76,7 +77,7 @@ class Post < ActiveRecord::Base
   end
 
   def self.cook_methods
-    @cook_methods ||= Enum.new(:regular, :raw_html)
+    @cook_methods ||= Enum.new(:regular, :raw_html, :email)
   end
 
   def self.find_by_detail(key, value)
@@ -161,16 +162,20 @@ class Post < ActiveRecord::Base
     # case we can skip the rendering pipeline.
     return raw if cook_method == Post.cook_methods[:raw_html]
 
-    # Default is to cook posts
-    cooked = if !self.user || SiteSetting.tl3_links_no_follow || !self.user.has_trust_level?(TrustLevel[3])
-               post_analyzer.cook(*args)
-             else
-               # At trust level 3, we don't apply nofollow to links
-               cloned = args.dup
-               cloned[1] ||= {}
-               cloned[1][:omit_nofollow] = true
-               post_analyzer.cook(*cloned)
-             end
+    cooked = nil
+    if cook_method == Post.cook_methods[:email]
+      cooked = EmailCook.new(raw).cook
+    else
+      cooked = if !self.user || SiteSetting.tl3_links_no_follow || !self.user.has_trust_level?(TrustLevel[3])
+                 post_analyzer.cook(*args)
+               else
+                 # At trust level 3, we don't apply nofollow to links
+                 cloned = args.dup
+                 cloned[1] ||= {}
+                 cloned[1][:omit_nofollow] = true
+                 post_analyzer.cook(*cloned)
+               end
+    end
 
     new_cooked = Plugin::Filter.apply(:after_post_cook, self, cooked)
 
@@ -395,7 +400,7 @@ class Post < ActiveRecord::Base
     return if user_id == new_user.id
 
     edit_reason = I18n.t('change_owner.post_revision_text',
-      old_user: self.user.username_lower,
+      old_user: (self.user.username_lower rescue nil) || I18n.t('change_owner.deleted_user'),
       new_user: new_user.username_lower
     )
 
@@ -488,14 +493,15 @@ class Post < ActiveRecord::Base
     Jobs.enqueue(:process_post, args)
   end
 
-  def self.public_posts_count_per_day(start_date, end_date)
-    public_posts.where('posts.created_at >= ? AND posts.created_at <= ?', start_date, end_date).group('date(posts.created_at)').order('date(posts.created_at)').count
+  def self.public_posts_count_per_day(start_date, end_date, category_id=nil)
+    result = public_posts.where('posts.created_at >= ? AND posts.created_at <= ?', start_date, end_date)
+    result = result.where('topics.category_id = ?', category_id) if category_id
+    result.group('date(posts.created_at)').order('date(posts.created_at)').count
   end
 
   def self.private_messages_count_per_day(since_days_ago, topic_subtype)
     private_posts.with_topic_subtype(topic_subtype).where('posts.created_at > ?', since_days_ago.days.ago).group('date(posts.created_at)').order('date(posts.created_at)').count
   end
-
 
   def reply_history(max_replies=100)
     post_ids = Post.exec_sql("WITH RECURSIVE breadcrumb(id, reply_to_post_number) AS (

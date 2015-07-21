@@ -17,9 +17,10 @@ class UserAvatar < ActiveRecord::Base
 
         self.last_gravatar_download_attempt = Time.new
 
-        gravatar_url = "http://www.gravatar.com/avatar/#{email_hash}.png?s=500&d=404"
+        max = Discourse.avatar_sizes.max
+        gravatar_url = "http://www.gravatar.com/avatar/#{email_hash}.png?s=#{max}&d=404"
         tempfile = FileHelper.download(gravatar_url, SiteSetting.max_image_size_kb.kilobytes, "gravatar")
-        upload = Upload.create_for(user.id, tempfile, 'gravatar.png', tempfile.size, { origin: gravatar_url })
+        upload = Upload.create_for(user.id, tempfile, 'gravatar.png', tempfile.size, origin: gravatar_url, image_type: "avatar")
 
         if gravatar_upload_id != upload.id
           gravatar_upload.try(:destroy!)
@@ -35,6 +36,53 @@ class UserAvatar < ActiveRecord::Base
         tempfile.try(:close!)
       end
     end
+  end
+
+  def self.local_avatar_url(hostname, username, upload_id, size)
+    version = self.version(upload_id)
+    "#{Discourse.base_uri}/user_avatar/#{hostname}/#{username}/#{size}/#{version}.png"
+  end
+
+  def self.local_avatar_template(hostname, username, upload_id)
+    version = self.version(upload_id)
+    "#{Discourse.base_uri}/user_avatar/#{hostname}/#{username}/{size}/#{version}.png"
+  end
+
+  def self.external_avatar_url(user_id, upload_id, size)
+    version = self.version(upload_id)
+    "#{Discourse.store.absolute_base_url}/avatars/#{user_id}/#{size}/#{version}.png"
+  end
+
+  def self.external_avatar_template(user_id, upload_id)
+    version = self.version(upload_id)
+    "#{Discourse.store.absolute_base_url}/avatars/#{user_id}/{size}/#{version}.png"
+  end
+
+  def self.version(upload_id)
+    "#{upload_id}_#{OptimizedImage::VERSION}"
+  end
+
+  def self.import_url_for_user(avatar_url, user)
+    tempfile = FileHelper.download(avatar_url, SiteSetting.max_image_size_kb.kilobytes, "sso-avatar", true)
+
+    ext = FastImage.type(tempfile).to_s
+    tempfile.rewind
+
+    upload = Upload.create_for(user.id, tempfile, "external-avatar." + ext, tempfile.size, origin: avatar_url, image_type: "avatar")
+    user.uploaded_avatar_id = upload.id
+
+    unless user.user_avatar
+      user.build_user_avatar
+    end
+
+    if !user.user_avatar.contains_upload?(upload.id)
+      user.user_avatar.custom_upload_id = upload.id
+    end
+  rescue => e
+    # skip saving, we are not connected to the net
+    Rails.logger.warn "#{e}: Failed to download external avatar: #{avatar_url}, user id #{ user.id }"
+  ensure
+    tempfile.close! if tempfile && tempfile.respond_to?(:close!)
   end
 
 end

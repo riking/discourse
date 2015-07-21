@@ -13,8 +13,6 @@ describe FileStore::S3Store do
   let(:optimized_image) { Fabricate(:optimized_image) }
   let(:optimized_image_file) { file_from_fixtures("logo.png") }
 
-  let(:avatar) { Fabricate(:upload) }
-
   before(:each) do
     SiteSetting.stubs(:s3_upload_bucket).returns("S3_Upload_Bucket")
     SiteSetting.stubs(:s3_access_key_id).returns("s3_access_key_id")
@@ -90,16 +88,6 @@ describe FileStore::S3Store do
   it "is external" do
     expect(store.external?).to eq(true)
     expect(store.internal?).to eq(false)
-  end
-
-  describe ".download" do
-
-    it "does nothing if the file hasn't been uploaded to that store" do
-      upload.stubs(:url).returns("/path/to/image.png")
-      FileHelper.expects(:download).never
-      store.download(upload)
-    end
-
   end
 
   describe ".purge_tombstone" do

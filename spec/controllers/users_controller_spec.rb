@@ -321,21 +321,8 @@ describe UsersController do
 
     context 'enqueues mail' do
       it 'enqueues mail with admin email and sso enabled' do
-        SiteSetting.enable_sso = true
         Jobs.expects(:enqueue).with(:user_email, has_entries(type: :admin_login, user_id: admin.id))
         put :admin_login, email: admin.email
-      end
-
-      it 'does not enqueue mail with admin email and sso disabled' do
-        SiteSetting.enable_sso = false
-        Jobs.expects(:enqueue).never
-        put :admin_login, email: admin.email
-      end
-
-      it 'does not enqueue mail with normal user email and sso enabled' do
-        SiteSetting.enable_sso = true
-        Jobs.expects(:enqueue).never
-        put :admin_login, email: user.email
       end
     end
 
@@ -346,13 +333,13 @@ describe UsersController do
         expect(session[:current_user_id]).to be_blank
       end
 
-      it 'does not log in admin with valid token and SSO disabled' do
+      it 'does log in admin with valid token and SSO disabled' do
         SiteSetting.enable_sso = false
         token = admin.email_tokens.create(email: admin.email).token
 
         get :admin_login, token: token
         expect(response).to redirect_to('/')
-        expect(session[:current_user_id]).to be_blank
+        expect(session[:current_user_id]).to eq(admin.id)
       end
 
       it 'logs in admin with valid token and SSO enabled' do
@@ -610,6 +597,13 @@ describe UsersController do
 
     context 'when password param is missing' do
       let(:create_params) { {name: @user.name, username: @user.username, email: @user.email} }
+      include_examples 'failed signup'
+    end
+
+    context 'with a reserved username' do
+      let(:create_params) { {name: @user.name, username: 'Reserved', email: @user.email, password: "x" * 20} }
+      before { SiteSetting.reserved_usernames = 'a|reserved|b' }
+      after { SiteSetting.reserved_usernames = nil }
       include_examples 'failed signup'
     end
 
@@ -917,7 +911,7 @@ describe UsersController do
         user: invitee
       )
 
-      xhr :get, :invited, username: inviter.username, filter: 'billybob'
+      xhr :get, :invited, username: inviter.username, search: 'billybob'
 
       invites = JSON.parse(response.body)['invites']
       expect(invites.size).to eq(1)
@@ -939,7 +933,7 @@ describe UsersController do
         user: Fabricate(:user, username: 'jimtom')
       )
 
-      xhr :get, :invited, username: inviter.username, filter: 'billybob'
+      xhr :get, :invited, username: inviter.username, search: 'billybob'
 
       invites = JSON.parse(response.body)['invites']
       expect(invites.size).to eq(1)
@@ -952,7 +946,7 @@ describe UsersController do
           inviter = Fabricate(:user)
           Fabricate(:invite, invited_by: inviter)
 
-          xhr :get, :invited, username: inviter.username
+          xhr :get, :invited, username: inviter.username, filter: 'pending'
 
           invites = JSON.parse(response.body)['invites']
           expect(invites).to be_empty
@@ -986,7 +980,7 @@ describe UsersController do
                 with(inviter).returns(true)
             end
 
-            xhr :get, :invited, username: inviter.username
+            xhr :get, :invited, username: inviter.username, filter: 'pending'
 
             invites = JSON.parse(response.body)['invites']
             expect(invites.size).to eq(1)
@@ -1005,7 +999,7 @@ describe UsersController do
                 with(inviter).returns(false)
             end
 
-            xhr :get, :invited, username: inviter.username
+            xhr :get, :invited, username: inviter.username, filter: 'pending'
 
             json = JSON.parse(response.body)['invites']
             expect(json).to be_empty
@@ -1323,10 +1317,12 @@ describe UsersController do
       it 'it successful' do
         xhr :put, :pick_avatar, username: user.username, upload_id: 111
         expect(user.reload.uploaded_avatar_id).to eq(111)
+        expect(user.user_avatar.reload.custom_upload_id).to eq(111)
         expect(response).to be_success
 
         xhr :put, :pick_avatar, username: user.username
         expect(user.reload.uploaded_avatar_id).to eq(nil)
+        expect(user.user_avatar.reload.custom_upload_id).to eq(111)
         expect(response).to be_success
       end
 

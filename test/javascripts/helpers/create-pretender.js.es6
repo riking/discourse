@@ -119,6 +119,11 @@ export default function() {
 
     this.get('/users/:username/staff-info.json', () => response({}));
 
+    this.put('/categories/:category_id', function(request) {
+      const category = parsePostData(request.requestBody);
+      return response({category});
+    });
+
     this.get('/draft.json', function() {
       return response({});
     });
@@ -177,6 +182,10 @@ export default function() {
 
     this.get('/t/403.json', () => {
       return response(403, {});
+    });
+
+    this.get('/t/404.json', () => {
+      return response(404, "not found");
     });
 
     this.get('/t/500.json', () => {

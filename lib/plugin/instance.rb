@@ -17,6 +17,10 @@ class Plugin::Instance
     }
   end
 
+  def seed_data
+    @seed_data ||= {}
+  end
+
   def self.find_all(parent_path)
     [].tap { |plugins|
       # also follows symlinks - http://stackoverflow.com/q/357754
@@ -166,7 +170,11 @@ class Plugin::Instance
 
   def register_color_scheme(name, colors)
     color_schemes << {name: name, colors: colors}
-   end
+  end
+
+  def register_seed_data(key, value)
+    seed_data[key] = value
+  end
 
   def automatic_assets
     css = styles.join("\n")
@@ -223,6 +231,10 @@ class Plugin::Instance
     end
 
     register_assets! unless assets.blank?
+
+    seed_data.each do |key, value|
+      DiscoursePluginRegistry.register_seed_data(key, value)
+    end
 
     # TODO: possibly amend this to a rails engine
 
@@ -287,8 +299,12 @@ class Plugin::Instance
     end
   end
 
-  def enabled_site_setting(setting)
-    @enabled_site_setting = setting
+  def enabled_site_setting(setting=nil)
+    if setting
+      @enabled_site_setting = setting
+    else
+      @enabled_site_setting
+    end
   end
 
   protected
