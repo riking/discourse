@@ -1,5 +1,6 @@
 import DiscourseURL from 'discourse/lib/url';
 import PageTracker from 'discourse/lib/page-tracker';
+import { checkServiceWorker } from 'discourse/lib/service-worker-utils';
 
 let primaryTab = false;
 let liveEnabled = false;
@@ -42,13 +43,20 @@ function init(messageBus) {
     Em.Logger.warn('Unexpected error, Notification is defined on window but not a responding correctly ' + e);
   }
 
-  liveEnabled = true;
-  try {
-    // Preliminary checks passed, continue with setup
-    setupNotifications();
-  } catch (e) {
-    Em.Logger.error(e);
-  }
+  checkServiceWorker().then(function(haveWorker) {
+    if (haveWorker) {
+      // We have a ServiceWorker, it will do the notifications
+      return;
+    } else {
+      liveEnabled = true;
+      try {
+        // Preliminary checks passed, continue with setup
+        setupNotifications();
+      } catch (e) {
+        Em.Logger.error(e);
+      }
+    }
+  });
 }
 
 // This function is only called if permission was granted

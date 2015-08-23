@@ -16,6 +16,11 @@ class ForumsController < ApplicationController
     raise "WAT - #{Time.now}"
   end
 
+  def workertest
+    # if a ServiceWorker is active, it will intercept and say 'true'
+    render text: 'false'
+  end
+
   def home_redirect
     redirect_to path('/')
   end

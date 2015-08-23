@@ -8,7 +8,7 @@ if Rails.env.development?
       request = Rack::Request.new(env)
       response = @app.call(env)
       if request.path == '/assets/worker.js'
-        response[1]['Service-Worker-Allowed'] = '/'
+        response[1]['Service-Worker-Allowed'] = Discourse.base_uri '/'
       end
       response
     end

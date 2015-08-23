@@ -43,6 +43,7 @@ Discourse::Application.routes.draw do
 
   resources :forums
   get "srv/status" => "forums#status"
+  get "srv/worker-test" => "forums#workertest"
 
   namespace :admin, constraints: StaffConstraint.new do
     get "" => "admin#index"
