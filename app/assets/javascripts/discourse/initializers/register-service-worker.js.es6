@@ -15,16 +15,5 @@ export default {
 
       // if we ever need the registration, stash it from here
     });
-
-    window.addEventListener('message', function(event) {
-      if (typeof event.data === "object") {
-        if (event.data.type === 'serviceWorkerUpdated') {
-          console.log(event.origin);
-          console.log(event.data);
-          console.log(event.source === navigator.serviceWorker.controller);
-          debugger;
-        }
-      }
-    });
   }
 }

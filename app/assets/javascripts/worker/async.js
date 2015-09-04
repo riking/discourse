@@ -17,9 +17,8 @@ self.async = {
           resolve(lastResult);
         }
       }
-
-      for (let i = 0; i < aryLength; i++) {
-        ary[i].then(function(result) {
+      function onsuccess(i) {
+        return function(result) {
           if (i === lastIdx) {
             lastResult = result;
             haveLastResult = true;
@@ -28,7 +27,10 @@ self.async = {
           if (completed === aryLength) {
             lastCompleted();
           }
-        }, function(err) {
+        }
+      }
+      function onfailure(i) {
+        return function(err) {
           if (i < firstErrorIdx) {
             firstError = err;
             firstErrorIdx = i;
@@ -37,7 +39,11 @@ self.async = {
           if (completed === aryLength) {
             lastCompleted();
           }
-        });
+        }
+      }
+
+      for (let i = 0; i < aryLength; i++) {
+        ary[i].then(onsuccess(i), onfailure(i));
       }
     });
   }

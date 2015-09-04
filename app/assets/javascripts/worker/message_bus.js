@@ -9,6 +9,6 @@ function intercept(request) {
   });
 }
 
-self.mbus = {
-  intercept
-};
+self.addEventListener('fetch', function(evt) {
+
+});
