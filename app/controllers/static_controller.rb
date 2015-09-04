@@ -117,7 +117,6 @@ class StaticController < ApplicationController
 
   end
 
-
   def cdn_asset
     path = File.expand_path(Rails.root + "public/assets/" + params[:path])
 
@@ -144,5 +143,4 @@ class StaticController < ApplicationController
     request.env['sendfile.type'] = ''
     send_file(path, opts)
   end
-
 end
