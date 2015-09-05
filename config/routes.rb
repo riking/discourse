@@ -524,6 +524,7 @@ Discourse::Application.routes.draw do
   get "exception" => "list#latest"
 
   get "message-bus/poll" => "message_bus#poll"
+  # get "message-bus/worker" => "message_bus#worker"
 
   get "draft" => "draft#show"
   post "draft" => "draft#update"

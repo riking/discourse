@@ -3,6 +3,9 @@
 const async = self.async,
   utils = self.utils;
 
+importScripts(
+  '/message-bus/worker.js');
+
 function refreshAllSiteData() {
   return async.allPromises(
     [
@@ -29,7 +32,6 @@ function refreshAllSiteData() {
 self.addEventListener('install', function(evt) {
   console.log('installing');
   self.Discourse = {};
-  self.MessageBusRegex = /^\/message-bus\/([0-9a-f]{32})\/poll\??$/;
 
   evt.waitUntil(async.allPromises(
     [
@@ -70,7 +72,9 @@ self.addEventListener('fetch', function(evt) {
   }
 
   if (path === '/srv/worker-test') {
-    console.log("Got request for worker-test");
+    console.log("Got /srv/worker-test");
     return evt.respondWith(new Response("true"));
+  } else if (path === '/message-bus/settings.json') {
+    console.log('Got /message-bus/settings (???)');
   }
 });

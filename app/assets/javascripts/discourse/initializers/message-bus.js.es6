@@ -22,6 +22,7 @@ export default {
     messageBus.alwaysLongPoll = Discourse.Environment === "development";
     messageBus.start();
 
+    // Make sure to update any changes in register-service-worker.js.es6
     messageBus.callbackInterval = siteSettings.anon_polling_interval;
     messageBus.backgroundCallbackInterval = siteSettings.background_polling_interval;
     messageBus.baseUrl = siteSettings.long_polling_base_url;
