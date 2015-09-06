@@ -37,7 +37,11 @@ self.addEventListener('install', function(evt) {
     [
       refreshAllSiteData(),
     ]
-  ).then(function() {console.log('Installed')}));
+  ).then(() => {
+      if (Discourse.Environment === "development") {
+        self.skipWaiting();
+      }
+  }).then(() => console.log('Installed')));
 });
 
 self.addEventListener('activate', function(evt) {

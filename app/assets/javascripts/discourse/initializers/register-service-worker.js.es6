@@ -47,7 +47,8 @@ export default {
       callbackInterval: messageBus.callbackInterval,
       backgroundCallbackInterval: messageBus.backgroundCallbackInterval,
       baseUrl: messageBus.baseUrl,
-      shared_session_key: $('meta[name=shared_session_key]').attr('content')
+      enableLongPolling: messageBus.enableLongPolling,
+      shared_session_key: $('meta[name=shared_session_key]').attr('content'),
     };
 
     Discourse.ajax(`${messageBus.baseUrl}message-bus/settings.json`, {
