@@ -28,16 +28,13 @@ function refreshAllSiteData() {
 
 self.addEventListener('install', function(evt) {
   console.log('installing');
-  self.Discourse = {};
 
-  evt.waitUntil(async.allPromises(
-    [
-      refreshAllSiteData(),
-    ]
-  ).then(() => {
-      if (Discourse.Environment === "development") {
-        self.skipWaiting();
-      }
+  evt.waitUntil(async.allPromises([
+    refreshAllSiteData(),
+  ]).then(() => {
+    if (Discourse.Environment === "development") {
+      return self.skipWaiting().then(self.clients.claim);
+    }
   }).then(() => console.log('Installed')));
 });
 

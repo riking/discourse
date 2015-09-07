@@ -4,7 +4,7 @@ require_dependency 'file_helper'
 class StaticController < ApplicationController
 
   skip_before_filter :check_xhr, :redirect_to_login_if_required
-  skip_before_filter :verify_authenticity_token, only: [:cdn_asset, :enter, :favicon]
+  skip_before_filter :verify_authenticity_token, :preload_json, only: [:cdn_asset, :enter, :favicon, :worker_asset]
 
   def show
     return redirect_to(path '/') if current_user && params[:id] == 'login'
@@ -146,10 +146,19 @@ class StaticController < ApplicationController
 
   def worker_asset
     response.headers["Service-Worker-Allowed"] = '/'
-    path = view_context.path_to_javascript('worker')
+    path = view_context.javascript_path('worker')
 
     response.content_type = 'application/javascript'
 
-    render text: "importScripts('#{path}')"
+    js = "importScripts('#{path}');\n"
+
+    if !Rails.env.production?
+      asset_root = File.join(Rails.root, 'app/assets/javascripts')
+      files = Dir.glob(File.join(asset_root, 'worker'))
+      files << File.join(asset_root, 'worker.js.erb')
+
+      js << "// last-modified #{files.map {|f| File.mtime(f)}.max};"
+    end
+    render text: js
   end
 end
