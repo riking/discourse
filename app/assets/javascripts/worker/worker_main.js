@@ -27,19 +27,22 @@ function refreshAllSiteData() {
 }
 
 self.addEventListener('install', function(evt) {
-  console.log('installing');
+  console.log('Installing...');
 
   evt.waitUntil(async.allPromises([
     refreshAllSiteData(),
   ]).then(() => {
     if (Discourse.Environment === "development") {
-      return self.skipWaiting().then(self.clients.claim);
+      return self.skipWaiting(); // test
     }
-  }).then(() => console.log('Installed')));
+  }).then(() => console.log('Installed.')));
 });
 
 self.addEventListener('activate', function(evt) {
-  console.log('Activating');
+  console.log('Activating...');
+  evt.waitUntil(async.allPromises([
+     self.clients.claim(), // TODO is this a good idea
+  ]).then(() => console.log('New ServiceWorker activated.')));
 });
 
 self.addEventListener('fetch', function(evt) {
