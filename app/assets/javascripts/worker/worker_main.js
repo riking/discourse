@@ -29,25 +29,27 @@ function refreshAllSiteData() {
 self.addEventListener('install', function(evt) {
   console.log('Installing...');
 
-  evt.waitUntil(async.allPromises([
+  const promises = [
     refreshAllSiteData(),
-    () => {
-      if (Discourse.Environment === "development") {
-        return self.skipWaiting(); // turn on in prod?
-      }
-    },
-  ]).then(() => console.log('Installed.')));
+  ];
+
+  if (Discourse.Environment === "development") {
+    //promises.push(self.skipWaiting()); // turn on in prod?
+  }
+  evt.waitUntil(async.allPromises(promises).then(() => console.log('Installed.')));
 });
 
 self.addEventListener('activate', function(evt) {
   console.log('Activating...');
-  evt.waitUntil(async.allPromises([
-    () => {
-      if (Discourse.Environment === "development") {
-        return self.clients.claim(); // turn on in prod?
-      }
-    }
-  ]).then(() => console.log('New ServiceWorker activated.')));
+
+  const promises = [
+  ];
+
+  if (Discourse.Environment === "development") {
+    // TODO does this do anything
+    //promises.push(self.clients.claim()); // turn on in prod?
+  }
+  evt.waitUntil(async.allPromises(promises).then(() => console.log('New ServiceWorker activated.')));
 });
 
 self.addEventListener('fetch', function(evt) {
@@ -56,10 +58,11 @@ self.addEventListener('fetch', function(evt) {
   // context: "internal"
   // credentials: "same-origin"
   // headers: {}
+  // integrity: ""
   // method: "GET"
   // mode: "no-cors"
-  // referrer: ""
-  // url: "https://discourse.example.com/"
+  // referrer: "https://discourse.example.com"
+  // url: "https://discourse.example.com/stylesheets/desktop-abcde1236873de.css"
   const request = evt.request,
     url = request.url,
     uri = utils.parseUri(url),
