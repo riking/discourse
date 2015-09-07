@@ -524,13 +524,13 @@ Discourse::Application.routes.draw do
   get "exception" => "list#latest"
 
   get "message-bus/poll" => "message_bus#poll"
-  # get "message-bus/worker" => "message_bus#worker"
 
   get "draft" => "draft#show"
   post "draft" => "draft#update"
   delete "draft" => "draft#destroy"
 
   get "cdn_asset/:site/*path" => "static#cdn_asset", format: false
+  get "worker" => "static#worker_asset", format: :js
 
   get "favicon/proxied" => "static#favicon", format: false
 

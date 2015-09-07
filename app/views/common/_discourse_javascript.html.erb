@@ -39,7 +39,6 @@
   Discourse.Environment = '<%= Rails.env %>';
   Discourse.SiteSettings = PreloadStore.get('siteSettings');
   Discourse.LetterAvatarVersion = '<%= LetterAvatar.version %>';
-  Discourse.WorkerUrl = '<%= path_to_javascript('worker') %>';
   I18n.defaultLocale = '<%= SiteSetting.default_locale %>';
   PreloadStore.get("customEmoji").forEach(function(emoji) {
     Discourse.Dialect.registerEmoji(emoji.name, emoji.url);

@@ -143,4 +143,13 @@ class StaticController < ApplicationController
     request.env['sendfile.type'] = ''
     send_file(path, opts)
   end
+
+  def worker_asset
+    response.headers["Service-Worker-Allowed"] = '/'
+    path = view_context.path_to_javascript('worker')
+
+    response.content_type = 'application/javascript'
+
+    render text: "importScripts('#{path}')"
+  end
 end

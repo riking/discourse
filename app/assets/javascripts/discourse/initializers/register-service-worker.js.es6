@@ -10,28 +10,30 @@ export default {
     }
 
     const messageBus = container.lookup('message-bus:main'),
-      siteSettings = container.lookup('site-settings:main');
+      siteSettings = container.lookup('site-settings:main'),
+      user = container.lookup('current-user:main');
 
-    const url = Discourse.WorkerUrl;
+    if (!user) {
+      // TODO some other way to clear variables on logout?
+      navigator.serviceWorker.getRegistration().then(function(reg) {
+        if (reg) {
+          reg.unregister();
+        }
+      });
+      return;
+    }
+
+    // TODO default Discourse.BaseUri to ''
+    const url = Discourse.BaseUri === '/' ? Discourse.BaseUri + '/worker.js' : '/worker.js';
     const self = this;
     const regPromise = navigator.serviceWorker.register(url, {
-      scope: Discourse.BaseUri
+      scope: Discourse.BaseUri || '/'
     });
 
     if (siteSettings.long_polling_base_url !== '/') {
-      let mbScriptUrl;
-      mbScriptUrl = `${siteSettings.long_polling_base_url}message-bus/worker.js`;
-
-      // TODO - DOMException: Failed to register a ServiceWorker: The origin of the provided scriptURL does not match the current origin
-      navigator.serviceWorker.register(mbScriptUrl, {
-        scope: `${siteSettings.long_polling_base_url}message-bus/`
-      }).then(function(reg) {
-        if (reg.active) {
-          self.sendMessageBusSettings(messageBus);
-        }
-      }).catch(function(err) {
-        console.error(err);
-      });
+      // too bad you don't get message bus multiplexing
+      console.info('Real-time update multiplexing is disabled due to long_polling_base_url being on a different domain.');
+      // so sad
     } else {
       regPromise.then(function(reg) {
         if (reg.active) {
@@ -48,7 +50,7 @@ export default {
       backgroundCallbackInterval: messageBus.backgroundCallbackInterval,
       baseUrl: messageBus.baseUrl,
       enableLongPolling: messageBus.enableLongPolling,
-      shared_session_key: $('meta[name=shared_session_key]').attr('content'),
+      // shared_session_key: $('meta[name=shared_session_key]').attr('content'),
     };
 
     Discourse.ajax(`${messageBus.baseUrl}message-bus/settings.json`, {
