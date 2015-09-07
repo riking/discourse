@@ -31,17 +31,22 @@ self.addEventListener('install', function(evt) {
 
   evt.waitUntil(async.allPromises([
     refreshAllSiteData(),
-  ]).then(() => {
-    if (Discourse.Environment === "development") {
-      return self.skipWaiting(); // test
-    }
-  }).then(() => console.log('Installed.')));
+    () => {
+      if (Discourse.Environment === "development") {
+        return self.skipWaiting(); // turn on in prod?
+      }
+    },
+  ]).then(() => console.log('Installed.')));
 });
 
 self.addEventListener('activate', function(evt) {
   console.log('Activating...');
   evt.waitUntil(async.allPromises([
-     self.clients.claim(), // TODO is this a good idea
+    () => {
+      if (Discourse.Environment === "development") {
+        return self.clients.claim(); // turn on in prod?
+      }
+    }
   ]).then(() => console.log('New ServiceWorker activated.')));
 });
 
