@@ -3,9 +3,6 @@
 const async = self.async,
   utils = self.utils;
 
-importScripts(
-  '/message-bus/worker.js');
-
 function refreshAllSiteData() {
   return async.allPromises(
     [
