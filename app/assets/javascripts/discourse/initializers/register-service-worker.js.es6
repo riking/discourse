@@ -14,12 +14,6 @@ export default {
       user = container.lookup('current-user:main');
 
     if (!user) {
-      // TODO some other way to clear variables on logout?
-      navigator.serviceWorker.getRegistration().then(function(reg) {
-        if (reg) {
-          reg.unregister();
-        }
-      });
       return;
     }
 
