@@ -31,7 +31,7 @@ export default {
     } else {
       regPromise.then(function(reg) {
         if (reg.active) {
-          self.sendMessageBusSettings(messageBus);
+          return self.sendMessageBusSettings(messageBus);
         }
       });
     }
