@@ -19,9 +19,30 @@ const ApplicationRoute = Discourse.Route.extend(OpenComposer, {
 
   actions: {
 
-    logout() {
+    logout(sessionAlreadyDestroyed) {
       if (this.currentUser) {
-        this.currentUser.destroySession().then(() => logout(this.siteSettings, this.keyValueStore));
+        let promise = Ember.RSVP.resolve();
+        if (!sessionAlreadyDestroyed) {
+          promise = promise.then(this.currentUser.destroySession());
+        }
+        promise.then(() => {
+          if (navigator && navigator.serviceWorker) {
+            return navigator.serviceWorker.getRegistration().then(function(reg) {
+              if (reg) {
+                reg.unregister();
+              }
+            });
+          }
+        }).then(() => {
+          this.keyValueStore.abandonLocal();
+        }).then(() => {
+          const redirect = this.siteSettings.logout_redirect;
+          if (Ember.isEmpty(redirect)) {
+            window.location.pathname = Discourse.getURL('/');
+          } else {
+            window.location.href = redirect;
+          }
+        });
       }
     },
 

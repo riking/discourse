@@ -1,5 +1,3 @@
-import logout from 'discourse/lib/logout';
-
 //  Subscribe to "logout" change events via the Message Bus
 export default {
   name: "logout",
@@ -7,14 +5,18 @@ export default {
 
   initialize: function (container) {
     const messageBus = container.lookup('message-bus:main');
-    const siteSettings = container.lookup('site-settings:main');
-    const keyValueStore = container.lookup('key-value-store:main');
+    const appRoute = container.lookup('route:application');
+    const sendAction = appRoute.send.bind(appRoute);
 
     if (!messageBus) { return; }
-    const callback = () => logout(siteSettings, keyValueStore);
+    const callback = () => sendAction('logout', true);
 
-    messageBus.subscribe("/logout", function () {
+    messageBus.subscribe("/logout", () => {
       bootbox.dialog(I18n.t("logout"), {label: I18n.t("refresh"), callback}, {onEscape: callback, backdrop: 'static'});
+      setTimeout(() => {
+        bootbox.hideAll();
+        callback();
+      }, 5000 + 5000 * Math.random());
     });
   }
 };
