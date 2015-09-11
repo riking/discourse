@@ -1,5 +1,4 @@
 import { setting } from 'discourse/lib/computed';
-import logout from 'discourse/lib/logout';
 import showModal from 'discourse/lib/show-modal';
 import OpenComposer from "discourse/mixins/open-composer";
 import Category from 'discourse/models/category';
