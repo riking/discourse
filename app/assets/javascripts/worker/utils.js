@@ -43,14 +43,14 @@ function cloneHeaders(old) {
 }
 
 function resolve(val) {
-  return new Promise(function(resolve) {
-    resolve(val);
+  return new Promise(function(res) {
+    res(val);
   });
 }
 
 function reject(val) {
-  return new Promise(function(_, reject) {
-    reject(val);
+  return new Promise(function(_, rej) {
+    rej(val);
   });
 }
 
