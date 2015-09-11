@@ -318,9 +318,11 @@ const ComposerView = Ember.View.extend(Ember.Evented, {
     this.messageBus.subscribe("/uploads/composer", upload => {
       if (!cancelledByTheUser) {
         if (upload && upload.url) {
-          const old = Discourse.Utilities.getUploadPlaceholder(upload.original_filename),
-                markdown = Discourse.Utilities.getUploadMarkdown(upload);
-          this.replaceMarkdown(old, markdown);
+          if (upload.client_id === this.messageBus.clientId) {
+            const old = Discourse.Utilities.getUploadPlaceholder(upload.original_filename),
+              markdown = Discourse.Utilities.getUploadMarkdown(upload);
+            this.replaceMarkdown(old, markdown);
+          }
         } else {
           Discourse.Utilities.displayErrorForUpload(upload);
         }

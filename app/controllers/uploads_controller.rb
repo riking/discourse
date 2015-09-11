@@ -18,7 +18,9 @@ class UploadsController < ApplicationController
     else
       Scheduler::Defer.later("Create Upload") do
         data = create_upload(type, file, url)
-        MessageBus.publish("/uploads/#{type}", data.as_json, client_ids: [client_id])
+        json = data.as_json
+        json[:client_id] = client_id
+        MessageBus.publish("/uploads/#{type}", json, client_ids: [client_id])
       end
       render json: success_json
     end
