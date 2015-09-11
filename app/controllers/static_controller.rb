@@ -153,11 +153,7 @@ class StaticController < ApplicationController
     js = "importScripts('#{path}');\n"
 
     if !Rails.env.production?
-      asset_root = File.join(Rails.root, 'app/assets/javascripts')
-      files = Dir.glob(File.join(asset_root, 'worker'))
-      files << File.join(asset_root, 'worker.js.erb')
-
-      js << "// last-modified #{files.map {|f| File.mtime(f)}.max};"
+      js << "// last-modified #{Rails.application.assets['worker'].mtime};"
     end
     render text: js
   end

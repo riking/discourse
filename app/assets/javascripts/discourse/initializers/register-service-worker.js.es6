@@ -31,19 +31,20 @@ export default {
     } else {
       regPromise.then(function(reg) {
         if (reg.active) {
-          return self.sendMessageBusSettings(messageBus);
+          return self.sendMessageBusSettings(messageBus, siteSettings);
         }
       });
     }
   },
 
-  sendMessageBusSettings(messageBus) {
+  sendMessageBusSettings(messageBus, siteSettings) {
     const data = {
       alwaysLongPoll: messageBus.alwaysLongPoll,
       callbackInterval: messageBus.callbackInterval,
       backgroundCallbackInterval: messageBus.backgroundCallbackInterval,
       baseUrl: messageBus.baseUrl,
       enableLongPolling: messageBus.enableLongPolling,
+      long_polling_interval: siteSettings.long_polling_interval,
       // shared_session_key: $('meta[name=shared_session_key]').attr('content'),
     };
 

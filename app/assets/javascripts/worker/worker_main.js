@@ -34,7 +34,7 @@ self.addEventListener('install', function(evt) {
   ];
 
   if (Discourse.Environment === "development") {
-    //promises.push(self.skipWaiting()); // turn on in prod?
+    promises.push(self.skipWaiting()); // turn on in prod?
   }
   evt.waitUntil(async.allPromises(promises).then(() => console.log('Installed.')));
 });
@@ -47,7 +47,7 @@ self.addEventListener('activate', function(evt) {
 
   if (Discourse.Environment === "development") {
     // TODO does this do anything
-    //promises.push(self.clients.claim()); // turn on in prod?
+    promises.push(self.clients.claim()); // turn on in prod?
   }
   evt.waitUntil(async.allPromises(promises).then(() => console.log('New ServiceWorker activated.')));
 });
