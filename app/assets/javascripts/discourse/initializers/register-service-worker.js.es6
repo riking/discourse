@@ -23,16 +23,16 @@ export default {
       return;
     }
 
-    // TODO default Discourse.BaseUri to ''
-    const url = Discourse.BaseUri === '/' ? Discourse.BaseUri + '/worker.js' : '/worker.js';
+    const BaseUri = Discourse.BaseUri === '/' ? '' : Discourse.BaseUri;
+    const url = BaseUri + '/worker.js';
     const self = this;
     const regPromise = navigator.serviceWorker.register(url, {
-      scope: Discourse.BaseUri || '/'
+      scope: BaseUri + '/'
     });
 
     if (siteSettings.long_polling_base_url !== '/') {
       // too bad you don't get message bus multiplexing
-      console.info('Real-time update multiplexing is disabled due to long_polling_base_url being on a different domain.');
+      console.info('Message bus multiplexing is disabled due to long_polling_base_url being on a different domain.');
       // so sad
     } else {
       regPromise.then(function(reg) {
