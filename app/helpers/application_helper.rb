@@ -147,6 +147,18 @@ module ApplicationHelper
     result
   end
 
+  def self.LD_SCHEMA_BASE
+    @ld_schema_base ||= {
+      '@context'.freeze => 'http://schema.org'.freeze,
+      '@type'.freeze => nil,
+
+    }
+  end
+
+  def topic_ld_schema(topic_view)
+
+  end
+
   # Look up site content for a key. If the key is blank, you can supply a block and that
   # will be rendered instead.
   def markdown_content(key, replacements=nil)

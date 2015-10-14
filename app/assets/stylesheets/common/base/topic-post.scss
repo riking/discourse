@@ -59,7 +59,11 @@ aside.quote {
     padding: 12px 12px 1px 12px;
     // blockquote is underneath this and has top margin
     .avatar { margin-right: 7px; }
-    img { margin-top: -4px; }
+    @if $amp == 1 {
+      amp-img { margin-top: -4px; }
+    } @else {
+      img { margin-top: -4px; }
+    }
     @include unselectable;
   }
 
@@ -198,11 +202,20 @@ kbd
 
 // we assume blockquotes have their own margins, so all blockquotes
 // will remove margins from first (top) and last (bottom) child elements
-blockquote > *:first-child {
-  margin-top: 0 !important;
-}
-blockquote > *:last-child {
-  margin-bottom: 0 !important;
+@if $amp == 1 {
+  blockquote > *:first-child {
+    margin-top: 0;
+  }
+  blockquote > *:last-child {
+    margin-bottom: 0;
+  }
+} @else {
+  blockquote > *:first-child {
+    margin-top: 0 !important;
+  }
+  blockquote > *:last-child {
+    margin-bottom: 0 !important;
+  }
 }
 
 .gap {

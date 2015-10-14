@@ -10,5 +10,7 @@
 <link rel="icon" sizes="144x144" href="<%=SiteSetting.apple_touch_icon_url%>">
 <%- end %>
 <meta name="theme-color" content="#<%= ColorScheme.hex_for_name('header_background') %>">
+<%- unless @amp_layout %>
 <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+<%- end %>
 <%= canonical_link_tag %>

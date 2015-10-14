@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html amp>
+<% @amp_layout = true %>
+<head>
+  <meta charset="utf-8">
+  <title><%= @topic_view.topic.title %></title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,minimal-ui">
+  <script type="application/ld+json">
+    <%= MultiJson.dump(topic_ld_schema(@topic_view)) %>
+  </script>
+  <%= crawlable_meta_data(title: @topic_view.title,
+                          description: @topic_view.summary,
+                          image: @topic_view.image_url) %>
+  <style>body {opacity: 0}</style><noscript><style>body {opacity: 1}</style></noscript>
+  <script async src="https://cdn.ampproject.org/v0.js"></script>
+  <%= render partial: "layouts/head" %>
+
+  <%= amp_render_extended_components %>
+
+  <style amp-custom><%= DiscourseStylesheets.inline_style_content :amp %></style>
+</head>
+<body>
+  <header class="d-header">
+    <div class="wrap">
+      <div class="contents clearfix">
+        <a href="<%= path "/" %>" class="home-logo">
+          <%- if application_logo_url.present? %>
+            <%# TODO calculate the logo width %>
+            <amp-img src="<%= application_logo_url %>" alt="<%= SiteSetting.title %>" id="site-logo" layout="fixed" height="40" width="150"></amp-img>
+          <%- else %>
+            <h2 id='site-text-logo'><%= SiteSetting.title %></h2>
+          <%- end %>
+        </a>
+        <% if current_user %>
+          <a href="<%= no_amp_url %>" class="return-link">
+            <amp-img src="<%= current_user.avatar_url_for(32) %>" width="32" height="32"></amp-img>
+          </a>
+        <% end %>
+        <div class="clearfix"></div>
+      </div>
+    </div>
+  </header>
+  <div id="main-outlet" class="wrap">
+    <%= yield %>
+  </div>
+  <footer class="wrap">
+    <nav itemscope itemtype='http://schema.org/SiteNavigationElement'>
+      <a href='<%= path "/" %>'><%= t 'home_title' %></a>
+      <%= link_to t('js.filters.categories.title'), main_app.categories_path %>
+      <%= link_to t('guidelines_topic.title'), main_app.guidelines_path %>
+      <%= link_to t('tos_topic.title'), main_app.tos_path %>
+      <%= link_to t('privacy_topic.title'), main_app.privacy_path %>
+    </nav>
+    <p><%= t 'powered_by_html' %></p>
+  </footer>
+</body>
+</html>

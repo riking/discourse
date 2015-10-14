@@ -186,6 +186,9 @@ basic:
     client: true
     default: false
 
+  use_amp_html:
+    default: false
+
   show_subcategory_list:
     default: false
     client: true

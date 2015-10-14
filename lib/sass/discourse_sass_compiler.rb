@@ -51,13 +51,13 @@ class DiscourseSassCompiler
     pathname = Pathname.new("app/assets/stylesheets/#{@target}.scss")
     context = env.context_class.new(env, "#{@target}.scss", pathname)
 
-    debug_opts = Rails.env.production? ? {} : {
+    debug_opts = (Rails.env.production? || opts[:devel_minify]) ? {} : {
       line_numbers: true,
       # debug_info: true, # great with Firebug + FireSass, but not helpful elsewhere
       style: :expanded
     }
 
-    css = ::Sass::Engine.new(@scss, {
+    engine = ::Sass::Engine.new(@scss, {
       syntax: :scss,
       cache: false,
       read_cache: false,
@@ -67,9 +67,13 @@ class DiscourseSassCompiler
         context: context,
         environment: context.environment
       }
-    }.merge(debug_opts)).render
+    }.merge(debug_opts))
 
-    css_output = css
+    if opts[:devel_minify]
+      engine.options[:style] = :compressed # force override to compressed
+    end
+
+    css_output = engine.render
     if opts[:rtl]
       begin
         require 'r2'

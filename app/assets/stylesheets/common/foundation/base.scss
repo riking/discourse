@@ -70,8 +70,14 @@ li {
 // Embedded content
 // --------------------------------------------------
 
-img {
-  vertical-align: middle;
+@if $amp == 1 {
+  amp-img {
+    vertical-align: middle;
+  }
+} @else {
+  img {
+    vertical-align: middle;
+  }
 }
 
 // Forms

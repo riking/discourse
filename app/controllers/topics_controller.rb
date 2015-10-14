@@ -51,7 +51,13 @@ class TopicsController < ApplicationController
     opts = params.slice(:username_filters, :filter, :page, :post_number, :show_deleted)
     username_filters = opts[:username_filters]
 
-    opts[:slow_platform] = true if slow_platform?
+    # Translate post numbers into pages if lightweight view
+    if params.key?(:amp) && (params[:post_number].to_i % TopicView.chunk_size) == 1
+      opts.delete(:post_number)
+      opts[:page] = params[:page] = ((params[:post_number].to_i - 1) / TopicView.chunk_size) + 1
+    end
+
+    opts[:slow_platform] = true if slow_platform? && !params.key?(:amp)
     opts[:username_filters] = username_filters.split(',') if username_filters.is_a?(String)
 
     begin
@@ -520,7 +526,16 @@ class TopicsController < ApplicationController
       format.html do
         @description_meta = @topic_view.topic.excerpt
         store_preloaded("topic_#{@topic_view.topic.id}", MultiJson.dump(topic_view_serializer))
-        render :show
+        if plain_html_requested?
+          if SiteSetting.use_amp_html
+            Rack::MiniProfiler.current.inject_js = false
+            render :amp, layout: 'amp_topic'
+          else
+            render :show, layout: 'crawler'
+          end
+        else
+          render :show
+        end
       end
 
       format.json do

@@ -50,8 +50,12 @@ class ApplicationController < ActionController::Base
     SiteSetting.enable_escaped_fragments? && params.key?("_escaped_fragment_")
   end
 
+  def plain_html_requested?
+    params.key?("nojs") || params.key?("amp")
+  end
+
   def use_crawler_layout?
-    @use_crawler_layout ||= (has_escaped_fragment? || CrawlerDetection.crawler?(request.user_agent))
+    @use_crawler_layout ||= (has_escaped_fragment? || plain_html_requested? || CrawlerDetection.crawler?(request.user_agent))
   end
 
   def add_readonly_header

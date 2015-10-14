@@ -27,6 +27,7 @@ en:
       short: "%m-%d-%Y"
       short_no_year: "%B %-d"
       date_only: "%B %-d, %Y"
+      full_with_year: "%B %-d, %Y %-I:%M%P"
   date:
     <<: *datetime
   time:
@@ -167,6 +168,7 @@ en:
   is_invalid: "is invalid; try to be a little more descriptive"
   next_page: "next page →"
   prev_page: "← previous page"
+  to_paged_at: "Enter Paged View at post %{post_number}"
   page_num: "Page %{num}"
   home_title: "Home"
   topics_in_category: "Topics in the '%{category}' category"
@@ -810,6 +812,7 @@ en:
     max_image_width: "Maximum thumbnail width of images in a post"
     max_image_height: "Maximum thumbnail height of images in a post"
     category_featured_topics: "Number of topics displayed per category on the /categories page. After changing this value, it takes up to 15 minutes for the categories page to update."
+    use_amp_html: "Enable the display of AMP HTML pages. (EXPERIMENTAL)"
     show_subcategory_list: "Show subcategory list instead of topic list when entering a category."
     fixed_category_positions: "If checked, you will be able to arrange categories into a fixed order. If unchecked, categories are listed in order of activity."
     fixed_category_positions_on_create: "If checked, category ordering will be maintained on topic creation dialog (requires fixed_category_positions)."

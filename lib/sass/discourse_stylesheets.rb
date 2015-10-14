@@ -32,6 +32,25 @@ class DiscourseStylesheets
     end
   end
 
+  def self.inline_style_content(target = :amp)
+    html = cache["#{target}_inline"]
+    return html.dup.html_safe if html
+
+    @lock.synchronize do
+      builder = self.new(target)
+      builder.compile(devel_minify: true)
+      builder.ensure_digestless_file
+      if target == :amp
+        raise "AMP stylesheet too large!" if File.size?(builder.stylesheet_fullpath) > 50000
+      end
+      html = File.read(builder.stylesheet_fullpath)
+
+      cache[target] = html
+
+      html.dup.html_safe
+    end
+  end
+
   def self.compile(target = :desktop, opts={})
     @lock.synchronize do
       FileUtils.rm(MANIFEST_FULL_PATH, force: true) if opts[:force]
@@ -94,7 +113,7 @@ class DiscourseStylesheets
     scss = File.read("#{Rails.root}/app/assets/stylesheets/#{@target}.scss")
     rtl = @target.to_s =~ /_rtl$/
     css = begin
-      DiscourseSassCompiler.compile(scss, @target, rtl: rtl)
+      DiscourseSassCompiler.compile(scss, @target, opts.merge({rtl: rtl}))
     rescue Sass::SyntaxError => e
       Rails.logger.error "Stylesheet failed to compile for '#{@target}'! Recompiling without plugins and theming."
       Rails.logger.error e.sass_backtrace_str("#{@target} stylesheet")

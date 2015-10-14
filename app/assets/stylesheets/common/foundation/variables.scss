@@ -9,6 +9,10 @@ $small-width: 800px !default;
 $medium-width: 995px !default;
 $large-width: 1110px !default;
 
+$topic-body-width: 690px;
+$topic-body-width-padding: 11px;
+$topic-avatar-width: 45px;
+
 // Brand color variables
 // --------------------------------------------------
 
@@ -31,6 +35,10 @@ $base-font-family: Helvetica, Arial, sans-serif !default;
 @import "theme_variables";
 @import "plugins_variables";
 @import "common/foundation/math";
+
+// Flag for whether this is an AMP stylesheet
+// use as: @if $amp != 1 { width: 45px; }
+$amp: 0 !default;
 
 // Color Utilities
 

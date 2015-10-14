@@ -41,8 +41,10 @@ a.loading-onebox {
   .onebox-result-body {
     padding-top: 5px;
     img {
-      max-height: 80%;
-      max-width: 25%;
+      @if $amp != 1 {
+        max-height: 80%;
+        max-width: 25%;
+      }
       height: auto;
       float: left;
       margin-right: 10px;
@@ -128,21 +130,30 @@ aside.onebox {
       color: dark-light-choose(scale-color($tertiary, $lightness: -20%), $tertiary);
     }
 
-    img {
-      max-height: 80%;
-      max-width: 20%;
-      height: auto;
-      float: left;
-      margin-right: 10px;
+    @if $amp == 1 {
+      amp-img {
+        float: left;
+        margin-right: 10px;
+      }
+    } @else {
+      img {
+        max-height: 80%;
+        max-width: 20%;
+        height: auto;
+        float: left;
+        margin-right: 10px;
+      }
     }
   }
 }
 
 aside.onebox .onebox-body .onebox-avatar {
-  max-height: none;
-  max-width: none;
-  height: 90px;
-  width: 90px;
+  @if $amp != 1 {
+    max-height: none;
+    max-width: none;
+    height: 90px;
+    width: 90px;
+  }
 }
 
 blockquote {

@@ -22,7 +22,7 @@ class Onebox::Engine::YoutubeOnebox
       video_height = (params['height'] && params['height'].to_i <= 500) ? params['height'] : 270 # embed height
 
       # Put in the LazyYT div instead of the iframe
-      "<div class=\"lazyYT\" data-youtube-id=\"#{video_id}\" data-youtube-title=\"#{video_title}\" data-width=\"#{video_width}\" data-height=\"#{video_height}\" data-parameters=\"#{embed_params}\"></div>"
+      "<div class=\"lazyYT\" data-youtube-id=\"#{video_id}\" data-youtube-title=\"#{ERB::Util.html_escape(video_title)}\" data-width=\"#{video_width}\" data-height=\"#{video_height}\" data-parameters=\"#{embed_params}\"><a href=\"https://youtu.be/#{v}\"</div>"
     else
       yt_onebox_to_html
     end
@@ -44,6 +44,12 @@ after_initialize do
         # If the URL is weird, remove it
         i.remove
       end
+    end
+  end
+
+  AmpHelper.register_plugin_style do |fragment|
+    fragment.css('.lazyYT').each do |i|
+      i.inner_html = "<amp-youtube video-id='#{i['data-youtube-id']}' width=#{i['data-width']} height=#{i['data-height']}></amp-youtube>"
     end
   end
 end

@@ -1,0 +1,93 @@
+// The compiled form of this file may be no larger than 50,000 bytes.
+// If it is, the compiler will throw an error
+
+@import "common/foundation/variables";
+$amp: 1;
+
+@import "common/foundation/mixins";
+
+@import "vendor/font_awesome/_variables";
+@import "common/components/buttons";
+@import "common/foundation/base";
+@import "common/base/onebox";
+@import "common/base/topic-post";
+
+.d-header {
+  width: 100%;
+  background-color: $header_background;
+  box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.25);
+  z-index: 1000;
+  padding-top: 3px;
+  height: 60px;
+}
+.wrap {
+  margin-left:auto;
+  margin-right:auto;
+  padding:0 8px;
+  max-width: $topic-body-width;
+}
+.clearfix, hr {
+  clear:both;
+}
+.cooked {
+  max-width: $topic-body-width;
+}
+footer {
+  margin-top: 30px;
+  nav a {
+    margin-right: 10px;
+  }
+}
+header {
+  .return-link {
+    float: right;
+    margin-top: 5px;
+    amp-img {
+      display: inline-block;
+    }
+  }
+  .home-logo {
+    float:left;
+  }
+  .contents {
+    margin-top: 5px;
+  }
+}
+
+@media (min-width: $topic-body-width + 150px) {
+  .byline time, .byline .post-num {
+    float:right;
+  }
+  .byline time {
+    margin-left: 10px;
+  }
+}
+
+blockquote {
+  @include post-aside;
+  margin-left:0; margin-right: 0; padding: 12px;
+}
+
+blockquote > *:first-child {
+  margin-top: 0;
+}
+blockquote > *:last-child {
+  margin-bottom: 0;
+}
+amp-img {
+  vertical-align: middle;
+}
+
+// ab
+
+/*
+header{margin-bottom: 15px;}
+.d-header #site-logo {max-height: 40px;}
+.d-header .contents.clearfix{margin: 8px 0;}
+.wrap {max-width: 1110px;}
+aside.quote{margin:1em 0;}
+aside.quote .title,blockquote,.onebox-result,aside.onebox {
+  @include post-aside;
+}
+
+*/

@@ -1,0 +1,129 @@
+<%
+   show_names = SiteSetting.display_name_on_posts && SiteSetting.enable_names?
+   topic = @topic_view.topic
+%>
+<div itemscope itemtype="https://schema.org/DiscussionForumPosting">
+  <h1 itemprop="headline">
+    <%= render_topic_title(topic) %>
+  </h1>
+  <meta itemprop="datePublished" content="<%= topic.created_at.to_formatted_s(:iso8601) %>">
+  <div itemprop="author" itemscope itemtype="https://schema.org/Person">
+    <% begin %>
+      <% u = topic.user %>
+      <meta itemprop="image" content="<%= u.tiny_avatar_url %>">
+      <meta itemprop="url" content="<%= Discourse.base_uri %>/users/<%= u.username_lower %>">
+      <meta itemprop="name" content="<%= u.username_lower %>">
+      <% if show_names && !u.name.blank? %>
+        <meta itemprop="alternateName" content="<%= u.name %>">
+      <% end %>
+    <% end %>
+  </div>
+  <meta itemprop="image" content="<%= UrlHelper.absolute (topic.image_url.presence || SiteSetting.logo_small_url) %>">
+  <meta itemprop="pageStart" content="1">
+  <meta itemprop="pageEnd" content="<%= topic.highest_post_number %>">
+  <meta itemprop="pagination" content="<%= @topic_view.posts.first.post_number %>-<%= @topic_view.posts.last.post_number %>">
+
+  <%= server_plugin_outlet "topic_header" %>
+  <hr>
+
+<div class="container posts">
+<section class="topic-area" data-topic-id="<%= topic.id %>">
+  <div id="top"></div>
+  <% @topic_view.posts.each do |post| %>
+    <article itemprop="comment" itemscope itemtype='https://schema.org/Comment' class="nojs-post" id="post-<%= topic.id %>-<%= post.post_number %>" data-post-id="<%= post.id %>" data-user-id="<%= post.user_id %>">
+      <meta itemprop="url" content="<%= topic.url(post.post_number) %>">
+      <% if (u = post.user) %>
+        <div class="topic-body">
+
+        <div class='byline'>
+          <span itemprop="author" itemscope itemtype="https://schema.org/Person">
+            <amp-img itemprop="image" srcset="<%= u.tiny_avatar_url %> 1x, <%= u.small_avatar_url %> 2x" width=20 height=20></amp-img>
+            <meta itemprop="image" content="<%= u.small_avatar_url %>">
+            <a itemprop="url" href='<%= Discourse.base_uri %>/users/<%= u.username_lower %>'><b itemprop='name'><%= u.username %></b></a>
+            <% if (show_names && !u.name.blank?) %>
+              (<span itemprop="alternateName"><%= u.name %></span>)
+            <% end %>
+          </span>
+          <time datetime='<%= post.created_at.to_formatted_s(:iso8601) %>' itemprop='datePublished'>
+            <%= smart_time post.created_at %>
+          </time>
+          <span itemprop='position' class="post-num">#<%= post.post_number %></span>
+        </div>
+        <div class='post' itemprop='text'>
+          <% if post.hidden %>
+            <%= t('flagging.user_must_edit').html_safe %>
+          <% elsif post.post_type == Post.types[:small_action] %>
+            <i><%= t("js.action_codes.#{post.action_code}", when: distance_of_time_in_words(post.created_at, Time.zone.now, scope: :'datetime.distance_in_words_verbose')) %></i>
+          <% else %>
+            <div class="cooked">
+              <%= ampify_post post.cooked.html_safe %>
+            </div>
+          <% end %>
+        </div>
+        <meta itemprop='upvoteCount' content='<%= post.like_count %>'>
+        <meta itemprop='interactionCount' content='UserComments:<%= post.reply_count %>'>
+        </div>
+        <hr>
+      <% end %>
+    </article>
+  <% end %>
+  <div id="bottom"></div>
+</section>
+</div>
+</div>
+<div class="clearfix"></div>
+<%
+   have_before = @topic_view.posts.first.post_number > 1
+   have_after = @topic_view.last_post.post_number < @topic_view.highest_post_number
+
+   if @topic_view.page_off_alignment
+     have_before = false
+     have_after = false
+   else
+     page_num = @topic_view.this_page
+   end
+%>
+<% if have_before || have_after || @topic_view.page_off_alignment %>
+  <div role='navigation' itemscope itemtype='http://schema.org/SiteNavigationElement' class="page-nav">
+    <% if @topic_view.page_off_alignment %>
+      <span itemprop='url' class="next">
+        <%
+           target_num = ((@topic_view.this_page_unchecked - 1) * @topic_view.chunk_size) + 1
+           anchor_num = @topic_view.last_post.post_number
+         %>
+        <a class="btn btn-primary" href="<%= topic.relative_url(target_num) %>?amp#post-<%= topic.id %>-<%= anchor_num %>"
+          rel="next" itemprop="name"><%= t(:to_paged_at, post_number: anchor_num) %></a>
+      </span>
+    <% end %>
+    <% if have_before %>
+      <span itemprop='url' class="prev">
+        <%
+           target_page = page_num - 1
+           target_page = 1 if target_page < 1
+           target_num = ((target_page - 1) * @topic_view.chunk_size) + 1
+         %>
+        <a class="btn" href="<%= topic.relative_url(target_num) %>?amp#bottom"
+           rel="next" itemprop="name"><%= t(:prev_page) %></a>
+      </span>
+    <% end %>
+    <% if have_after %>
+      <%
+         target_page = page_num + 1
+         target_num = ((target_page - 1) * @topic_view.chunk_size) + 1
+      %>
+      <span itemprop='url' class="next">
+        <a class="btn btn-primary" href="<%= topic.relative_url(target_num) %>?amp#top"
+        rel="next" itemprop="name"><%= t(:next_page) %></a>
+      </span>
+    <% end %>
+  </div>
+<% end %>
+
+<% content_for :head do %>
+  <%= auto_discovery_link_tag(@topic_view, {action: :feed, slug: topic.slug, topic_id: topic.id}, title: t('rss_posts_in_topic', topic: @topic_view.title), type: 'application/rss+xml') %>
+  <%= crawlable_meta_data(title: @topic_view.title,
+                          description: @topic_view.summary,
+                          image: @topic_view.image_url) %>
+<% end %>
+
+<% content_for(:title) { "#{@topic_view.page_title}" } %>

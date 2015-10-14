@@ -438,8 +438,17 @@ class User < ActiveRecord::Base
   # This is used in
   #   - self oneboxes in open graph data
   #   - emails
+  #   - AMP views
+  def avatar_url_for(size)
+    avatar_template_url.gsub('{size}', size.to_s)
+  end
+
+  def tiny_avatar_url
+    avatar_url_for('20'.freeze)
+  end
+
   def small_avatar_url
-    avatar_template_url.gsub("{size}", "45")
+    avatar_url_for('45'.freeze)
   end
 
   def avatar_template_url

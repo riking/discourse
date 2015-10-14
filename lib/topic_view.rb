@@ -5,7 +5,7 @@ require_dependency 'gaps'
 
 class TopicView
 
-  attr_reader :topic, :posts, :guardian, :filtered_posts, :chunk_size
+  attr_reader :topic, :posts, :guardian, :filtered_posts, :chunk_size, :page_off_alignment
   attr_accessor :draft, :draft_key, :draft_sequence, :user_custom_fields, :post_custom_fields
 
   def self.slow_chunk_size
@@ -38,12 +38,20 @@ class TopicView
       self.instance_variable_set("@#{key}".to_sym, value)
     end
 
+    @chunk_size = options[:slow_platform] ? TopicView.slow_chunk_size : TopicView.chunk_size
+    @limit ||= @chunk_size
+
     # work around people somehow sending in arrays,
     # arrays are not supported
     @page = @page.to_i rescue 1
-    @page = 1 if @page.zero?
-    @chunk_size = options[:slow_platform] ? TopicView.slow_chunk_size : TopicView.chunk_size
-    @limit ||= @chunk_size
+    if @page.zero?
+      if options[:post_number]
+        @page = ((options[:post_number].to_i - 1) / @chunk_size) + 1
+        @page_off_alignment = true
+      else
+        @page = 1
+      end
+    end
 
     setup_filtered_posts
 
@@ -101,6 +109,14 @@ class TopicView
     else
       nil
     end
+  end
+
+  def this_page
+    @page unless @page_off_alignment
+  end
+
+  def this_page_unchecked
+    @page
   end
 
   def next_page
