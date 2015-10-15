@@ -3,9 +3,16 @@
    topic = @topic_view.topic
 %>
 <div itemscope itemtype="https://schema.org/DiscussionForumPosting">
-  <h1 itemprop="headline">
-    <%= render_topic_title(topic) %>
-  </h1>
+  <div id="topic-title">
+    <div class="title-wrapper">
+      <h1>
+        <%= render_topic_status(@topic_view) %>
+        <span class="fancy-title">
+          <%= render_topic_title(topic) %>
+        </span>
+      </h1>
+    </div>
+  </div>
   <meta itemprop="datePublished" content="<%= topic.created_at.to_formatted_s(:iso8601) %>">
   <div itemprop="author" itemscope itemtype="https://schema.org/Person">
     <% begin %>
@@ -33,11 +40,15 @@
     <article itemprop="comment" itemscope itemtype='https://schema.org/Comment' class="nojs-post" id="post-<%= topic.id %>-<%= post.post_number %>" data-post-id="<%= post.id %>" data-user-id="<%= post.user_id %>">
       <meta itemprop="url" content="<%= topic.url(post.post_number) %>">
       <% if (u = post.user) %>
+        <div class="topic-avatar av-left">
+          <amp-img itemprop="image" src="<%= u.small_avatar_url %>" width=45 height=45></amp-img>
+        </div>
         <div class="topic-body">
-
         <div class='byline'>
           <span itemprop="author" itemscope itemtype="https://schema.org/Person">
-            <amp-img itemprop="image" srcset="<%= u.tiny_avatar_url %> 1x, <%= u.small_avatar_url %> 2x" width=20 height=20></amp-img>
+            <span class="av-byline">
+              <amp-img itemprop="image" src="<%= u.small_avatar_url %>" width=20 height=20></amp-img>
+            </span>
             <meta itemprop="image" content="<%= u.small_avatar_url %>">
             <a itemprop="url" href='<%= Discourse.base_uri %>/users/<%= u.username_lower %>'><b itemprop='name'><%= u.username %></b></a>
             <% if (show_names && !u.name.blank?) %>
@@ -51,18 +62,19 @@
         </div>
         <div class='post' itemprop='text'>
           <% if post.hidden %>
-            <%= t('flagging.user_must_edit').html_safe %>
+            <p><%= t('flagging.user_must_edit').html_safe %></p>
           <% elsif post.post_type == Post.types[:small_action] %>
-            <i><%= t("js.action_codes.#{post.action_code}", when: distance_of_time_in_words(post.created_at, Time.zone.now, scope: :'datetime.distance_in_words_verbose')) %></i>
+            <p><i class="fa fa-<%= small_actions_icons[post.action_code] %>"></i> <em><%= t("js.action_codes.#{post.action_code}", when: distance_of_time_in_words(post.created_at, Time.zone.now, scope: :'datetime.distance_in_words_verbose')) %></em></p>
           <% else %>
             <div class="cooked">
-              <%= ampify_post post.cooked.html_safe %>
+              <%= ampify_post post.cooked.html_safe, first_post: @topic_view.posts.first == post %>
             </div>
           <% end %>
         </div>
         <meta itemprop='upvoteCount' content='<%= post.like_count %>'>
         <meta itemprop='interactionCount' content='UserComments:<%= post.reply_count %>'>
         </div>
+        <div class="gutter"></div>
         <hr>
       <% end %>
     </article>
@@ -85,13 +97,13 @@
 %>
 <% if have_before || have_after || @topic_view.page_off_alignment %>
   <div role='navigation' itemscope itemtype='http://schema.org/SiteNavigationElement' class="page-nav">
-    <% if @topic_view.page_off_alignment %>
+    <% if @topic_view.page_off_alignment && @topic_view.filtered_post_ids.length > @topic_view.chunk_size %>
       <span itemprop='url' class="next">
         <%
-           target_num = ((@topic_view.this_page_unchecked - 1) * @topic_view.chunk_size) + 1
+           target_page = @topic_view.this_page_unchecked
            anchor_num = @topic_view.last_post.post_number
          %>
-        <a class="btn btn-primary" href="<%= topic.relative_url(target_num) %>?amp#post-<%= topic.id %>-<%= anchor_num %>"
+        <a class="btn btn-primary" href="<%= topic.relative_url %>?amp&page=<%= target_page %>#post-<%= topic.id %>-<%= anchor_num %>"
           rel="next" itemprop="name"><%= t(:to_paged_at, post_number: anchor_num) %></a>
       </span>
     <% end %>
@@ -100,30 +112,33 @@
         <%
            target_page = page_num - 1
            target_page = 1 if target_page < 1
-           target_num = ((target_page - 1) * @topic_view.chunk_size) + 1
+           # target_num = ((target_page - 1) * @topic_view.chunk_size) + 1
          %>
-        <a class="btn" href="<%= topic.relative_url(target_num) %>?amp#bottom"
+        <a class="btn" href="<%= topic.relative_url %>?amp&page=<%= target_page %>#bottom"
            rel="next" itemprop="name"><%= t(:prev_page) %></a>
       </span>
     <% end %>
     <% if have_after %>
       <%
          target_page = page_num + 1
-         target_num = ((target_page - 1) * @topic_view.chunk_size) + 1
+         # target_num = ((target_page - 1) * @topic_view.chunk_size) + 1
       %>
       <span itemprop='url' class="next">
-        <a class="btn btn-primary" href="<%= topic.relative_url(target_num) %>?amp#top"
-        rel="next" itemprop="name"><%= t(:next_page) %></a>
+        <a class="btn btn-primary" href="<%= topic.relative_url %>?amp&page=<%= target_page %>#top"
+          rel="next" itemprop="name"><%= t(:next_page) %></a>
       </span>
     <% end %>
+    <hr>
+    <span itemprop="url">
+      <a class="btn" href="<%= topic.relative_url(@topic_view.posts.last.post_number) %>"
+         rel="alternate"><%= t(:nojs_return_nav) %></a>
+    </span>
   </div>
 <% end %>
-
 <% content_for :head do %>
   <%= auto_discovery_link_tag(@topic_view, {action: :feed, slug: topic.slug, topic_id: topic.id}, title: t('rss_posts_in_topic', topic: @topic_view.title), type: 'application/rss+xml') %>
   <%= crawlable_meta_data(title: @topic_view.title,
                           description: @topic_view.summary,
                           image: @topic_view.image_url) %>
 <% end %>
-
 <% content_for(:title) { "#{@topic_view.page_title}" } %>

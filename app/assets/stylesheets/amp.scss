@@ -1,12 +1,19 @@
 // The compiled form of this file may be no larger than 50,000 bytes.
 // If it is, the compiler will throw an error
-
-@import "common/foundation/variables";
 $amp: 1;
 
+@import "common/foundation/variables";
 @import "common/foundation/mixins";
 
 @import "vendor/font_awesome/_variables";
+@import "vendor/font_awesome/_mixins";
+@import "vendor/font_awesome/_core";
+//@import "vendor/font_awesome/_icons";
+.#{$fa-css-prefix}-lock:before { content: $fa-var-lock; }
+.#{$fa-css-prefix}-eye-slash:before { content: $fa-var-eye-slash; }
+.#{$fa-css-prefix}-thumb-tack:before { content: $fa-var-thumb-tack; }
+.#{$fa-css-prefix}-envelope:before { content: $fa-var-envelope; }
+
 @import "common/components/buttons";
 @import "common/foundation/base";
 @import "common/base/onebox";
@@ -15,22 +22,27 @@ $amp: 1;
 .d-header {
   width: 100%;
   background-color: $header_background;
+  color: $header_primary;
+  a, a:visited {
+    color: $tertiary;
+    font-weight: bold;
+  }
   box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.25);
   z-index: 1000;
   padding-top: 3px;
   height: 60px;
 }
+
+$total-width: $topic-body-width + $topic-body-width-padding + $topic-avatar-width;
+
 .wrap {
   margin-left:auto;
   margin-right:auto;
   padding:0 8px;
-  max-width: $topic-body-width;
+  max-width: $total-width;
 }
 .clearfix, hr {
   clear:both;
-}
-.cooked {
-  max-width: $topic-body-width;
 }
 footer {
   margin-top: 30px;
@@ -38,12 +50,15 @@ footer {
     margin-right: 10px;
   }
 }
+
 header {
   .return-link {
     float: right;
     margin-top: 5px;
-    amp-img {
+    amp-img,.setheight {
       display: inline-block;
+      height: 32px;
+      vertical-align: middle;
     }
   }
   .home-logo {
@@ -51,15 +66,6 @@ header {
   }
   .contents {
     margin-top: 5px;
-  }
-}
-
-@media (min-width: $topic-body-width + 150px) {
-  .byline time, .byline .post-num {
-    float:right;
-  }
-  .byline time {
-    margin-left: 10px;
   }
 }
 
@@ -78,16 +84,58 @@ amp-img {
   vertical-align: middle;
 }
 
-// ab
-
-/*
-header{margin-bottom: 15px;}
-.d-header #site-logo {max-height: 40px;}
-.d-header .contents.clearfix{margin: 8px 0;}
-.wrap {max-width: 1110px;}
-aside.quote{margin:1em 0;}
-aside.quote .title,blockquote,.onebox-result,aside.onebox {
-  @include post-aside;
+.topic-avatar {
+  width: $topic-avatar-width;
+  position: relative;
+  z-index: 2;
+}
+.topic-body {
+  padding-left: $topic-body-width-padding;
+  width: $topic-body-width;
+}
+.topic-avatar,.topic-body {
+  float: left;
+  margin-top: 15px;
+}
+.byline time, .byline .post-num {
+  float:right;
+}
+.byline time {
+  margin-left: 10px;
+}
+article.nojs-post {
+  hr {
+    clear: both;
+  }
+}
+.avatar-wrapper {
+  display: inline-block;
+  height: 45px;
+  width: 45px;
+}
+.av-byline {
+  display: none;
+}
+.av-left {
+  display: block;
+}
+@media (max-width: $total-width + 50px) {
+  .topic-body {
+    float: none;
+    width: initial;
+    max-width: $topic-body-width;
+  }
+  .topic-avatar {
+    display: none;
+  }
+  .av-byline {
+    display: inline-block;
+  }
+  .av-left {
+    display: none;
+  }
 }
 
-*/
+@import "plugins";
+//@import "plugins_amp"; // TODO
+

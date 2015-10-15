@@ -118,6 +118,9 @@ en:
   not_found: "The requested URL or resource could not be found."
   invalid_access: "You are not permitted to view the requested resource."
   read_only_mode_enabled: "The site is in read only mode. Interactions are disabled."
+  nojs_return_header: "Use Interactive Version"
+  nojs_return_nav: "Use Interactive Version"
+  nojs_expl: "You're using the noscript version of Discourse. You can't reply or interact in this view, and posts are not marked as read."
 
   too_many_replies:
     one: "We're sorry, but new users are temporarily limited to 1 reply in the same topic."

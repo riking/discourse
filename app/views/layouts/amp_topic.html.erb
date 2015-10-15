@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html amp>
+<html amp class="nojs">
 <% @amp_layout = true %>
 <head>
   <meta charset="utf-8">
@@ -17,7 +17,7 @@
 
   <%= amp_render_extended_components %>
 
-  <style amp-custom><%= DiscourseStylesheets.inline_style_content :amp %></style>
+  <style amp-custom><%= amp_render_styles %></style>
 </head>
 <body>
   <header class="d-header">
@@ -31,11 +31,15 @@
             <h2 id='site-text-logo'><%= SiteSetting.title %></h2>
           <%- end %>
         </a>
-        <% if current_user %>
-          <a href="<%= no_amp_url %>" class="return-link">
+        <a class="return-link" href="<%= @topic_view.topic.relative_url(@topic_view.posts.last.post_number) %>"
+           rel="alternate">
+          <%= t(:nojs_return_header) %>
+          <% if current_user %>
             <amp-img src="<%= current_user.avatar_url_for(32) %>" width="32" height="32"></amp-img>
-          </a>
-        <% end %>
+          <% else %>
+            <div class="setheight"></div>
+          <% end %>
+        </a>
         <div class="clearfix"></div>
       </div>
     </div>

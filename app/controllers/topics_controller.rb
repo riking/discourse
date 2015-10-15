@@ -51,12 +51,6 @@ class TopicsController < ApplicationController
     opts = params.slice(:username_filters, :filter, :page, :post_number, :show_deleted)
     username_filters = opts[:username_filters]
 
-    # Translate post numbers into pages if lightweight view
-    if params.key?(:amp) && (params[:post_number].to_i % TopicView.chunk_size) == 1
-      opts.delete(:post_number)
-      opts[:page] = params[:page] = ((params[:post_number].to_i - 1) / TopicView.chunk_size) + 1
-    end
-
     opts[:slow_platform] = true if slow_platform? && !params.key?(:amp)
     opts[:username_filters] = username_filters.split(',') if username_filters.is_a?(String)
 
