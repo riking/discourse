@@ -76,7 +76,7 @@ class DirectoryItem < ActiveRecord::Base
                     u.id user_id,
                     SUM(CASE WHEN p.id IS NOT NULL AND t.id IS NOT NULL AND ua.action_type = :was_liked_type THEN 1 ELSE 0 END) likes_received,
                     SUM(CASE WHEN p.id IS NOT NULL AND t.id IS NOT NULL AND ua.action_type = :like_type THEN 1 ELSE 0 END) likes_given,
-                    COALESCE((SELECT COUNT(topic_id) FROM topic_views AS v WHERE v.user_id = u.id AND v.viewed_at >= :since), 0) topics_entered,
+                    COALESCE((SELECT SUM(count) FROM topic_view_user_rollups AS v WHERE v.user_id = u.id AND v.viewed_at >= :since), 0) topics_entered,
                     COALESCE((SELECT COUNT(id) FROM user_visits AS uv WHERE uv.user_id = u.id AND uv.visited_at >= :since), 0) days_visited,
                     COALESCE((SELECT SUM(posts_read) FROM user_visits AS uv2 WHERE uv2.user_id = u.id AND uv2.visited_at >= :since), 0) posts_read,
                     SUM(CASE WHEN t2.id IS NOT NULL AND ua.action_type = :new_topic_type THEN 1 ELSE 0 END) topic_count,

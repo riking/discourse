@@ -108,8 +108,8 @@ class TopTopic < ActiveRecord::Base
   end
 
   def self.update_views_count_for(period)
-    sql = "SELECT topic_id, COUNT(*) AS count
-             FROM topic_views
+    sql = "SELECT topic_id, SUM(count) AS count
+             FROM topic_view_topic_rollups
              WHERE viewed_at >= :from
              GROUP BY topic_id"
 

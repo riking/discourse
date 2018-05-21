@@ -138,11 +138,11 @@ class TrustLevel3Requirements
   end
 
   def topics_viewed_query
-    TopicViewItem.where(user_id: @user.id).select('topic_id')
+    TopicViewUserRollup.where(user_id: @user.id)
   end
 
   def topics_viewed
-    topics_viewed_query.where('viewed_at > ?', time_period.days.ago).count
+    topics_viewed_query.where('viewed_at > ?', time_period.days.ago).pluck(:count).sum
   end
 
   def min_topics_viewed

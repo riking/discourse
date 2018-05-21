@@ -125,7 +125,7 @@ end
 #  user_id       :integer
 #  created_at    :datetime         not null
 #  updated_at    :datetime         not null
-#  ip_address    :inet             not null
+#  ip_address    :inet
 #
 # Indexes
 #

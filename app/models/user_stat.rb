@@ -23,10 +23,11 @@ class UserStat < ActiveRecord::Base
     #  we also ensure we only touch the table if data changes
 
     # Update denormalized topics_entered
+    # TODO do this in the rollup code
     exec_sql "UPDATE user_stats SET topics_entered = X.c
              FROM
-            (SELECT v.user_id, COUNT(topic_id) AS c
-             FROM topic_views AS v
+            (SELECT v.user_id, SUM(count) AS c
+             FROM topic_view_user_rollups AS v
              WHERE v.user_id IN (
                 SELECT u1.id FROM users u1 where u1.last_seen_at > :seen_at
              )
