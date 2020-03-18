@@ -14,6 +14,10 @@ class WordWatcher
     WatchedWord.where(action: WatchedWord.actions[action.to_sym]).exists?
   end
 
+  def self.never_matching
+    '(?!)'
+  end
+
   def self.get_cached_words(action)
     Discourse.cache.fetch(word_matcher_regexp_key(action), expires_in: 1.day) do
       words_for_action(action).presence
@@ -26,16 +30,21 @@ class WordWatcher
   def self.word_matcher_regexp(action, raise_errors: false)
     words = get_cached_words(action)
     if words
-      words = words.map do |w|
-        word = word_to_regexp(w)
-        word = "(#{word})" if SiteSetting.watched_words_regular_expressions?
-        word
+      with_boundary = words.filter { |w| w.word_boundary }.map(&:regexp).join('|')
+      without_boundary = words.filter { |w| !w.word_boundary }.map(&:regexp).join('|')
+
+      with_boundary_present = with_boundary.present?
+      with_boundary = "(?:\\W|^)(#{with_boundary})(?=\\W|$)"
+      if with_boundary_present && without_boundary.present?
+        regexp = "((#{without_boundary})|#{with_boundary})"
+      elsif with_boundary_present
+        regexp = with_boundary
+      elsif without_boundary.present?
+        regexp = "(#{without_boundary})"
+      else
+        regexp = WordWatcher.never_matching
       end
-      regexp = words.join('|')
-      if !SiteSetting.watched_words_regular_expressions?
-        regexp = "(#{regexp})"
-        regexp = "(?:\\W|^)#{regexp}(?=\\W|$)"
-      end
+
       Regexp.new(regexp, Regexp::IGNORECASE)
     end
   rescue RegexpError => e
