@@ -11,6 +11,14 @@ class WatchedWord < ActiveRecord::Base
     )
   end
 
+  def self.mode
+    @mode ||= Enum.new(
+      glob: 1,
+      literal: 2,
+      regex: 3
+    )
+  end
+
   MAX_WORDS_PER_ACTION = 1000
 
   before_validation do
