@@ -16,7 +16,7 @@ class WatchedWord < ActiveRecord::Base
     @modes ||= Enum.new(
       glob: 1,
       literal: 2,
-      regex: 3
+      regexp: 3
     )
   end
 
@@ -32,7 +32,7 @@ class WatchedWord < ActiveRecord::Base
     if WatchedWord.where(action: record.action).count >= MAX_WORDS_PER_ACTION
       record.errors.add(:word, :too_many)
     end
-    if record.mode == WatchedWord.modes[:regex]
+    if record.mode == WatchedWord.modes[:regexp]
       begin
         Regexp.new(val)
       rescue RegexpError
@@ -56,19 +56,27 @@ class WatchedWord < ActiveRecord::Base
       w.strip.squeeze('*')
     elsif mode == WatchedWord.modes[:literal]
       w.strip
-    elsif mode == WatchedWord.modes[:regex]
+    elsif mode == WatchedWord.modes[:regexp]
       w.start_with?("(?-mix:") ? w[7..-2] : w
     end
   end
 
+  def self.word_boundary_default
+    SiteSetting.watched_words_regular_expressions? ? false : true
+  end
+
   def self.create_or_update_word(params)
-    new_word = normalize_word(params[:word])
+    mode = SiteSetting.watched_words_regular_expressions? ? WatchedWord.modes[:regexp] : WatchedWord.modes[:glob]
+    mode = params[:mode] if params[:mode]
+    mode = WatchedWord.modes[params[:mode_key].to_sym] if params[:mode_key]
+
+    new_word = normalize_word(params[:word], mode)
     w = WatchedWord.where("word ILIKE ?", new_word).first || WatchedWord.new(word: new_word)
     w.action_key = params[:action_key] if params[:action_key]
     w.action = params[:action] if params[:action]
-    w.mode_key = params[:mode_key] if params[:mode_key]
-    w.mode = params[:mode] if params[:mode]
+    w.mode = mode
     w.replacement = params[:replacement]
+    w.word_boundary = (params[:word_boundary].nil? ? WatchedWord.word_boundary_default : params[:word_boundary])
     w.save
     w
   end
@@ -82,13 +90,17 @@ class WatchedWord < ActiveRecord::Base
   end
 
   def regexp
-    case self.mode
+    WatchedWord.word_to_regexp(self.word, self.mode)
+  end
+
+  def self.word_to_regexp(word, mode)
+    case mode
     when WatchedWord.modes[:literal]
       Regexp.escape(word)
-    when WatchedWord.modes[:regex]
+    when WatchedWord.modes[:regexp]
       word
     when WatchedWord.modes[:glob]
-      self.word.split('').map { |char|
+      word.split('').map { |char|
         case char
         when '?'
           '.'
