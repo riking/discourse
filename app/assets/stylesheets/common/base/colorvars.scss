@@ -1,0 +1,48 @@
+
+html {
+  --primary: #{$primary};
+  --primary-very-low: #{$primary-very-low};
+  --primary-low: #{$primary-low};
+  --primary-low-mid: #{$primary-low-mid};
+  --primary-medium: #{$primary-medium};
+  --primary-high: #{$primary-high};
+  --primary-very-high: #{$primary-very-high};
+
+  --header-primary: #{$header-primary};
+  --header-primary-low: #{$header-primary-low};
+  --header-primary-low-mid: #{$header-primary-low-mid};
+  --header-primary-medium: #{$header-primary-medium};
+  --header-primary-high: #{$header-primary-high};
+  --header-primary-very-high: #{$header-primary-very-high};
+
+  --secondary: #{$secondary};
+  --secondary-low: #{$secondary-low};
+  --secondary-medium: #{$secondary-medium};
+  --secondary-high: #{$secondary-high};
+  --secondary-very-high: #{$secondary-very-high};
+
+  --tertiary: #{$tertiary};
+  --tertiary-low: #{$tertiary-low};
+  --tertiary-medium: #{$tertiary-medium};
+  --tertiary-high: #{$tertiary-high};
+
+  --quaternary: #{$quaternary};
+
+  --highlight: #{$highlight};
+  --highlight-low: #{$highlight-low};
+  --highlight-medium: #{$highlight-medium};
+  --highlight-high: #{$highlight-high};
+
+  --danger: #{$danger};
+  --danger-low: #{$danger-low};
+  --danger-medium: #{$danger-medium};
+
+  --success: #{$success};
+  --success-low: #{$success-low};
+  --success-medium: #{$success-medium};
+
+  --love: #{$love};
+  --love-low: #{$love-low};
+
+  --wiki: #{$wiki};
+}
