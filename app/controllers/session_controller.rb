@@ -401,10 +401,10 @@ class SessionController < ApplicationController
   def forgot_password
     params.require(:login)
 
-    RateLimiter.new(nil, "forgot-password-hr-#{request.remote_ip}", 6, 1.hour).performed!
-    RateLimiter.new(nil, "forgot-password-min-#{request.remote_ip}", 3, 1.minute).performed!
+    RateLimiter.new(nil, "forgot-password-hr-#{request.remote_ip}", 3, 1.hour).performed!
+    RateLimiter.new(nil, "forgot-password-min-#{request.remote_ip}", 2, 1.minute).performed!
 
-    RateLimiter.new(nil, "forgot-password-login-day-#{params[:login].to_s[0..100]}", 3, 24.hours).performed!
+    RateLimiter.new(nil, "forgot-password-login-day-#{params[:login].to_s[0..100]}", 6, 24.hours).performed!
     RateLimiter.new(nil, "forgot-password-login-short-#{params[:login].to_s[0..100]}", 1, 5.minutes).performed!
 
     user = User.find_by_username_or_email(params[:login])
