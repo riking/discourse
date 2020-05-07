@@ -404,12 +404,13 @@ class SessionController < ApplicationController
     RateLimiter.new(nil, "forgot-password-hr-#{request.remote_ip}", 6, 1.hour).performed!
     RateLimiter.new(nil, "forgot-password-min-#{request.remote_ip}", 3, 1.minute).performed!
 
-    RateLimiter.new(nil, "forgot-password-login-hour-#{params[:login].to_s[0..100]}", 12, 1.hour).performed!
-    RateLimiter.new(nil, "forgot-password-login-min-#{params[:login].to_s[0..100]}", 3, 1.minute).performed!
+    RateLimiter.new(nil, "forgot-password-login-day-#{params[:login].to_s[0..100]}", 3, 24.hours).performed!
+    RateLimiter.new(nil, "forgot-password-login-short-#{params[:login].to_s[0..100]}", 1, 5.minutes).performed!
 
     user = User.find_by_username_or_email(params[:login])
     user_presence = user.present? && user.human? && !user.staged
     if user_presence
+      RateLimiter.new(nil, "forgot-password-user-day-#{user.id}", 3, 24.hours).performed! unless SiteSetting.hide_email_address_taken
       email_token = user.email_tokens.create(email: user.email)
       Jobs.enqueue(:critical_user_email, type: :forgot_password, user_id: user.id, email_token: email_token.token)
     end
