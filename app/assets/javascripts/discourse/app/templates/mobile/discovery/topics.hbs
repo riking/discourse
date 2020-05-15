@@ -1,36 +1,36 @@
-{{#discovery-topics-list model=model refresh=(action "refresh") incomingCount=topicTrackingState.incomingCount as |discoveryTopicList|}}
-  {{#if top}}
+{{#discovery-topics-list model=this.model refresh=(action "refresh") incomingCount=this.topicTrackingState.incomingCount as |discoveryTopicList|}}
+  {{#if this.top}}
     <div class="top-lists">
-      {{period-chooser period=period action=(action "changePeriod") fullDay=false}}
+      {{period-chooser period=this.period action=(action "changePeriod") fullDay=false}}
     </div>
   {{else}}
-    {{#if topicTrackingState.hasIncoming}}
+    {{#if this.topicTrackingState.hasIncoming}}
       <a href {{action "showInserted"}} class="alert alert-info clickable">
-        {{count-i18n key="topic_count_" suffix=topicTrackingState.filter count=topicTrackingState.incomingCount}}
+        {{count-i18n key="topic_count_" suffix=this.topicTrackingState.filter count=this.topicTrackingState.incomingCount}}
       </a>
     {{/if}}
   {{/if}}
 
-  {{#if hasTopics}}
+  {{#if this.hasTopics}}
     {{topic-list
       highlightLastVisited=true
       showPosters=true
-      hideCategory=model.hideCategory
-      order=order
-      ascending=ascending
-      topics=model.topics
-      expandGloballyPinned=expandGloballyPinned
-      expandAllPinned=expandAllPinned
+      hideCategory=this.model.hideCategory
+      order=this.order
+      ascending=this.ascending
+      topics=this.model.topics
+      expandGloballyPinned=this.expandGloballyPinned
+      expandAllPinned=this.expandAllPinned
       scrollOnLoad=true
       onScroll=discoveryTopicList.saveScrollPosition
-      category=category}}
+      category=this.category}}
   {{/if}}
 {{/discovery-topics-list}}
 
 <footer class="topic-list-bottom">
-  {{conditional-loading-spinner condition=model.loadingMore}}
-  {{#if allLoaded}}
-    {{#if showDismissRead}}
+  {{conditional-loading-spinner condition=this.model.loadingMore}}
+  {{#if this.allLoaded}}
+    {{#if this.showDismissRead}}
       {{d-button
         class="btn-default dismiss-read"
         id="dismiss-topics"
@@ -38,7 +38,7 @@
         title="topics.bulk.dismiss_tooltip"
         label="topics.bulk.dismiss_button"}}
     {{/if}}
-    {{#if showResetNew}}
+    {{#if this.showResetNew}}
       {{d-button
         class="btn-default dismiss-read"
         id="dismiss-new"
@@ -47,12 +47,12 @@
         label="topics.bulk.dismiss_new"}}
     {{/if}}
 
-    {{#footer-message education=footerEducation message=footerMessage}}
-      {{#if latest}}
-        {{#if canCreateTopicOnCategory}}<a href {{action "createTopic"}}>{{i18n "topic.suggest_create_topic"}}</a>{{/if}}
-      {{else if top}}
+    {{#footer-message education=this.footerEducation message=this.footerMessage}}
+      {{#if this.latest}}
+        {{#if this.canCreateTopicOnCategory}}<a href {{action "createTopic"}}>{{i18n "topic.suggest_create_topic"}}</a>{{/if}}
+      {{else if this.top}}
         {{#link-to "discovery.categories"}}{{i18n "topic.browse_all_categories"}}{{/link-to}}, {{#link-to "discovery.latest"}}{{i18n "topic.view_latest_topics"}}{{/link-to}} {{i18n "or"}} {{i18n "filters.top.other_periods"}}
-        {{top-period-buttons period=period action=(action "changePeriod")}}
+        {{top-period-buttons period=this.period action=(action "changePeriod")}}
       {{else}}
         {{#link-to "discovery.categories"}} {{i18n "topic.browse_all_categories"}}{{/link-to}} {{i18n "or"}} {{#link-to "discovery.latest"}}{{i18n "topic.view_latest_topics"}}{{/link-to}}
       {{/if}}

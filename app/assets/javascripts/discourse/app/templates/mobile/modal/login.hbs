@@ -1,17 +1,17 @@
-{{#login-modal screenX=lastX screenY=lastY loginName=loginName loginPassword=loginPassword secondFactorToken=secondFactorToken action=(action "login")}}
+{{#login-modal screenX=this.lastX screenY=this.lastY loginName=this.loginName loginPassword=this.loginPassword secondFactorToken=this.secondFactorToken action=(action "login")}}
   {{plugin-outlet name="login-before-modal-body" tagName=""}}
-  {{#d-modal-body title="login.title" class=modalBodyClasses}}
-    {{#if showLoginButtons}}
+  {{#d-modal-body title="login.title" class=this.modalBodyClasses}}
+    {{#if this.showLoginButtons}}
       {{login-buttons
-        showLoginWithEmailLink=showLoginWithEmailLink
-        processingEmailLink=processingEmailLink
+        showLoginWithEmailLink=this.showLoginWithEmailLink
+        processingEmailLink=this.processingEmailLink
         emailLogin=(action "emailLogin")
         externalLogin=(action "externalLogin")}}
     {{/if}}
 
-    {{#if canLoginLocal}}
+    {{#if this.canLoginLocal}}
       <form id="login-form" method="post">
-        <div id="credentials" class={{credentialsClass}}>
+        <div id="credentials" class={{this.credentialsClass}}>
           <table>
             <tbody>
               <tr>
@@ -19,7 +19,7 @@
                   <label for="login-account-name">{{i18n "login.username"}}</label>
                 </td>
                 <td>
-                  {{text-field value=loginName type="email" placeholderKey="login.email_placeholder" id="login-account-name" autocorrect="off" autocapitalize="off" disabled=showSecondFactor}}
+                  {{text-field value=this.loginName type="email" placeholderKey="login.email_placeholder" id="login-account-name" autocorrect="off" autocapitalize="off" disabled=this.showSecondFactor}}
                 </td>
               </tr>
               <tr>
@@ -27,7 +27,7 @@
                   <label for="login-account-password">{{i18n "login.password"}}</label>
                 </td>
                 <td>
-                  {{text-field value=loginPassword type="password" id="login-account-password" maxlength="200" disabled=showSecondFactor}}
+                  {{text-field value=this.loginPassword type="password" id="login-account-password" maxlength="200" disabled=this.showSecondFactor}}
                 </td>
               </tr>
               <tr>
@@ -40,23 +40,23 @@
           </table>
         </div>
         {{#second-factor-form
-          secondFactorMethod=secondFactorMethod
-          secondFactorToken=secondFactorToken
-          class=secondFactorClass
-          backupEnabled=backupEnabled
+          secondFactorMethod=this.secondFactorMethod
+          secondFactorToken=this.secondFactorToken
+          class=this.secondFactorClass
+          backupEnabled=this.backupEnabled
           isLogin=true}}
-          {{#if showSecurityKey}}
+          {{#if this.showSecurityKey}}
             {{#security-key-form
-              allowedCredentialIds=securityKeyAllowedCredentialIds
-              challenge=securityKeyChallenge
-              showSecurityKey=showSecurityKey
-              showSecondFactor=showSecondFactor
-              secondFactorMethod=secondFactorMethod
-              otherMethodAllowed=otherMethodAllowed
+              allowedCredentialIds=this.securityKeyAllowedCredentialIds
+              challenge=this.securityKeyChallenge
+              showSecurityKey=this.showSecurityKey
+              showSecondFactor=this.showSecondFactor
+              secondFactorMethod=this.secondFactorMethod
+              otherMethodAllowed=this.otherMethodAllowed
               action=(action "authenticateSecurityKey")}}
             {{/security-key-form}}
           {{else}}
-            {{second-factor-input value=secondFactorToken inputId="login-second-factor" secondFactorMethod=secondFactorMethod backupEnabled=backupEnabled}}
+            {{second-factor-input value=this.secondFactorToken inputId="login-second-factor" secondFactorMethod=this.secondFactorMethod backupEnabled=this.backupEnabled}}
           {{/if}}
         {{/second-factor-form}}
       </form>
@@ -65,16 +65,16 @@
   {{/d-modal-body}}
 
   <div class="modal-footer">
-    {{#if canLoginLocal}}
-      {{#unless showSecurityKey }}
+    {{#if this.canLoginLocal}}
+      {{#unless this.showSecurityKey}}
         {{d-button action=(action "login")
           icon="unlock"
-          label=loginButtonLabel
-          disabled=loginDisabled
+          label=this.loginButtonLabel
+          disabled=this.loginDisabled
           class="btn-large btn-primary"}}
       {{/unless}}
 
-      {{#if showSignupLink}}
+      {{#if this.showSignupLink}}
         {{#d-button class="btn-large" id="new-account-link" action=(route-action "showCreateAccount")}}
           {{i18n "create_account.title"}}
         {{/d-button}}

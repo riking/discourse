@@ -1,6 +1,6 @@
 {{#discovery-categories refresh=(action "refresh")}}
-  {{component categoryPageStyle
-              categories=model.categories
-              latestTopicOnly=latestTopicOnly
-              topics=model.topics}}
+  {{component this.categoryPageStyle
+              categories=this.model.categories
+              latestTopicOnly=this.latestTopicOnly
+              topics=this.model.topics}}
 {{/discovery-categories}}

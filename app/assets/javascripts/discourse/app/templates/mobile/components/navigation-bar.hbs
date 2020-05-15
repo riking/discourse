@@ -1,16 +1,16 @@
 <li class="navigation-toggle">
   <a href {{action "toggleDrop"}} class="toggle-link">
-    {{selectedNavItem.displayName}}
+    {{this.selectedNavItem.displayName}}
     {{d-icon "caret-down"}}
   </a>
 </li>
-{{#if expanded}}
+{{#if this.expanded}}
   <ul class="drop">
-    {{#each navItems as |navItem|}}
-      {{navigation-item content=navItem filterMode=filterMode category=category}}
+    {{#each this.navItems as |navItem|}}
+      {{navigation-item content=navItem filterMode=this.filterMode category=this.category}}
     {{/each}}
-    {{#each connectors as |c|}}
-      {{plugin-connector connector=c class=c.classNames tagName="li" args=(hash category=category filterMode=filterMode)}}
+    {{#each this.connectors as |c|}}
+      {{plugin-connector connector=c class=c.classNames tagName="li" args=(hash category=this.category filterMode=this.filterMode)}}
     {{/each}}
   </ul>
 {{/if}}
