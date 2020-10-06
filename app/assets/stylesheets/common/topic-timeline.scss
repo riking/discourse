@@ -274,3 +274,37 @@
     }
   }
 }
+
+.minichat-history {
+  border: 1px solid var(--primary-low);
+  background-color: var(--blend-primary-secondary-5);
+  .chat-stream {
+    margin: 6px;
+  }
+  .chat-message {
+    margin-bottom: 0.6em;
+    white-space: pre-wrap;
+  }
+  .chat-meta-data {
+    font-weight: bold;
+    .avatar {
+      margin-right: 4px;
+    }
+    .chat-user-name, .chat-timestamp {
+      margin-right: 0.6em;
+    }
+    .chat-timestamp {
+      color: var(--primary-med-or-secondary-med);
+    }
+  }
+  .chat-composer {
+    padding: 8px;
+    border-top: 1px solid var(--primary-low);
+    input {
+      width: calc(100% - 32px);
+      border: 1px solid var(--primary-low);
+      background-color: var(--secondary);
+      padding: 4px;
+    }
+  }
+}

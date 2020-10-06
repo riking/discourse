@@ -188,6 +188,24 @@ registerButton("flag", (attrs) => {
   }
 });
 
+registerButton("chat-count", (attrs) => {
+  return {
+    className: "button-count show-chat",
+    contents: h("span", "9"),
+    action: "showChat",
+  };
+});
+
+registerButton("chat", (attrs) => {
+  return {
+    action: "showChat",
+    icon: "comment",
+    className: "show-chat",
+    before: "chat-count",
+  };
+});
+
+
 registerButton("edit", (attrs) => {
   if (attrs.canEdit) {
     return {

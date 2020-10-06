@@ -188,6 +188,7 @@ basic:
       - bookmark
       - admin
       - reply
+      - chat
   post_menu_hidden_items:
     client: true
     type: list

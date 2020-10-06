@@ -426,6 +426,61 @@ createWidget("post-contents", {
       );
     }
 
+    const fakeMessages = [
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do",
+      "eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut",
+      "enim ad minim veniam, quis nostrud exercitation ullamco",
+      "laboris nisi",
+      "ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit\nenim ad minim veniam, quis nostrud exercitation ullamco",
+      "esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non",
+      "proident, sunt in culpa qui officia deserunt mollit anim id est",
+      "laborum."
+    ];
+    const fakeUsers = [
+      {
+        username: "rikingreelw",
+        template: "/letter_avatar_proxy/v4/letter/r/a587f6/{size}.png"
+      },
+      {
+        username: "kanepyork",
+        template: "/user_avatar/localhost/kanepyork/{size}/1_2.png"
+      },
+      {
+        username: "EvilTrout",
+        template: "/letter_avatar_proxy/v4/letter/e/50afbb/{size}.png"
+      }
+    ];
+    let fakeTime = 1601939507;
+    const makeChatMessage = () => {
+      const rand = Math.random() * (fakeMessages.length * fakeUsers.length);
+      const msg = fakeMessages[rand % fakeMessages.length | 0],
+        user = fakeUsers[(rand / fakeMessages.length) | 0];
+      const ts = moment(fakeTime).format(I18n.t("dates.time"));
+
+      fakeTime = fakeTime + Math.random() * 360 * 1000;
+      return h("div.chat-message", [
+        h("div.chat-meta-data", [
+          avatarImg("small", user),
+          h("span.chat-user-name", [user.username]),
+          h("span.chat-timestamp", [ts])
+        ]),
+        h("div.chat-message-body", [msg])
+      ]);
+    };
+    result.push(
+      h("section.minichat-history", [
+        h(
+          "div.chat-stream",
+          [0, 1, 2, 3, 4, 5, 6, 7, 8].map(() => {
+            return makeChatMessage();
+          })
+        ),
+        h("div.chat-composer", [
+          h("input", { placeholder: "Write your message" })
+        ])
+      ])
+    );
+
     return result;
   },
 
