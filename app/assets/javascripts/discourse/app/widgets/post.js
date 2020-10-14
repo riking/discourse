@@ -431,29 +431,44 @@ createWidget("post-contents", {
       "eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut",
       "enim ad minim veniam, quis nostrud exercitation ullamco",
       "laboris nisi",
-      "ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit\nenim ad minim veniam, quis nostrud exercitation ullamco",
+      "ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit enim ad minim veniam, quis nostrud exercitation ullamco",
       "esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non",
       "proident, sunt in culpa qui officia deserunt mollit anim id est",
-      "laborum."
+      "laborum.",
+      "Eiusmod cow veniam laborum labore. Pork belly laboris kevin commodo aliquip leberkas quis venison ground round drumstick boudin. Pastrami drumstick short loin ut, turkey eu anim tri-tip jowl enim cillum buffalo ipsum hamburger. Picanha est corned beef ut salami capicola porchetta ground round. Salami frankfurter ham, do pancetta culpa ut cupim nostrud exercitation labore est.",
+      "Hello, 世界",
+      "the world needs to see our friendship"
     ];
     const fakeUsers = [
       {
-        username: "rikingreelw",
-        template: "/letter_avatar_proxy/v4/letter/r/a587f6/{size}.png"
+        username: "sayaka",
+        template: "https://avatars.discourse-cdn.com/v4/letter/s/a587f6/{size}.png",
       },
       {
-        username: "kanepyork",
-        template: "/user_avatar/localhost/kanepyork/{size}/1_2.png"
+        username: "Anonymous",
+        template: "https://avatars.discourse-cdn.com/v4/letter/a/e36b37/{size}.png",
       },
       {
-        username: "EvilTrout",
-        template: "/letter_avatar_proxy/v4/letter/e/50afbb/{size}.png"
+        username: "Anonymous",
+        template: "https://avatars.discourse-cdn.com/v4/letter/a/bbce88/{size}.png",
+      },
+      {
+        username: "Anonymous",
+        template: "https://avatars.discourse-cdn.com/v4/letter/a/ac91a4/{size}.png",
+      },
+      {
+        username: "homura",
+        template: "https://avatars.discourse-cdn.com/v4/letter/h/f07891/{size}.png",
+      },
+      {
+        username: "jkaname",
+        template: "https://avatars.discourse-cdn.com/v4/letter/j/258eb7/{size}.png",
       }
     ];
     let fakeTime = 1601939507;
     const makeChatMessage = () => {
       const rand = Math.random() * (fakeMessages.length * fakeUsers.length);
-      const msg = fakeMessages[rand % fakeMessages.length | 0],
+      const msg = fakeMessages[(rand % fakeMessages.length) | 0],
         user = fakeUsers[(rand / fakeMessages.length) | 0];
       const ts = moment(fakeTime).format(I18n.t("dates.time"));
 
